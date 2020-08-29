@@ -635,6 +635,7 @@ namespace ShareX
                 epFFmpeg.Args = "-i %input -c:v libx264 -preset medium -crf 23 -pix_fmt yuv420p -movflags +faststart -y %output";
                 epFFmpeg.OutputExtension = "mp4";
                 epFFmpeg.DeleteInputFile = true;
+                epFFmpeg.Extensions = "mov";
                 taskSettings.ExternalPrograms.Add(epFFmpeg);
             }
 
@@ -646,6 +647,7 @@ namespace ShareX
                 epFFmpeg.Args = "-i %input -lavfi \"palettegen = stats_mode = full[palette],[0:v][palette]paletteuse = dither = sierra2_4a\" -y %output";
                 epFFmpeg.OutputExtension = "gif";
                 epFFmpeg.DeleteInputFile = true;
+                epFFmpeg.Extensions = "mov";
                 taskSettings.ExternalPrograms.Add(epFFmpeg);
             }
         }
