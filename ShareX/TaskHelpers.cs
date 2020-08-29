@@ -619,9 +619,9 @@ namespace ShareX
             if (taskSettings.ExternalPrograms == null)
             {
                 taskSettings.ExternalPrograms = new List<ExternalProgram>();
+                AddExternalProgramFromRegistry(taskSettings, "Edit in Paint", "mspaint.exe");
             }
 
-            AddExternalProgramFromRegistry(taskSettings, "Edit in Paint", "mspaint.exe");
             AddExternalProgramFromRegistry(taskSettings, "Edit in Paint.NET", "PaintDotNet.exe");
             AddExternalProgramFromRegistry(taskSettings, "Edit in Adobe Photoshop", "Photoshop.exe");
             AddExternalProgramFromRegistry(taskSettings, "Edit in IrfanView", "i_view32.exe");
