@@ -621,11 +621,11 @@ namespace ShareX
                 taskSettings.ExternalPrograms = new List<ExternalProgram>();
             }
 
-            AddExternalProgramFromRegistry(taskSettings, "Paint", "mspaint.exe");
-            AddExternalProgramFromRegistry(taskSettings, "Paint.NET", "PaintDotNet.exe");
-            AddExternalProgramFromRegistry(taskSettings, "Adobe Photoshop", "Photoshop.exe");
-            AddExternalProgramFromRegistry(taskSettings, "IrfanView", "i_view32.exe");
-            AddExternalProgramFromRegistry(taskSettings, "XnView", "xnview.exe");
+            AddExternalProgramFromRegistry(taskSettings, "Edit in Paint", "mspaint.exe");
+            AddExternalProgramFromRegistry(taskSettings, "Edit in Paint.NET", "PaintDotNet.exe");
+            AddExternalProgramFromRegistry(taskSettings, "Edit in Adobe Photoshop", "Photoshop.exe");
+            AddExternalProgramFromRegistry(taskSettings, "Edit in IrfanView", "i_view32.exe");
+            AddExternalProgramFromRegistry(taskSettings, "Edit in XnView", "xnview.exe");
 
             string strConvertToMp4 = "Convert to MP4";
             if (!taskSettings.ExternalPrograms.Exists(x => x.Name == strConvertToMp4))
