@@ -23,7 +23,7 @@ AppVerName={#MyAppName} {#MyAppVersion}
 AppVersion={#MyAppVersion}
 ArchitecturesAllowed=x86 x64 ia64 arm64
 ArchitecturesInstallIn64BitMode=x64 ia64
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DirExistsWarning=no
 DisableStartupPrompt=yes
@@ -35,9 +35,10 @@ DisableFinishedPage=no
 LicenseFile={#MyAppRootDirectory}\LICENSE.txt
 ; .NET 4.7.2 is supported only on Windows 7 SP1 and up
 MinVersion=0,6.1.7601
-OutputBaseFilename={#MyAppName}-{#MyAppVersion}-setup
+OutputBaseFilename={#MyAppName}-{#MyAppVersion}-McoreD-setup
 OutputDir={#MyAppOutputDirectory}
-PrivilegesRequired=none
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 ShowLanguageDialog=no
 UninstallDisplayIcon={app}\{#MyAppFilename}
 UninstallDisplayName={#MyAppName}
@@ -47,6 +48,7 @@ VersionInfoVersion={#MyAppVersion}
 WizardImageFile=WizardImageFile.bmp
 WizardImageStretch=no
 WizardSmallImageFile=WizardSmallImageFile.bmp
+WizardStyle=modern
 
 #include "Scripts\lang\english.iss"
 
