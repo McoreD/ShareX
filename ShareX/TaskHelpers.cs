@@ -626,6 +626,18 @@ namespace ShareX
             AddExternalProgramFromRegistry(taskSettings, "Adobe Photoshop", "Photoshop.exe");
             AddExternalProgramFromRegistry(taskSettings, "IrfanView", "i_view32.exe");
             AddExternalProgramFromRegistry(taskSettings, "XnView", "xnview.exe");
+
+            string strConvertMov = "Convert MOV to MP4";
+            if (!taskSettings.ExternalPrograms.Exists(x => x.Name == strConvertMov))
+            {
+                string filePath = taskSettings.CaptureSettings.FFmpegOptions.FFmpegPath;
+                ExternalProgram epFFmpeg = new ExternalProgram(strConvertMov, filePath);
+                epFFmpeg.Args = "-i %input %output";
+                epFFmpeg.OutputExtension = "mp4";
+                epFFmpeg.DeleteInputFile = true;
+                epFFmpeg.Extensions = "mov";
+                taskSettings.ExternalPrograms.Add(epFFmpeg);
+            }
         }
 
         private static void AddExternalProgramFromRegistry(TaskSettings taskSettings, string name, string fileName)
