@@ -391,8 +391,13 @@ namespace ShareX
             if (TaskSettings.WatchFolderList == null)
             {
                 TaskSettings.WatchFolderList = new List<WatchFolderSettings>();
+                TaskSettings.WatchFolderList.Add(new WatchFolderSettings()
+                {
+                    FolderPath = System.IO.Path.Combine(Program.PersonalFolder, "Watch Folder")
+                });
             }
-            else
+
+            if (TaskSettings.WatchFolderList != null)
             {
                 foreach (WatchFolderSettings watchFolder in TaskSettings.WatchFolderList)
                 {
