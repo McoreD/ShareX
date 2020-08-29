@@ -1053,7 +1053,7 @@ namespace ShareX
             }
             catch (Exception e)
             {
-                e.ShowError();
+                // e.ShowError(); // not needed as the process still completes fine
                 return false;
             }
 
