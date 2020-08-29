@@ -627,15 +627,25 @@ namespace ShareX
             AddExternalProgramFromRegistry(taskSettings, "IrfanView", "i_view32.exe");
             AddExternalProgramFromRegistry(taskSettings, "XnView", "xnview.exe");
 
-            string strConvertMov = "Convert MOV to MP4";
-            if (!taskSettings.ExternalPrograms.Exists(x => x.Name == strConvertMov))
+            string strConvertToMp4 = "Convert to MP4";
+            if (!taskSettings.ExternalPrograms.Exists(x => x.Name == strConvertToMp4))
             {
                 string filePath = taskSettings.CaptureSettings.FFmpegOptions.FFmpegPath;
-                ExternalProgram epFFmpeg = new ExternalProgram(strConvertMov, filePath);
-                epFFmpeg.Args = "-i %input %output";
+                ExternalProgram epFFmpeg = new ExternalProgram(strConvertToMp4, filePath);
+                epFFmpeg.Args = "-i %input -c:v libx264 -preset medium -crf 23 -pix_fmt yuv420p -movflags +faststart -y %output";
                 epFFmpeg.OutputExtension = "mp4";
                 epFFmpeg.DeleteInputFile = true;
-                epFFmpeg.Extensions = "mov";
+                taskSettings.ExternalPrograms.Add(epFFmpeg);
+            }
+
+            string strConvertToGif = "Convert to GIF";
+            if (!taskSettings.ExternalPrograms.Exists(x => x.Name == strConvertToGif))
+            {
+                string filePath = taskSettings.CaptureSettings.FFmpegOptions.FFmpegPath;
+                ExternalProgram epFFmpeg = new ExternalProgram(strConvertToGif, filePath);
+                epFFmpeg.Args = "-i %input -lavfi \"palettegen = stats_mode = full[palette],[0:v][palette]paletteuse = dither = sierra2_4a\" -y %output";
+                epFFmpeg.OutputExtension = "gif";
+                epFFmpeg.DeleteInputFile = true;
                 taskSettings.ExternalPrograms.Add(epFFmpeg);
             }
         }
