@@ -26,12 +26,12 @@ ArchitecturesInstallIn64BitMode=x64 ia64
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DirExistsWarning=no
+DisableFinishedPage=no
+DisableProgramGroupPage=yes
+DisableReadyMemo=no
+DisableReadyPage=no
 DisableStartupPrompt=yes
 DisableWelcomePage=yes
-DisableProgramGroupPage=yes
-DisableReadyPage=no
-DisableReadyMemo=no
-DisableFinishedPage=no
 LicenseFile={#MyAppRootDirectory}\LICENSE.txt
 ; .NET 4.7.2 is supported only on Windows 7 SP1 and up
 MinVersion=0,6.1.7601
@@ -49,6 +49,7 @@ WizardImageFile=WizardImageFile.bmp
 WizardImageStretch=no
 WizardSmallImageFile=WizardSmallImageFile.bmp
 WizardStyle=modern
+
 
 #include "Scripts\lang\english.iss"
 
