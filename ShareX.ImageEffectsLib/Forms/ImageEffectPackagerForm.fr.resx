@@ -117,19 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblName.Text" xml:space="preserve">
-    <value>Описание в меню:</value>
+  <data name="btnPackageFilePathBrowse.Text" xml:space="preserve">
+    <value>...</value>
   </data>
-  <data name="btnOK.Text" xml:space="preserve">
-    <value>ОК</value>
+  <data name="btnAssetsFolderPathBrowse.Text" xml:space="preserve">
+    <value>...</value>
   </data>
-  <data name="lblAfterUploadTasks.Text" xml:space="preserve">
-    <value>Задачи после загрузки:</value>
-  </data>
-  <data name="lblAfterCaptureTasks.Text" xml:space="preserve">
-    <value>Задачи после захвата:</value>
+  <data name="lblAssetsFolderPath.Text" xml:space="preserve">
+    <value>Chemin du dossier des ressources :</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>ShareX - Редактирование быстрой задачи</value>
+    <value>ShareX - Outil de packaging d'effet d'image</value>
+  </data>
+  <data name="lblPackageFilePath.Text" xml:space="preserve">
+    <value>Chemin du fichier de paquet :</value>
+  </data>
+  <data name="btnPackage.Text" xml:space="preserve">
+    <value>Paquet</value>
+  </data>
+  <data name="btnOpenImageEffectsFolder.Text" xml:space="preserve">
+    <value>Ouvrir le dossier des effets d'image...</value>
   </data>
 </root>
