@@ -34,11 +34,10 @@ namespace ShareX.MediaLib
         public static DialogResult DownloadFFmpeg(bool async, DownloaderForm.DownloaderInstallEventHandler installRequested)
         {
             FFmpegUpdateChecker updateChecker = new FFmpegUpdateChecker("ShareX", "FFmpeg");
-            string url = updateChecker.GetLatestDownloadURL(false);
+            string url = updateChecker.GetLatestDownloadURL(true);
 
             using (DownloaderForm form = new DownloaderForm(url, "ffmpeg.zip"))
             {
-                form.AcceptHeader = "application/octet-stream";
                 form.Proxy = HelpersOptions.CurrentProxy.GetWebProxy();
                 form.InstallType = InstallType.Event;
                 form.RunInstallerInBackground = async;
@@ -51,7 +50,7 @@ namespace ShareX.MediaLib
         {
             try
             {
-                ZipManager.Extract(archivePath, extractPath, false, entry => entry.Name.Equals("ffmpeg.exe", StringComparison.OrdinalIgnoreCase), 1_000_000_000);
+                ZipManager.Extract(archivePath, extractPath, false, entry => entry.Name.Equals("ffmpeg.exe", StringComparison.OrdinalIgnoreCase), 100_000_000);
                 return true;
             }
             catch (Exception e)

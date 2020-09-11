@@ -145,7 +145,7 @@
     <value>텍스트 변환</value>
   </data>
   <data name="lblHashCheckText.Text" xml:space="preserve">
-    <value>텍스트</value>
+    <value>텍스트:</value>
   </data>
   <data name="btnHashCheckEncodeText.Text" xml:space="preserve">
     <value>인코드</value>
