@@ -662,6 +662,9 @@ namespace ShareX.ScreenCaptureLib
                         case Keys.H:
                             CurrentTool = ShapeType.EffectHighlight;
                             break;
+                        case Keys.Control | Keys.D:
+                            DuplicateCurrrentShape(true);
+                            break;
                         case Keys.Control | Keys.V:
                             PasteFromClipboard(true);
                             break;
@@ -1652,6 +1655,31 @@ namespace ShareX.ScreenCaptureLib
             foreach (StepDrawingShape shape in Shapes.OfType<StepDrawingShape>())
             {
                 shape.Number = i++;
+            }
+        }
+
+        private void DuplicateCurrrentShape(bool insertMousePosition)
+        {
+            BaseShape shape = CurrentShape;
+
+            if (shape != null && shape.IsHandledBySelectTool)
+            {
+                BaseShape shapeCopy = shape.Duplicate();
+                if (shapeCopy != null)
+                {
+                    if (insertMousePosition)
+                    {
+                        shapeCopy.MoveAbsolute(InputManager.ClientMousePosition, true);
+                    }
+                    else
+                    {
+                        shapeCopy.Move(10, 10);
+                    }
+
+                    shapeCopy.OnMoved();
+                    AddShape(shapeCopy);
+                    SelectCurrentShape();
+                }
             }
         }
 
