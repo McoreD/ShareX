@@ -455,8 +455,7 @@ namespace ShareX
                 int maxHotkeyLength = hotkeys.Max(x => x.HotkeyInfo.ToString().Length);
                 int maxDescriptionLength = hotkeys.Max(x => x.TaskSettings.ToString().Length);
 
-                // TODO: Translate
-                sb.AppendFormat("┌{0}┬{1}┐\r\n", "Hotkey".PadCenter(maxHotkeyLength + 2, '─'), "Description".PadCenter(maxDescriptionLength + 2, '─'));
+                sb.AppendFormat("┌{0}┬{1}┐\r\n", Resources.Hotkey.PadCenter(maxHotkeyLength + 2, '─'), Resources.Description.PadCenter(maxDescriptionLength + 2, '─'));
 
                 for (int i = 0; i < hotkeys.Count; i++)
                 {
@@ -975,15 +974,6 @@ namespace ShareX
 
         private void AfterApplicationSettingsJobs()
         {
-            if (Program.Settings.TrayTextMoreInfo)
-            {
-                niTray.Text = Program.TitleLong;
-            }
-            else
-            {
-                niTray.Text = "ShareX";
-            }
-
             HotkeyRepeatLimit = Program.Settings.HotkeyRepeatLimit;
 
             HelpersOptions.CurrentProxy = Program.Settings.ProxySettings;
@@ -994,6 +984,7 @@ namespace ShareX
             HelpersOptions.RotateImageByExifOrientationData = Program.Settings.RotateImageByExifOrientationData;
             HelpersOptions.BrowserPath = Program.Settings.BrowserPath;
             HelpersOptions.RecentColors = Program.Settings.RecentColors;
+            HelpersOptions.DevMode = Program.Settings.DevMode;
             Program.UpdateHelpersSpecialFolders();
 
             TaskManager.RecentManager.MaxCount = Program.Settings.RecentTasksMaxCount;
@@ -1008,6 +999,17 @@ namespace ShareX
                 Icon = ShareXResources.Icon;
                 niTray.Icon = ShareXResources.Icon;
             }
+
+            if (HelpersOptions.DevMode)
+            {
+                niTray.Text = Program.TitleLong;
+            }
+            else
+            {
+                niTray.Text = "ShareX";
+            }
+
+            tsmiRestartAsAdmin.Visible = HelpersOptions.DevMode && !Helpers.IsAdministrator();
 
 #if RELEASE
             ConfigureAutoUpdate();
@@ -1386,6 +1388,12 @@ namespace ShareX
                 e.Cancel = true;
                 Hide();
                 SettingManager.SaveAllSettingsAsync();
+
+                if (Program.Settings.FirstTimeMinimizeToTray)
+                {
+                    TaskHelpers.ShowNotificationTip(Resources.ShareXIsMinimizedToTheSystemTray, "ShareX", 8000);
+                    Program.Settings.FirstTimeMinimizeToTray = false;
+                }
             }
         }
 
@@ -2488,6 +2496,11 @@ namespace ShareX
             Program.Settings.ShowThumbnailTitle = true;
             tsmiThumbnailTitleShow.Check();
             UpdateMainWindowLayout();
+        }
+
+        private void tsmiRestartAsAdmin_Click(object sender, EventArgs e)
+        {
+            Program.Restart(true);
         }
 
         private void TsmiThumbnailTitleHide_Click(object sender, EventArgs e)

@@ -590,8 +590,10 @@ namespace ShareX
 
         public static Bitmap ApplyImageEffects(Bitmap bmp, TaskSettingsImage taskSettingsImage)
         {
-            if (bmp != null && !bmp.PixelFormat.HasFlag(PixelFormat.Indexed))
+            if (bmp != null)
             {
+                bmp = ImageHelpers.NonIndexedBitmap(bmp);
+
                 if (taskSettingsImage.ShowImageEffectsWindowAfterCapture)
                 {
                     using (ImageEffectsForm imageEffectsForm = new ImageEffectsForm(bmp, taskSettingsImage.ImageEffectPresets,
@@ -841,13 +843,25 @@ namespace ShareX
 
             if (pointInfo != null)
             {
-                string text = CodeMenuEntryPixelInfo.Parse(taskSettings.ToolsSettings.ScreenColorPickerFormat, pointInfo.Color, pointInfo.Position);
+                string input;
 
-                ClipboardHelpers.CopyText(text);
+                if (Control.ModifierKeys == Keys.Control)
+                {
+                    input = taskSettings.ToolsSettings.ScreenColorPickerFormatCtrl;
+                }
+                else
+                {
+                    input = taskSettings.ToolsSettings.ScreenColorPickerFormat;
+                }
 
-                // TODO: Translate
-                ShowNotificationTip(string.Format(Resources.TaskHelpers_OpenQuickScreenColorPicker_Copied_to_clipboard___0_, text),
-                    "ShareX - " + "Screen color picker");
+                if (!string.IsNullOrEmpty(input))
+                {
+                    string text = CodeMenuEntryPixelInfo.Parse(input, pointInfo.Color, pointInfo.Position);
+                    ClipboardHelpers.CopyText(text);
+
+                    ShowNotificationTip(string.Format(Resources.TaskHelpers_OpenQuickScreenColorPicker_Copied_to_clipboard___0_, text),
+                        "ShareX - " + Resources.ScreenColorPicker);
+                }
             }
         }
 
@@ -991,6 +1005,8 @@ namespace ShareX
         {
             if (bmp != null)
             {
+                bmp = ImageHelpers.NonIndexedBitmap(bmp);
+
                 using (bmp)
                 {
                     RegionCaptureMode mode = taskMode ? RegionCaptureMode.TaskEditor : RegionCaptureMode.Editor;
@@ -1091,21 +1107,16 @@ namespace ShareX
 
                 if (bmp != null)
                 {
-                    if (bmp.PixelFormat.HasFlag(PixelFormat.Indexed))
-                    {
-                        MessageBox.Show("Unsupported pixel format: " + bmp.PixelFormat, "ShareX - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        if (taskSettings == null) taskSettings = Program.DefaultTaskSettings;
+                    bmp = ImageHelpers.NonIndexedBitmap(bmp);
 
-                        using (ImageEffectsForm imageEffectsForm = new ImageEffectsForm(bmp, taskSettings.ImageSettings.ImageEffectPresets,
-                            taskSettings.ImageSettings.SelectedImageEffectPreset))
-                        {
-                            imageEffectsForm.EnableToolMode(x => UploadManager.RunImageTask(x, taskSettings), filePath);
-                            imageEffectsForm.ShowDialog();
-                            //taskSettings.ImageSettings.SelectedImageEffectPreset = imageEffectsForm.SelectedPresetIndex;
-                        }
+                    if (taskSettings == null) taskSettings = Program.DefaultTaskSettings;
+
+                    using (ImageEffectsForm imageEffectsForm = new ImageEffectsForm(bmp, taskSettings.ImageSettings.ImageEffectPresets,
+                        taskSettings.ImageSettings.SelectedImageEffectPreset))
+                    {
+                        imageEffectsForm.EnableToolMode(x => UploadManager.RunImageTask(x, taskSettings), filePath);
+                        imageEffectsForm.ShowDialog();
+                        //taskSettings.ImageSettings.SelectedImageEffectPreset = imageEffectsForm.SelectedPresetIndex;
                     }
                 }
             }
@@ -1157,7 +1168,7 @@ namespace ShareX
 #endif
         }
 
-        public static void RunShareXAsAdmin(string arguments)
+        public static void RunShareXAsAdmin(string arguments = null)
         {
             try
             {
@@ -1766,9 +1777,8 @@ namespace ShareX
                     imageEffectsForm.ImportImageEffect(configJson);
                 }
 
-                // TODO: Translate
                 if (!Program.DefaultTaskSettings.AfterCaptureJob.HasFlag(AfterCaptureTasks.AddImageEffects) &&
-                    MessageBox.Show("Would you like to enable image effects?\r\n\r\nYou can later disable it from \"After capture tasks\" menu.",
+                    MessageBox.Show(Resources.WouldYouLikeToEnableImageEffects,
                     "ShareX", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     Program.DefaultTaskSettings.AfterCaptureJob = Program.DefaultTaskSettings.AfterCaptureJob.Add(AfterCaptureTasks.AddImageEffects);

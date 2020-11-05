@@ -276,6 +276,7 @@
             this.tsmiTrayDonate = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTrayAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.tssTray3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiRestartAsAdmin = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTrayRecentItems = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpenActionsToolbar = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiTrayShow = new System.Windows.Forms.ToolStripMenuItem();
@@ -1602,6 +1603,7 @@
             this.tsmiTrayDonate,
             this.tsmiTrayAbout,
             this.tssTray3,
+            this.tsmiRestartAsAdmin,
             this.tsmiTrayRecentItems,
             this.tsmiOpenActionsToolbar,
             this.tsmiTrayShow,
@@ -2200,6 +2202,13 @@
             this.tssTray3.Name = "tssTray3";
             resources.ApplyResources(this.tssTray3, "tssTray3");
             // 
+            // tsmiRestartAsAdmin
+            // 
+            this.tsmiRestartAsAdmin.Image = global::ShareX.Properties.Resources.uac;
+            this.tsmiRestartAsAdmin.Name = "tsmiRestartAsAdmin";
+            resources.ApplyResources(this.tsmiRestartAsAdmin, "tsmiRestartAsAdmin");
+            this.tsmiRestartAsAdmin.Click += new System.EventHandler(this.tsmiRestartAsAdmin_Click);
+            // 
             // tsmiTrayRecentItems
             // 
             this.tsmiTrayRecentItems.Image = global::ShareX.Properties.Resources.clipboard_list;
@@ -2666,5 +2675,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiAddImageEffects;
         private System.Windows.Forms.ToolStripMenuItem tsmiClipboardViewer;
         private System.Windows.Forms.ToolStripMenuItem tsmiTrayClipboardViewer;
+        private System.Windows.Forms.ToolStripMenuItem tsmiRestartAsAdmin;
     }
 }
