@@ -150,6 +150,7 @@
     <Compile Include="CaptureHelpers\CaptureRegion.cs" />
     <Compile Include="CaptureHelpers\CaptureWindow.cs" />
     <Compile Include="ChromeManifest.cs" />
+    <Compile Include="CleanupManager.cs" />
     <Compile Include="Controls\BeforeUploadControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -185,6 +186,12 @@
     </Compile>
     <Compile Include="Forms\ClipboardUploadForm.Designer.cs">
       <DependentUpon>ClipboardUploadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\InspectWindowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InspectWindowForm.Designer.cs">
+      <DependentUpon>InspectWindowForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TextUploadForm.cs">
       <SubType>Form</SubType>
@@ -377,6 +384,9 @@
       <DependentUpon>HotkeySelectionControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\HotkeySelectionControl.es.resx">
+      <DependentUpon>HotkeySelectionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\HotkeySelectionControl.fa-IR.resx">
       <DependentUpon>HotkeySelectionControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\HotkeySelectionControl.fr.resx">
@@ -1194,6 +1204,9 @@
     <EmbeddedResource Include="Forms\HotkeySettingsForm.zh-TW.resx">
       <DependentUpon>HotkeySettingsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InspectWindowForm.resx">
+      <DependentUpon>InspectWindowForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm.de.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -1316,6 +1329,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\QuickTaskInfoEditForm.es-MX.resx">
+      <DependentUpon>QuickTaskInfoEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\QuickTaskInfoEditForm.fa-IR.resx">
       <DependentUpon>QuickTaskInfoEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\QuickTaskInfoEditForm.fr.resx">
@@ -1756,7 +1772,6 @@
     <None Include="Resources\ruler-triangle.png" />
     <None Include="Resources\barcode-2d.png" />
     <None Include="Resources\GitHub.png" />
-    <None Include="Resources\Twitter.ico" />
     <None Include="Resources\folder.png" />
     <None Include="Resources\clipboard.png" />
     <None Include="Resources\drive.png" />
@@ -1927,6 +1942,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\image-resize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\application-search-result.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Twitter-16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
