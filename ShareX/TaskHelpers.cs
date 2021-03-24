@@ -1439,9 +1439,9 @@ namespace ShareX
         {
             if (taskSettings == null) taskSettings = TaskSettings.GetDefaultTaskSettings();
 
-            if (taskSettings.AdvancedSettings.UseCustomCaptureSound && !string.IsNullOrEmpty(taskSettings.AdvancedSettings.CustomCaptureSoundPath))
+            if (taskSettings.GeneralSettings.UseCustomCaptureSound && !string.IsNullOrEmpty(taskSettings.GeneralSettings.CustomCaptureSoundPath))
             {
-                Helpers.PlaySoundAsync(taskSettings.AdvancedSettings.CustomCaptureSoundPath);
+                Helpers.PlaySoundAsync(taskSettings.GeneralSettings.CustomCaptureSoundPath);
             }
             else
             {
@@ -1453,9 +1453,9 @@ namespace ShareX
         {
             if (taskSettings == null) taskSettings = TaskSettings.GetDefaultTaskSettings();
 
-            if (taskSettings.AdvancedSettings.UseCustomTaskCompletedSound && !string.IsNullOrEmpty(taskSettings.AdvancedSettings.CustomTaskCompletedSoundPath))
+            if (taskSettings.GeneralSettings.UseCustomTaskCompletedSound && !string.IsNullOrEmpty(taskSettings.GeneralSettings.CustomTaskCompletedSoundPath))
             {
-                Helpers.PlaySoundAsync(taskSettings.AdvancedSettings.CustomTaskCompletedSoundPath);
+                Helpers.PlaySoundAsync(taskSettings.GeneralSettings.CustomTaskCompletedSoundPath);
             }
             else
             {
@@ -1467,9 +1467,9 @@ namespace ShareX
         {
             if (taskSettings == null) taskSettings = TaskSettings.GetDefaultTaskSettings();
 
-            if (taskSettings.AdvancedSettings.UseCustomErrorSound && !string.IsNullOrEmpty(taskSettings.AdvancedSettings.CustomErrorSoundPath))
+            if (taskSettings.GeneralSettings.UseCustomErrorSound && !string.IsNullOrEmpty(taskSettings.GeneralSettings.CustomErrorSoundPath))
             {
-                Helpers.PlaySoundAsync(taskSettings.AdvancedSettings.CustomErrorSoundPath);
+                Helpers.PlaySoundAsync(taskSettings.GeneralSettings.CustomErrorSoundPath);
             }
             else
             {
@@ -1908,15 +1908,15 @@ namespace ShareX
         {
             if (duration < 0)
             {
-                duration = (int)(Program.DefaultTaskSettings.AdvancedSettings.ToastWindowDuration * 1000);
+                duration = (int)(Program.DefaultTaskSettings.GeneralSettings.ToastWindowDuration * 1000);
             }
 
             NotificationFormConfig toastConfig = new NotificationFormConfig()
             {
                 Duration = duration,
-                FadeDuration = (int)(Program.DefaultTaskSettings.AdvancedSettings.ToastWindowFadeDuration * 1000),
-                Placement = Program.DefaultTaskSettings.AdvancedSettings.ToastWindowPlacement,
-                Size = Program.DefaultTaskSettings.AdvancedSettings.ToastWindowSize,
+                FadeDuration = (int)(Program.DefaultTaskSettings.GeneralSettings.ToastWindowFadeDuration * 1000),
+                Placement = Program.DefaultTaskSettings.GeneralSettings.ToastWindowPlacement,
+                Size = Program.DefaultTaskSettings.GeneralSettings.ToastWindowSize,
                 Title = title,
                 Text = text
             };
