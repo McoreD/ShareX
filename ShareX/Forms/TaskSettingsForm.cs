@@ -1707,7 +1707,15 @@ namespace ShareX
                 lvWatchFolderList.Items.Remove(lvi);
             }
         }
-
+        private void btnWatchFolderOpen_Click(object sender, EventArgs e)
+        {
+            if (lvWatchFolderList.SelectedItems.Count > 0)
+            {
+                ListViewItem lvi = lvWatchFolderList.SelectedItems[0];
+                WatchFolderSettings watchFolderSetting = lvi.Tag as WatchFolderSettings;
+                Helpers.OpenFolder(watchFolderSetting.FolderPath);
+            }
+        }
         private void lvWatchFolderList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             WatchFolderEditSelected();
@@ -1737,6 +1745,8 @@ namespace ShareX
         {
             TaskSettings.ToolsSettings.ScreenColorPickerInfoText = txtToolsScreenColorPickerInfoText.Text;
         }
+
+
 
         #endregion Tools
 
