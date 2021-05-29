@@ -220,6 +220,8 @@ namespace ShareX
         ImageThumbnailer,
         VideoConverter,
         VideoThumbnailer,
+        InspectWindow,
+        ClipboardViewer,
         TweetMessage,
         MonitorTest,
         // Other
@@ -284,11 +286,6 @@ namespace ShareX
     public enum ThumbnailTitleLocation
     {
         Top, Bottom
-    }
-
-    public enum ScreenRecordState
-    {
-        Waiting, BeforeStart, AfterStart, AfterRecordingStart, Encoding
     }
 
     public enum RegionCaptureType

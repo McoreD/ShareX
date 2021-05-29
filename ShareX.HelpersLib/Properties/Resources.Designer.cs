@@ -1183,6 +1183,24 @@ namespace ShareX.HelpersLib.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clipboard viewer.
+        /// </summary>
+        internal static string HotkeyType_ClipboardViewer {
+            get {
+                return ResourceManager.GetString("HotkeyType_ClipboardViewer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        internal static string HotkeyType_ClipboardViewer_Category {
+            get {
+                return ResourceManager.GetString("HotkeyType_ClipboardViewer_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Color picker.
         /// </summary>
         internal static string HotkeyType_ColorPicker {
@@ -1467,6 +1485,24 @@ namespace ShareX.HelpersLib.Properties {
         internal static string HotkeyType_IndexFolder_Category {
             get {
                 return ResourceManager.GetString("HotkeyType_IndexFolder_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inspect window.
+        /// </summary>
+        internal static string HotkeyType_InspectWindow {
+            get {
+                return ResourceManager.GetString("HotkeyType_InspectWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        internal static string HotkeyType_InspectWindow_Category {
+            get {
+                return ResourceManager.GetString("HotkeyType_InspectWindow_Category", resourceCulture);
             }
         }
         
@@ -3409,6 +3445,51 @@ namespace ShareX.HelpersLib.Properties {
         internal static string Start {
             get {
                 return ResourceManager.GetString("Start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Letters (Lowercase).
+        /// </summary>
+        internal static string StepType_LettersLowercase {
+            get {
+                return ResourceManager.GetString("StepType_LettersLowercase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Letters (Uppercase).
+        /// </summary>
+        internal static string StepType_LettersUppercase {
+            get {
+                return ResourceManager.GetString("StepType_LettersUppercase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Numbers.
+        /// </summary>
+        internal static string StepType_Numbers {
+            get {
+                return ResourceManager.GetString("StepType_Numbers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roman numerals (Lowercase).
+        /// </summary>
+        internal static string StepType_RomanNumeralsLowercase {
+            get {
+                return ResourceManager.GetString("StepType_RomanNumeralsLowercase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roman numerals (Uppercase).
+        /// </summary>
+        internal static string StepType_RomanNumeralsUppercase {
+            get {
+                return ResourceManager.GetString("StepType_RomanNumeralsUppercase", resourceCulture);
             }
         }
         

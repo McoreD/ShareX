@@ -1271,4 +1271,31 @@ Would you like to download and install it?</value>
   <data name="ArrowHeadDirection_Both" xml:space="preserve">
     <value>Both</value>
   </data>
+  <data name="StepType_LettersLowercase" xml:space="preserve">
+    <value>Letters (Lowercase)</value>
+  </data>
+  <data name="StepType_LettersUppercase" xml:space="preserve">
+    <value>Letters (Uppercase)</value>
+  </data>
+  <data name="StepType_Numbers" xml:space="preserve">
+    <value>Numbers</value>
+  </data>
+  <data name="StepType_RomanNumeralsLowercase" xml:space="preserve">
+    <value>Roman numerals (Lowercase)</value>
+  </data>
+  <data name="StepType_RomanNumeralsUppercase" xml:space="preserve">
+    <value>Roman numerals (Uppercase)</value>
+  </data>
+  <data name="HotkeyType_ClipboardViewer" xml:space="preserve">
+    <value>Clipboard viewer</value>
+  </data>
+  <data name="HotkeyType_ClipboardViewer_Category" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="HotkeyType_InspectWindow" xml:space="preserve">
+    <value>Inspect window</value>
+  </data>
+  <data name="HotkeyType_InspectWindow_Category" xml:space="preserve">
+    <value>Tools</value>
+  </data>
 </root>

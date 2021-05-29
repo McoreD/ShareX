@@ -204,10 +204,12 @@ namespace ShareX.HelpersLib
         macos64
     }
 
-    public enum StepType
+    public enum StepType // Localized
     {
         Numbers,
-        Letters,
-        RomanNumerals
+        LettersUppercase,
+        LettersLowercase,
+        RomanNumeralsUppercase,
+        RomanNumeralsLowercase
     }
 }
