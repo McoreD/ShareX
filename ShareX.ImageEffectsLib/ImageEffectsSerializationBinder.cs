@@ -24,40 +24,14 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using System;
-using System.ComponentModel;
-using System.Windows.Forms;
 
-namespace ShareX.UploadersLib
+namespace ShareX.ImageEffectsLib
 {
-    [DefaultEvent("AccountTypeChanged")]
-    public partial class AccountTypeControl : UserControl
+    public class ImageEffectsSerializationBinder : KnownTypesSerializationBinder
     {
-        public delegate void AccountTypeChangedEventHandler(AccountType accountType);
-
-        public event AccountTypeChangedEventHandler AccountTypeChanged;
-
-        public AccountType SelectedAccountType
+        public ImageEffectsSerializationBinder()
         {
-            get
-            {
-                return (AccountType)cbAccountType.SelectedIndex.Clamp(0, 1);
-            }
-            set
-            {
-                cbAccountType.SelectedIndex = (int)value;
-            }
-        }
-
-        public AccountTypeControl()
-        {
-            InitializeComponent();
-            cbAccountType.SelectedIndexChanged += cbAccountType_SelectedIndexChanged;
-        }
-
-        private void cbAccountType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            AccountTypeChanged?.Invoke(SelectedAccountType);
+            KnownTypes = Helpers.FindSubclassesOf<ImageEffect>();
         }
     }
 }

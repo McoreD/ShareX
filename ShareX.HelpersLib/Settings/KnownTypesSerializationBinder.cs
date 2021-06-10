@@ -25,19 +25,14 @@
 
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShareX.HelpersLib
 {
-    public class TypeNameSerializationBinder : ISerializationBinder
+    public class KnownTypesSerializationBinder : ISerializationBinder
     {
-        public string AppNamespace { get; private set; }
-        public string AppAssembly { get; private set; }
-
-        public TypeNameSerializationBinder(string appNamespace, string appAssembly)
-        {
-            AppNamespace = appNamespace;
-            AppAssembly = appAssembly;
-        }
+        public IEnumerable<Type> KnownTypes { get; set; }
 
         public void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
@@ -47,18 +42,7 @@ namespace ShareX.HelpersLib
 
         public Type BindToType(string assemblyName, string typeName)
         {
-            string resolvedTypeName;
-
-            if (!string.IsNullOrEmpty(assemblyName))
-            {
-                resolvedTypeName = $"{typeName}, {assemblyName}";
-            }
-            else
-            {
-                resolvedTypeName = $"{AppNamespace}.{typeName}, {AppAssembly}";
-            }
-
-            return Type.GetType(resolvedTypeName, true);
+            return KnownTypes.SingleOrDefault(t => t.Name == typeName);
         }
     }
 }

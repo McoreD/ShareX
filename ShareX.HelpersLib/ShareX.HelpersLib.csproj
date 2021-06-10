@@ -165,6 +165,7 @@
     <Compile Include="Settings\DPAPIEncryptedStringPropertyResolver.cs" />
     <Compile Include="Settings\DPAPIEncryptedStringValueProvider.cs" />
     <Compile Include="Settings\JsonEncryptAttribute.cs" />
+    <Compile Include="Settings\KnownTypesSerializationBinder.cs" />
     <Compile Include="SevenZipManager.cs" />
     <Compile Include="Input\HotkeyForm.cs">
       <SubType>Form</SubType>
@@ -297,7 +298,6 @@
     <Compile Include="ShareXTheme.cs" />
     <Compile Include="TextBoxTraceListener.cs" />
     <Compile Include="Settings\SafeStringEnumConverter.cs" />
-    <Compile Include="Settings\TypeNameSerializationBinder.cs" />
     <Compile Include="UITypeEditors\EnumDescriptionConverter.cs" />
     <Compile Include="UITypeEditors\DirectoryNameEditor.cs" />
     <Compile Include="UITypeEditors\EnumProperNameKeepCaseConverter.cs" />
