@@ -331,3 +331,4 @@ ASALocalRun/
 # ShareX
 Output/
 APIKeysLocal.cs
+ShareX.UploadersLib/APIKeys/._APIKeysLocal.cs

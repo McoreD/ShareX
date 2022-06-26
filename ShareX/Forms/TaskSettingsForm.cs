@@ -1755,7 +1755,7 @@ namespace ShareX
             {
                 ListViewItem lvi = lvWatchFolderList.SelectedItems[0];
                 WatchFolderSettings watchFolderSetting = lvi.Tag as WatchFolderSettings;
-                Helpers.OpenFolder(watchFolderSetting.FolderPath);
+                FileHelpers.OpenFolder(watchFolderSetting.FolderPath);
             }
         }
         private void lvWatchFolderList_MouseDoubleClick(object sender, MouseEventArgs e)
