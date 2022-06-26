@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -140,11 +140,11 @@ namespace ShareX.UploadersLib.FileUploaders
 
         private string GetUploadPath(string fileName)
         {
-            string uploadPath = NameParser.Parse(NameParserType.FolderPath, Prefix.Trim('/'));
+            string uploadPath = NameParser.Parse(NameParserType.FilePath, Prefix.Trim('/'));
 
-            if ((RemoveExtensionImage && Helpers.IsImageFile(fileName)) ||
-                (RemoveExtensionText && Helpers.IsTextFile(fileName)) ||
-                (RemoveExtensionVideo && Helpers.IsVideoFile(fileName)))
+            if ((RemoveExtensionImage && FileHelpers.IsImageFile(fileName)) ||
+                (RemoveExtensionText && FileHelpers.IsTextFile(fileName)) ||
+                (RemoveExtensionVideo && FileHelpers.IsVideoFile(fileName)))
             {
                 fileName = Path.GetFileNameWithoutExtension(fileName);
             }

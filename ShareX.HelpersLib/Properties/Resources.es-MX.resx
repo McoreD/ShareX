@@ -662,9 +662,6 @@
   <data name="ReplCodeMenuEntry_rn_Random_number_0_to_9" xml:space="preserve">
     <value>Número aleatorio del 0 al 9. Repetir con {n}</value>
   </data>
-  <data name="ReplCodeMenuCategory_Target" xml:space="preserve">
-    <value>Destino</value>
-  </data>
   <data name="ReplCodeMenuEntry_unix_Unix_timestamp" xml:space="preserve">
     <value>Marca de tiempo Unix</value>
   </data>
@@ -724,12 +721,6 @@
   </data>
   <data name="AfterUploadTasks_UseURLShortener" xml:space="preserve">
     <value>Acortar enlace</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD" xml:space="preserve">
-    <value>Almacenamiento estándar</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD_IA" xml:space="preserve">
-    <value>Almacenamiento estándar de acceso poco frecuente</value>
   </data>
   <data name="CodeMenuEntryFilename_RandomAdjective" xml:space="preserve">
     <value>Adjetivo aleatorio (inglés)</value>

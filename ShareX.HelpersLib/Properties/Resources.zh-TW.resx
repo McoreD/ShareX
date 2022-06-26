@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -653,9 +653,6 @@
   <data name="ReplCodeMenuCategory_Computer" xml:space="preserve">
     <value>電腦</value>
   </data>
-  <data name="ReplCodeMenuCategory_Target" xml:space="preserve">
-    <value>目標</value>
-  </data>
   <data name="HotkeyType_ScrollingCapture" xml:space="preserve">
     <value>捲動擷取</value>
   </data>
@@ -953,12 +950,6 @@
   </data>
   <data name="AfterCaptureTasks_ScanQRCode" xml:space="preserve">
     <value>掃描二維碼</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD" xml:space="preserve">
-    <value>標準儲存</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD_IA" xml:space="preserve">
-    <value>標準非頻繁存取儲存</value>
   </data>
   <data name="CodeMenuEntryFilename_RandomAdjective" xml:space="preserve">
     <value>隨機形容詞</value>

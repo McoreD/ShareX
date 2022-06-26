@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ShareX.HelpersLib</RootNamespace>
     <AssemblyName>ShareX.HelpersLib</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
     </StartupObject>
@@ -60,9 +60,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsStore|AnyCPU'">
-    <OutputPath>bin\WindowsStore\</OutputPath>
-    <DefineConstants>TRACE;WindowsStore</DefineConstants>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MicrosoftStore|AnyCPU' ">
+    <OutputPath>bin\MicrosoftStore\</OutputPath>
+    <DefineConstants>TRACE;MicrosoftStore</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -71,10 +71,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsStoreDebug|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MicrosoftStoreDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\WindowsStoreDebug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WindowsStore</DefineConstants>
+    <OutputPath>bin\MicrosoftStoreDebug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;MicrosoftStore</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -84,6 +84,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -93,19 +95,24 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ColorPickerOptions.cs" />
     <Compile Include="ControlHider.cs" />
+    <Compile Include="Controls\ImageLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ObjectListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ReadOnlyRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ToolStripRoundedEdgeRenderer.cs" />
@@ -155,8 +162,11 @@
     <Compile Include="Forms\ClipboardViewerForm.designer.cs">
       <DependentUpon>ClipboardViewerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FPSManager.cs" />
     <Compile Include="Helpers\ClipboardHelpersEx.cs" />
+    <Compile Include="Helpers\FileHelpers.cs" />
     <Compile Include="Helpers\JsonHelpers.cs" />
+    <Compile Include="TimerResolutionManager.cs" />
     <Compile Include="ImageFilesCache.cs" />
     <Compile Include="MaxLengthStream.cs" />
     <Compile Include="PointInfo.cs" />
@@ -191,9 +201,6 @@
     <Compile Include="Colors\HSB.cs" />
     <Compile Include="Colors\MyColor.cs" />
     <Compile Include="Colors\RGBA.cs" />
-    <Compile Include="Controls\BlackStyle\BlackStyleForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Controls\DoubleLabeledNumericUpDown.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -218,12 +225,6 @@
     </Compile>
     <Compile Include="Controls\ToolStripLabeledNumericUpDown.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\BlackStyle\UpdatePanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\BlackStyle\UpdatePanel.Designer.cs">
-      <DependentUpon>UpdatePanel.cs</DependentUpon>
     </Compile>
     <Compile Include="ConvolutionMatrix.cs" />
     <Compile Include="ConvolutionMatrixManager.cs" />
@@ -296,6 +297,7 @@
     </Compile>
     <Compile Include="NameParser\CodeMenuEntryFilename.cs" />
     <Compile Include="ShareXTheme.cs" />
+    <Compile Include="TaskEx.cs" />
     <Compile Include="TextBoxTraceListener.cs" />
     <Compile Include="Settings\SafeStringEnumConverter.cs" />
     <Compile Include="UITypeEditors\EnumDescriptionConverter.cs" />
@@ -524,6 +526,9 @@
       <DependentUpon>ClipboardViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ClipboardViewerForm.ru.resx">
+      <DependentUpon>ClipboardViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ClipboardViewerForm.tr.resx">
       <DependentUpon>ClipboardViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ClipboardViewerForm.zh-CN.resx">
@@ -1114,6 +1119,9 @@
     <EmbeddedResource Include="Controls\ExportImportControl.resx">
       <DependentUpon>ExportImportControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\OutputBox.resx">
+      <DependentUpon>OutputBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\PrintForm.de.resx">
       <DependentUpon>PrintForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -1455,26 +1463,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="Shell32">
-      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Loading.gif" />
     <None Include="Resources\Crosshair.cur" />
     <None Include="Resources\ShareX_Icon.ico" />
@@ -1509,6 +1497,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\tick.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

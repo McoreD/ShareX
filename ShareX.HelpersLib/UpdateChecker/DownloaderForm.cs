@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -34,13 +34,13 @@ using System.Windows.Forms;
 
 namespace ShareX.HelpersLib
 {
-    public partial class DownloaderForm : BlackStyleForm
+    public partial class DownloaderForm : Form
     {
         public delegate void DownloaderInstallEventHandler(string filePath);
         public event DownloaderInstallEventHandler InstallRequested;
 
         public string URL { get; set; }
-        public string Filename { get; set; }
+        public string FileName { get; set; }
         public string DownloadLocation { get; private set; }
         public IWebProxy Proxy { get; set; }
         public string AcceptHeader { get; set; }
@@ -55,6 +55,7 @@ namespace ShareX.HelpersLib
         private DownloaderForm()
         {
             InitializeComponent();
+            ShareXResources.ApplyTheme(this);
 
             ChangeStatus(Resources.DownloaderForm_DownloaderForm_Waiting_);
             Status = DownloaderFormStatus.Waiting;
@@ -64,14 +65,14 @@ namespace ShareX.HelpersLib
             RunInstallerInBackground = true;
         }
 
-        public DownloaderForm(string url, string filename) : this()
+        public DownloaderForm(string url, string fileName) : this()
         {
             URL = url;
-            Filename = filename;
-            lblFilename.Text = Helpers.SafeStringFormat(Resources.DownloaderForm_DownloaderForm_Filename___0_, Filename);
+            FileName = fileName;
+            lblFilename.Text = Helpers.SafeStringFormat(Resources.DownloaderForm_DownloaderForm_Filename___0_, FileName);
         }
 
-        public DownloaderForm(UpdateChecker updateChecker) : this(updateChecker.DownloadURL, updateChecker.Filename)
+        public DownloaderForm(UpdateChecker updateChecker) : this(updateChecker.DownloadURL, updateChecker.FileName)
         {
             Proxy = updateChecker.Proxy;
 
@@ -215,8 +216,8 @@ namespace ShareX.HelpersLib
                 btnAction.Text = Resources.DownloaderForm_StartDownload_Cancel;
 
                 string folderPath = Path.Combine(Path.GetTempPath(), "ShareX");
-                Helpers.CreateDirectory(folderPath);
-                DownloadLocation = Path.Combine(folderPath, Filename);
+                FileHelpers.CreateDirectory(folderPath);
+                DownloadLocation = Path.Combine(folderPath, FileName);
 
                 DebugHelper.WriteLine($"Downloading: \"{URL}\" -> \"{DownloadLocation}\"");
 

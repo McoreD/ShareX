@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ShareX.UploadersLib</RootNamespace>
     <AssemblyName>ShareX.UploadersLib</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <SccProjectName>
@@ -76,9 +76,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsStore|AnyCPU'">
-    <OutputPath>bin\WindowsStore\</OutputPath>
-    <DefineConstants>TRACE;WindowsStore</DefineConstants>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MicrosoftStore|AnyCPU' ">
+    <OutputPath>bin\MicrosoftStore\</OutputPath>
+    <DefineConstants>TRACE;MicrosoftStore</DefineConstants>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -86,10 +86,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsStoreDebug|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MicrosoftStoreDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\WindowsStoreDebug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WindowsStore</DefineConstants>
+    <OutputPath>bin\MicrosoftStoreDebug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;MicrosoftStore</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -109,10 +109,8 @@
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
@@ -125,6 +123,21 @@
     <Compile Include="BaseServices\IUploaderService.cs" />
     <Compile Include="BaseUploaders\GenericUploader.cs" />
     <Compile Include="BaseUploaders\URLSharer.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunction.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionBase64.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionFileName.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionInput.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionResponseURL.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionResponse.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionPrompt.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionSelect.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionRandom.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionXml.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionHeader.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionRegex.cs" />
+    <Compile Include="CustomUploader\Functions\CustomUploaderFunctionJson.cs" />
+    <Compile Include="CustomUploader\ShareXCustomUploaderSyntaxParser.cs" />
+    <Compile Include="CustomUploader\ShareXSyntaxParser.cs" />
     <Compile Include="FileUploaders\AmazonS3.cs" />
     <Compile Include="FileUploaders\AmazonS3Endpoint.cs" />
     <Compile Include="FileUploaders\AmazonS3Settings.cs" />
@@ -132,7 +145,7 @@
     <Compile Include="FileUploaders\BackblazeB2.cs" />
     <Compile Include="FileUploaders\Box.cs" />
     <Compile Include="FileUploaders\GoogleCloudStorage.cs" />
-    <Compile Include="FileUploaders\Lithiio.cs" />
+    <Compile Include="FileUploaders\LobFile.cs" />
     <Compile Include="FileUploaders\MegaAuthInfos.cs" />
     <Compile Include="FileUploaders\Plik.cs" />
     <Compile Include="FileUploaders\PlikSettings.cs" />
@@ -141,7 +154,6 @@
     <Compile Include="FileUploaders\Lambda.cs" />
     <Compile Include="FileUploaders\Copy.cs" />
     <Compile Include="FileUploaders\Email.cs" />
-    <Compile Include="FileUploaders\Ge_tt.cs" />
     <Compile Include="FileUploaders\GoogleDrive.cs" />
     <Compile Include="FileUploaders\Jira.cs" />
     <Compile Include="FileUploaders\Hostr.cs" />
@@ -159,7 +171,6 @@
     <Compile Include="FileUploaders\Transfersh.cs" />
     <Compile Include="FileUploaders\Uguu.cs" />
     <Compile Include="FileUploaders\Vault_ooo.cs" />
-    <Compile Include="FileUploaders\VideoBin.cs" />
     <Compile Include="FileUploaders\YouTube.cs" />
     <Compile Include="Forms\CustomUploaderSettingsForm.cs">
       <SubType>Form</SubType>
@@ -167,11 +178,11 @@
     <Compile Include="Forms\CustomUploaderSettingsForm.Designer.cs">
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\OCRSpaceForm.cs">
+    <Compile Include="Forms\CustomUploaderSyntaxTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\OCRSpaceForm.Designer.cs">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
+    <Compile Include="Forms\CustomUploaderSyntaxTestForm.Designer.cs">
+      <DependentUpon>CustomUploaderSyntaxTestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ParserSelectForm.cs">
       <SubType>Form</SubType>
@@ -215,6 +226,12 @@
     <Compile Include="Forms\ResponseForm.Designer.cs">
       <DependentUpon>ResponseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TextUploadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TextUploadForm.Designer.cs">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\UploadersConfigFormHelper.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -227,11 +244,14 @@
     <Compile Include="FileUploaders\Pushbullet.cs" />
     <Compile Include="FileUploaders\GfycatUploader.cs" />
     <Compile Include="CustomUploader\CustomUploaderInput.cs" />
-    <Compile Include="CustomUploader\CustomUploaderParser.cs" />
-    <Compile Include="CustomUploader\CustomUploaderSyntaxInfo.cs" />
+    <Compile Include="Forms\YouTubeVideoOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YouTubeVideoOptionsForm.Designer.cs">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\EscapeHelper.cs" />
     <Compile Include="Helpers\MimeTypes.cs" />
-    <Compile Include="Helpers\OCROptions.cs" />
     <Compile Include="Helpers\ResponseInfo.cs" />
     <Compile Include="Helpers\RequestHelpers.cs" />
     <Compile Include="OAuth\GoogleOAuth2.cs" />
@@ -240,12 +260,12 @@
     <Compile Include="Helpers\SSLBypassHelper.cs" />
     <Compile Include="BaseServices\URLSharingService.cs" />
     <Compile Include="OAuth\OAuthUserInfo.cs" />
-    <Compile Include="OtherServices\OCRSpace.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SharingServices\BingVisualSearchSharingService.cs" />
     <Compile Include="SharingServices\CustomURLSharingService.cs" />
     <Compile Include="SharingServices\DeliciousSharingService.cs" />
     <Compile Include="SharingServices\EmailSharingService.cs" />
@@ -499,6 +519,9 @@
     <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.ru.resx">
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.tr.resx">
+      <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.uk.resx">
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -510,6 +533,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.zh-TW.resx">
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CustomUploaderSyntaxTestForm.resx">
+      <DependentUpon>CustomUploaderSyntaxTestForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EmailForm.de.resx">
       <DependentUpon>EmailForm.cs</DependentUpon>
@@ -625,48 +651,6 @@
     <EmbeddedResource Include="Forms\JiraUpload.zh-TW.resx">
       <DependentUpon>JiraUpload.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.de.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.es-MX.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.fa-IR.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.fr.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.id-ID.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.ja-JP.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.ko-KR.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.pt-PT.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.ru.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.uk.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.vi-VN.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.zh-CN.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OCRSpaceForm.zh-TW.resx">
-      <DependentUpon>OCRSpaceForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ParserSelectForm.resx">
       <DependentUpon>ParserSelectForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -762,6 +746,48 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ResponseForm.zh-TW.resx">
       <DependentUpon>ResponseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.de.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.es-MX.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.fa-IR.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.fr.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.ja-JP.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.ko-KR.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.pt-PT.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.ru.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.tr.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.uk.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.vi-VN.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.zh-CN.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.zh-TW.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TwitterTweetForm.de.resx">
       <DependentUpon>TwitterTweetForm.cs</DependentUpon>
@@ -961,6 +987,15 @@
       <DependentUpon>TwitterTweetForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.resx">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.ru.resx">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.zh-CN.resx">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.de.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -1041,7 +1076,6 @@
     <None Include="Favicons\AzureStorage.png" />
     <None Include="Favicons\Plik.ico" />
     <None Include="Favicons\Gfycat.png" />
-    <None Include="Favicons\GooglePhotos.ico" />
     <None Include="Favicons\BackblazeB2.ico" />
     <None Include="Favicons\Firebase.ico" />
     <None Include="Favicons\YouTube.ico" />
@@ -1049,16 +1083,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP">
-      <Version>34.0.0</Version>
+      <Version>37.0.3</Version>
     </PackageReference>
     <PackageReference Include="MegaApiClient">
-      <Version>1.9.0</Version>
+      <Version>1.10.2</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="SSH.NET">
-      <Version>2020.0.1</Version>
+      <Version>2020.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -1068,13 +1102,16 @@
     <None Include="Favicons\Teknik.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Favicons\Lithiio.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\navigation-270-button-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Favicons\ZeroWidthShortener.png" />
+    <None Include="Favicons\ZeroWidthShortener.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Favicons\GooglePhotos.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Favicons\LobFile.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

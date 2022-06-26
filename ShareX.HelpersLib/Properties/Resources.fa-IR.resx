@@ -847,9 +847,6 @@
   <data name="ReplCodeMenuEntry_height_Gets_image_height" xml:space="preserve">
     <value>ارتفاع تصویر</value>
   </data>
-  <data name="AmazonS3StorageClass_STANDARD" xml:space="preserve">
-    <value>فضای ذخیره سازی استاندار</value>
-  </data>
   <data name="ShapeType_ToolCrop" xml:space="preserve">
     <value>بریدن عکس (C)</value>
   </data>
@@ -876,9 +873,6 @@
   </data>
   <data name="ReplCodeMenuCategory_Incremental" xml:space="preserve">
     <value>افزایشی</value>
-  </data>
-  <data name="ReplCodeMenuCategory_Target" xml:space="preserve">
-    <value>هدف</value>
   </data>
   <data name="ReplCodeMenuEntry_guid_Random_guid" xml:space="preserve">
     <value>GUID تصادفی</value>

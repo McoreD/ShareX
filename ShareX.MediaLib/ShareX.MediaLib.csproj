@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ShareX.MediaLib</RootNamespace>
     <AssemblyName>ShareX.MediaLib</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,8 +44,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsStore|AnyCPU'">
-    <OutputPath>bin\WindowsStore\</OutputPath>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MicrosoftStore|AnyCPU' ">
+    <OutputPath>bin\MicrosoftStore\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -54,9 +54,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsStoreDebug|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MicrosoftStoreDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\WindowsStoreDebug\</OutputPath>
+    <OutputPath>bin\MicrosoftStoreDebug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -209,6 +209,9 @@
     <EmbeddedResource Include="Forms\ImageSplitterForm.ru.resx">
       <DependentUpon>ImageSplitterForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImageSplitterForm.tr.resx">
+      <DependentUpon>ImageSplitterForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageSplitterForm.uk.resx">
       <DependentUpon>ImageSplitterForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -273,6 +276,9 @@
       <DependentUpon>VideoConverterForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\VideoConverterForm.ru.resx">
+      <DependentUpon>VideoConverterForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\VideoConverterForm.tr.resx">
       <DependentUpon>VideoConverterForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\VideoConverterForm.uk.resx">

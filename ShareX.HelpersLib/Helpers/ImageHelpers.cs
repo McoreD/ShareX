@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using Encoder = System.Drawing.Imaging.Encoder;
 
 namespace ShareX.HelpersLib
 {
@@ -212,9 +213,9 @@ namespace ShareX.HelpersLib
             return ResizeImageLimit(bmp, size, size);
         }
 
-        public static Bitmap CropBitmap(Bitmap bmp, Rectangle rect)
+        public static Bitmap CropBitmap(Bitmap bmp, RectangleF rect)
         {
-            if (bmp != null && rect.X >= 0 && rect.Y >= 0 && rect.Width > 0 && rect.Height > 0 && new Rectangle(0, 0, bmp.Width, bmp.Height).Contains(rect))
+            if (bmp != null && rect.X >= 0 && rect.Y >= 0 && rect.Width > 0 && rect.Height > 0 && new RectangleF(0, 0, bmp.Width, bmp.Height).Contains(rect))
             {
                 return bmp.Clone(rect, bmp.PixelFormat);
             }
@@ -381,6 +382,11 @@ namespace ShareX.HelpersLib
             return bmp;
         }
 
+        public static Bitmap AddCanvas(Image img, int margin)
+        {
+            return AddCanvas(img, new Padding(margin));
+        }
+
         public static Bitmap AddCanvas(Image img, Padding margin)
         {
             return AddCanvas(img, margin, Color.Transparent);
@@ -407,6 +413,11 @@ namespace ShareX.HelpersLib
 
                     using (Brush brush = new SolidBrush(canvasColor))
                     {
+                        if (margin.Left > 0)
+                        {
+                            g.FillRectangle(brush, 0, 0, margin.Left, bmp.Height);
+                        }
+
                         if (margin.Top > 0)
                         {
                             g.FillRectangle(brush, 0, 0, bmp.Width, margin.Top);
@@ -420,11 +431,6 @@ namespace ShareX.HelpersLib
                         if (margin.Bottom > 0)
                         {
                             g.FillRectangle(brush, 0, bmp.Height - margin.Bottom, bmp.Width, margin.Bottom);
-                        }
-
-                        if (margin.Left > 0)
-                        {
-                            g.FillRectangle(brush, 0, 0, margin.Left, bmp.Height);
                         }
                     }
                 }
@@ -775,7 +781,6 @@ namespace ShareX.HelpersLib
         {
             Bitmap result = img.CreateEmptyBitmap();
 
-            using (img)
             using (Graphics g = Graphics.FromImage(result))
             {
                 g.FillRectangle(brush, 0, 0, result.Width, result.Height);
@@ -997,45 +1002,32 @@ namespace ShareX.HelpersLib
 
         public static Bitmap AddShadow(Bitmap bmp, float opacity, int size, float darkness, Color color, Point offset)
         {
-            Bitmap shadowImage = null;
+            Bitmap bmpShadow = null;
 
             try
             {
-                shadowImage = bmp.CreateEmptyBitmap(size * 2, size * 2);
-
-                ColorMatrix maskMatrix = new ColorMatrix();
-                maskMatrix.Matrix00 = 0;
-                maskMatrix.Matrix11 = 0;
-                maskMatrix.Matrix22 = 0;
-                maskMatrix.Matrix33 = opacity;
-                maskMatrix.Matrix40 = ((float)color.R).Remap(0, 255, 0, 1);
-                maskMatrix.Matrix41 = ((float)color.G).Remap(0, 255, 0, 1);
-                maskMatrix.Matrix42 = ((float)color.B).Remap(0, 255, 0, 1);
-
+                bmpShadow = bmp.CreateEmptyBitmap(size * 2, size * 2);
                 Rectangle shadowRectangle = new Rectangle(size, size, bmp.Width, bmp.Height);
-                maskMatrix.Apply(bmp, shadowImage, shadowRectangle);
+                ColorMatrixManager.Mask(opacity, color).Apply(bmp, bmpShadow, shadowRectangle);
 
                 if (size > 0)
                 {
-                    BoxBlur(shadowImage, size);
+                    ApplyBoxBlur(bmpShadow, size);
                 }
 
                 if (darkness > 1)
                 {
-                    ColorMatrix alphaMatrix = new ColorMatrix();
-                    alphaMatrix.Matrix33 = darkness;
-
-                    Bitmap shadowImage2 = alphaMatrix.Apply(shadowImage);
-                    shadowImage.Dispose();
-                    shadowImage = shadowImage2;
+                    Bitmap shadowImage2 = ColorMatrixManager.Alpha(darkness).Apply(bmpShadow);
+                    bmpShadow.Dispose();
+                    bmpShadow = shadowImage2;
                 }
 
-                Bitmap bmpResult = shadowImage.CreateEmptyBitmap(Math.Abs(offset.X), Math.Abs(offset.Y));
+                Bitmap bmpResult = bmpShadow.CreateEmptyBitmap(Math.Abs(offset.X), Math.Abs(offset.Y));
 
                 using (Graphics g = Graphics.FromImage(bmpResult))
                 {
                     g.SetHighQuality();
-                    g.DrawImage(shadowImage, Math.Max(0, offset.X), Math.Max(0, offset.Y), shadowImage.Width, shadowImage.Height);
+                    g.DrawImage(bmpShadow, Math.Max(0, offset.X), Math.Max(0, offset.Y), bmpShadow.Width, bmpShadow.Height);
                     g.DrawImage(bmp, Math.Max(size, -offset.X + size), Math.Max(size, -offset.Y + size), bmp.Width, bmp.Height);
                 }
 
@@ -1043,9 +1035,86 @@ namespace ShareX.HelpersLib
             }
             finally
             {
-                if (bmp != null) bmp.Dispose();
-                if (shadowImage != null) shadowImage.Dispose();
+                bmp?.Dispose();
+                bmpShadow?.Dispose();
             }
+        }
+
+        public static Bitmap AddGlow(Bitmap bmp, int size, float strength, Color color, Point offset, GradientInfo gradient = null)
+        {
+            if (size < 0 || strength < 0.1f)
+            {
+                return bmp;
+            }
+
+            Bitmap bmpBlur = null, bmpMask = null;
+
+            try
+            {
+                if (size > 0)
+                {
+                    bmpBlur = AddCanvas(bmp, size);
+                    ApplyBoxBlur(bmpBlur, size);
+                }
+                else
+                {
+                    bmpBlur = bmp;
+                }
+
+                if (gradient != null && gradient.IsValid)
+                {
+                    bmpMask = CreateGradientMask(bmpBlur, gradient, strength);
+                }
+                else
+                {
+                    bmpMask = ColorMatrixManager.Mask(strength, color).Apply(bmpBlur);
+                }
+
+                Bitmap bmpResult = bmpMask.CreateEmptyBitmap(Math.Abs(offset.X), Math.Abs(offset.Y));
+
+                using (Graphics g = Graphics.FromImage(bmpResult))
+                {
+                    g.SetHighQuality();
+                    g.DrawImage(bmpMask, Math.Max(0, offset.X), Math.Max(0, offset.Y), bmpMask.Width, bmpMask.Height);
+                    g.DrawImage(bmp, Math.Max(size, -offset.X + size), Math.Max(size, -offset.Y + size), bmp.Width, bmp.Height);
+                }
+
+                return bmpResult;
+            }
+            finally
+            {
+                bmp?.Dispose();
+                bmpBlur?.Dispose();
+                bmpMask?.Dispose();
+            }
+        }
+
+        public static Bitmap CreateGradientMask(Bitmap bmp, GradientInfo gradient, float opacity = 1f)
+        {
+            Bitmap mask = bmp.CreateEmptyBitmap();
+
+            if (opacity <= 0)
+            {
+                return mask;
+            }
+
+            gradient.Draw(mask);
+
+            using (UnsafeBitmap bmpSource = new UnsafeBitmap(bmp, true, ImageLockMode.ReadOnly))
+            using (UnsafeBitmap bmpMask = new UnsafeBitmap(mask, true, ImageLockMode.ReadWrite))
+            {
+                int pixelCount = bmpSource.PixelCount;
+
+                for (int i = 0; i < pixelCount; i++)
+                {
+                    ColorBgra sourceColor = bmpSource.GetPixel(i);
+                    ColorBgra maskColor = bmpMask.GetPixel(i);
+                    maskColor.Alpha = (byte)Math.Min(255, sourceColor.Alpha * (maskColor.Alpha / 255f) * opacity);
+                    bmpMask.SetPixel(i, maskColor);
+                }
+            }
+
+            return mask;
         }
 
         public static Bitmap Sharpen(Bitmap bmp, double strength)
@@ -1226,7 +1295,7 @@ namespace ShareX.HelpersLib
             }
         }
 
-        public static void BoxBlur(Bitmap bmp, int range)
+        public static void ApplyBoxBlur(Bitmap bmp, int range)
         {
             BoxBlur(bmp, range, new Rectangle(0, 0, bmp.Width, bmp.Height));
         }
@@ -1698,7 +1767,7 @@ namespace ShareX.HelpersLib
         public static ImageFormat GetImageFormat(string filePath)
         {
             ImageFormat imageFormat = ImageFormat.Png;
-            string ext = Helpers.GetFilenameExtension(filePath);
+            string ext = FileHelpers.GetFileNameExtension(filePath);
 
             if (!string.IsNullOrEmpty(ext))
             {
@@ -1730,7 +1799,7 @@ namespace ShareX.HelpersLib
 
         public static bool SaveImage(Image img, string filePath)
         {
-            Helpers.CreateDirectoryFromFilePath(filePath);
+            FileHelpers.CreateDirectoryFromFilePath(filePath);
             ImageFormat imageFormat = GetImageFormat(filePath);
 
             try
@@ -1771,7 +1840,7 @@ namespace ShareX.HelpersLib
 
                     sfd.FileName = Path.GetFileName(filePath);
 
-                    string ext = Helpers.GetFilenameExtension(filePath);
+                    string ext = FileHelpers.GetFileNameExtension(filePath);
 
                     if (!string.IsNullOrEmpty(ext))
                     {
@@ -1817,13 +1886,13 @@ namespace ShareX.HelpersLib
 
         public static Bitmap LoadImage(string filePath)
         {
-            try
+            if (!string.IsNullOrEmpty(filePath))
             {
-                if (!string.IsNullOrEmpty(filePath))
+                try
                 {
-                    filePath = Helpers.GetAbsolutePath(filePath);
+                    filePath = FileHelpers.GetAbsolutePath(filePath);
 
-                    if (!string.IsNullOrEmpty(filePath) && Helpers.IsImageFile(filePath) && File.Exists(filePath))
+                    if (!string.IsNullOrEmpty(filePath) && FileHelpers.IsImageFile(filePath) && File.Exists(filePath))
                     {
                         // http://stackoverflow.com/questions/788335/why-does-image-fromfile-keep-a-file-handle-open-sometimes
                         Bitmap bmp = (Bitmap)Image.FromStream(new MemoryStream(File.ReadAllBytes(filePath)));
@@ -1836,10 +1905,10 @@ namespace ShareX.HelpersLib
                         return bmp;
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                DebugHelper.WriteException(e);
+                catch (Exception e)
+                {
+                    DebugHelper.WriteException(e);
+                }
             }
 
             return null;
@@ -1847,11 +1916,11 @@ namespace ShareX.HelpersLib
 
         public static Bitmap LoadImageWithFileDialog()
         {
-            string filepath = OpenImageFileDialog();
+            string filePath = OpenImageFileDialog();
 
-            if (!string.IsNullOrEmpty(filepath))
+            if (!string.IsNullOrEmpty(filePath))
             {
-                return LoadImage(filepath);
+                return LoadImage(filePath);
             }
 
             return null;
@@ -1938,6 +2007,42 @@ namespace ShareX.HelpersLib
             }
 
             return bmp;
+        }
+
+        public static Bitmap CombineImages(IEnumerable<string> imageFiles, Orientation orientation = Orientation.Vertical,
+            ImageCombinerAlignment alignment = ImageCombinerAlignment.LeftOrTop, int space = 0, bool autoFillBackground = false)
+        {
+            List<Bitmap> images = new List<Bitmap>();
+
+            try
+            {
+                foreach (string filePath in imageFiles)
+                {
+                    Bitmap bmp = LoadImage(filePath);
+
+                    if (bmp != null)
+                    {
+                        images.Add(bmp);
+                    }
+                }
+
+                if (images.Count > 1)
+                {
+                    return CombineImages(images, orientation, alignment, space, autoFillBackground);
+                }
+            }
+            finally
+            {
+                foreach (Bitmap bmp in images)
+                {
+                    if (bmp != null)
+                    {
+                        bmp.Dispose();
+                    }
+                }
+            }
+
+            return null;
         }
 
         public static List<Bitmap> SplitImage(Image img, int rowCount, int columnCount)
@@ -2220,6 +2325,38 @@ namespace ShareX.HelpersLib
             }
         }
 
+        public static void ReplaceColor(Bitmap bmp, Color sourceColor, Color targetColor, bool autoSourceColor = false, int threshold = 0)
+        {
+            ColorBgra sourceBgra = new ColorBgra(sourceColor);
+            ColorBgra targetBgra = new ColorBgra(targetColor);
+
+            using (UnsafeBitmap unsafeBitmap = new UnsafeBitmap(bmp, true))
+            {
+                if (autoSourceColor)
+                {
+                    sourceBgra = unsafeBitmap.GetPixel(0);
+                    sourceColor = sourceBgra.ToColor();
+                }
+
+                for (int i = 0; i < unsafeBitmap.PixelCount; i++)
+                {
+                    ColorBgra color = unsafeBitmap.GetPixel(i);
+
+                    if (threshold == 0)
+                    {
+                        if (color == sourceBgra)
+                        {
+                            unsafeBitmap.SetPixel(i, targetBgra);
+                        }
+                    }
+                    else if (ColorHelpers.ColorsAreClose(color.ToColor(), sourceColor, threshold))
+                    {
+                        unsafeBitmap.SetPixel(i, targetBgra);
+                    }
+                }
+            }
+        }
+
         public static Size GetImageFileDimensions(string filePath)
         {
             using (Bitmap bmp = LoadImage(filePath))
@@ -2315,6 +2452,208 @@ namespace ShareX.HelpersLib
             }
 
             return bmp;
+        }
+
+        public static MemoryStream SavePNG(Image img, PNGBitDepth bitDepth)
+        {
+            MemoryStream ms = new MemoryStream();
+            SavePNG(img, ms, bitDepth);
+            return ms;
+        }
+
+        public static void SavePNG(Image img, Stream stream, PNGBitDepth bitDepth)
+        {
+            if (bitDepth == PNGBitDepth.Automatic)
+            {
+                if (IsImageTransparent((Bitmap)img))
+                {
+                    bitDepth = PNGBitDepth.Bit32;
+                }
+                else
+                {
+                    bitDepth = PNGBitDepth.Bit24;
+                }
+            }
+
+            if (bitDepth == PNGBitDepth.Bit32)
+            {
+                if (img.PixelFormat != PixelFormat.Format32bppArgb && img.PixelFormat != PixelFormat.Format32bppRgb)
+                {
+                    using (Bitmap bmpNew = ((Bitmap)img).Clone(new Rectangle(0, 0, img.Width, img.Height), PixelFormat.Format32bppArgb))
+                    {
+                        bmpNew.Save(stream, ImageFormat.Png);
+                        return;
+                    }
+                }
+            }
+            else if (bitDepth == PNGBitDepth.Bit24)
+            {
+                if (img.PixelFormat != PixelFormat.Format24bppRgb)
+                {
+                    using (Bitmap bmpNew = ((Bitmap)img).Clone(new Rectangle(0, 0, img.Width, img.Height), PixelFormat.Format24bppRgb))
+                    {
+                        bmpNew.Save(stream, ImageFormat.Png);
+                        return;
+                    }
+                }
+            }
+
+            img.Save(stream, ImageFormat.Png);
+        }
+
+        public static MemoryStream PNGStripChunks(MemoryStream stream, params string[] chunks)
+        {
+            MemoryStream output = new MemoryStream();
+            stream.Seek(0, SeekOrigin.Begin);
+
+            byte[] signature = new byte[8];
+            stream.Read(signature, 0, 8);
+            output.Write(signature, 0, 8);
+
+            while (true)
+            {
+                byte[] lenBytes = new byte[4];
+                if (stream.Read(lenBytes, 0, 4) != 4)
+                {
+                    break;
+                }
+
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(lenBytes);
+                }
+
+                int len = BitConverter.ToInt32(lenBytes, 0);
+
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(lenBytes);
+                }
+
+                byte[] type = new byte[4];
+                stream.Read(type, 0, 4);
+
+                byte[] data = new byte[len + 4];
+                stream.Read(data, 0, data.Length);
+
+                string strType = Encoding.ASCII.GetString(type);
+
+                if (!chunks.Contains(strType))
+                {
+                    output.Write(lenBytes, 0, lenBytes.Length);
+                    output.Write(type, 0, type.Length);
+                    output.Write(data, 0, data.Length);
+                }
+            }
+
+            return output;
+        }
+
+        public static MemoryStream PNGStripColorSpaceInformation(MemoryStream stream)
+        {
+            // http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
+            // 4.2.2.1. gAMA Image gamma
+            // 4.2.2.2. cHRM Primary chromaticities
+            // 4.2.2.3. sRGB Standard RGB color space
+            // 4.2.2.4. iCCP Embedded ICC profile
+            return PNGStripChunks(stream, "gAMA", "cHRM", "sRGB", "iCCP");
+        }
+
+        public static MemoryStream SaveJPEG(Image img, int quality)
+        {
+            MemoryStream ms = new MemoryStream();
+            SaveJPEG(img, ms, quality);
+            return ms;
+        }
+
+        public static void SaveJPEG(Image img, string filePath, int quality)
+        {
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                SaveJPEG(img, fs, quality);
+            }
+        }
+
+        public static void SaveJPEG(Image img, Stream stream, int quality)
+        {
+            quality = quality.Clamp(0, 100);
+
+            using (EncoderParameters encoderParameters = new EncoderParameters(1))
+            {
+                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+                img.Save(stream, ImageFormat.Jpeg.GetCodecInfo(), encoderParameters);
+            }
+        }
+
+        public static MemoryStream SaveJPEGAutoQuality(Image img, int sizeLimit, int qualityDecrement = 5, int minQuality = 0, int maxQuality = 100)
+        {
+            qualityDecrement = qualityDecrement.Clamp(1, 100);
+            minQuality = minQuality.Clamp(0, 100);
+            maxQuality = maxQuality.Clamp(0, 100);
+
+            if (minQuality >= maxQuality)
+            {
+                return SaveJPEG(img, minQuality);
+            }
+
+            MemoryStream ms = null;
+
+            for (int quality = maxQuality; quality >= minQuality; quality -= qualityDecrement)
+            {
+                if (ms != null)
+                {
+                    ms.Dispose();
+                }
+
+                ms = SaveJPEG(img, quality);
+
+                //DebugHelper.WriteLine($"Quality: {quality}% - Size: {ms.Length.ToSizeString()}");
+
+                if (ms.Length <= sizeLimit)
+                {
+                    break;
+                }
+            }
+
+            return ms;
+        }
+
+        public static MemoryStream SaveGIF(Image img, GIFQuality quality)
+        {
+            MemoryStream ms = new MemoryStream();
+            SaveGIF(img, ms, quality);
+            return ms;
+        }
+
+        public static void SaveGIF(Image img, Stream stream, GIFQuality quality)
+        {
+            if (quality == GIFQuality.Default)
+            {
+                img.Save(stream, ImageFormat.Gif);
+            }
+            else
+            {
+                Quantizer quantizer;
+
+                switch (quality)
+                {
+                    case GIFQuality.Grayscale:
+                        quantizer = new GrayscaleQuantizer();
+                        break;
+                    case GIFQuality.Bit4:
+                        quantizer = new OctreeQuantizer(15, 4);
+                        break;
+                    default:
+                    case GIFQuality.Bit8:
+                        quantizer = new OctreeQuantizer(255, 4);
+                        break;
+                }
+
+                using (Bitmap quantized = quantizer.Quantize(img))
+                {
+                    quantized.Save(stream, ImageFormat.Gif);
+                }
+            }
         }
     }
 }

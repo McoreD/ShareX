@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -135,7 +135,7 @@ namespace ShareX.HistoryLib
             {
                 lock (thisLock)
                 {
-                    Helpers.CreateDirectoryFromFilePath(filePath);
+                    FileHelpers.CreateDirectoryFromFilePath(filePath);
 
                     using (FileStream fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, 4096, FileOptions.WriteThrough))
                     using (XmlTextWriter writer = new XmlTextWriter(fileStream, Encoding.UTF8))

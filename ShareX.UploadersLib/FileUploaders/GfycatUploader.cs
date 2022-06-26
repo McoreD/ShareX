@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -22,8 +22,6 @@
 */
 
 #endregion License Information (GPL v3)
-
-// Credits: https://github.com/Dinnerbone
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
@@ -98,7 +96,7 @@ namespace ShareX.UploadersLib.FileUploaders
             args.Add("scope", "all");
             args.Add("state", "ShareX");
             args.Add("response_type", "code");
-            args.Add("redirect_uri", Links.URL_CALLBACK);
+            args.Add("redirect_uri", Links.Callback);
 
             return URLHelpers.CreateQueryString(URL_AUTHORIZE, args);
         }
@@ -110,7 +108,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 client_id = AuthInfo.Client_ID,
                 client_secret = AuthInfo.Client_Secret,
                 grant_type = "authorization_code",
-                redirect_uri = Links.URL_CALLBACK,
+                redirect_uri = Links.Callback,
                 code = code
             });
 

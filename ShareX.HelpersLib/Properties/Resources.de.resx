@@ -669,9 +669,6 @@ Soll sie heruntergeladen und installiert werden?</value>
   <data name="ReplCodeMenuCategory_Computer" xml:space="preserve">
     <value>Computer</value>
   </data>
-  <data name="ReplCodeMenuCategory_Target" xml:space="preserve">
-    <value>Ziel</value>
-  </data>
   <data name="HotkeyType_ScrollingCapture" xml:space="preserve">
     <value>Scroll-Aufnahme</value>
   </data>
@@ -1059,9 +1056,6 @@ Soll sie heruntergeladen werden?</value>
   </data>
   <data name="PastebinExpiration_M1" xml:space="preserve">
     <value>1 Monat</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD" xml:space="preserve">
-    <value>Standardspeicherplatz</value>
   </data>
   <data name="CustomUploaderDestinationType_TextUploader" xml:space="preserve">
     <value>Textuploader</value>

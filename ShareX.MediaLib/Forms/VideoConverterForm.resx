@@ -178,6 +178,7 @@
   </data>
   <data name="btnInputFilePathBrowse.Text" xml:space="preserve">
     <value>...</value>
+    <comment>@Invariant</comment>
   </data>
   <data name="&gt;&gt;btnInputFilePathBrowse.Name" xml:space="preserve">
     <value>btnInputFilePathBrowse</value>
@@ -250,6 +251,7 @@
   </data>
   <data name="btnOutputFolderBrowse.Text" xml:space="preserve">
     <value>...</value>
+    <comment>@Invariant</comment>
   </data>
   <data name="&gt;&gt;btnOutputFolderBrowse.Name" xml:space="preserve">
     <value>btnOutputFolderBrowse</value>
@@ -478,6 +480,7 @@
   </data>
   <data name="lblVideoQualityValue.Text" xml:space="preserve">
     <value>0</value>
+    <comment>@Invariant</comment>
   </data>
   <data name="&gt;&gt;lblVideoQualityValue.Name" xml:space="preserve">
     <value>lblVideoQualityValue</value>
@@ -502,6 +505,7 @@
   </data>
   <data name="lblVideoQualityHigher.Text" xml:space="preserve">
     <value>-&gt;</value>
+    <comment>@Invariant</comment>
   </data>
   <data name="lblVideoQualityHigher.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
     <value>TopRight</value>
@@ -529,6 +533,7 @@
   </data>
   <data name="lblVideoQualityLower.Text" xml:space="preserve">
     <value>&lt;-</value>
+    <comment>@Invariant</comment>
   </data>
   <data name="&gt;&gt;lblVideoQualityLower.Name" xml:space="preserve">
     <value>lblVideoQualityLower</value>
@@ -589,7 +594,7 @@
     <value>pbProgress</value>
   </data>
   <data name="&gt;&gt;pbProgress.Type" xml:space="preserve">
-    <value>ShareX.HelpersLib.BlackStyleProgressBar, ShareX.HelpersLib, Version=13.0.2.0, Culture=neutral, PublicKeyToken=null</value>
+    <value>ShareX.HelpersLib.BlackStyleProgressBar, ShareX.HelpersLib, Version=13.6.1.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;pbProgress.Parent" xml:space="preserve">
     <value>$this</value>
@@ -628,7 +633,7 @@
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
+    <value>96, 96</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>456, 278</value>

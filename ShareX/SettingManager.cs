@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ namespace ShareX
 {
     internal static class SettingManager
     {
-        private const string ApplicationConfigFilename = "ApplicationConfig.json";
+        private const string ApplicationConfigFileName = "ApplicationConfig.json";
 
         private static string ApplicationConfigFilePath
         {
@@ -49,11 +49,11 @@ namespace ShareX
             {
                 if (Program.Sandbox) return null;
 
-                return Path.Combine(Program.PersonalFolder, ApplicationConfigFilename);
+                return Path.Combine(Program.PersonalFolder, ApplicationConfigFileName);
             }
         }
 
-        private const string UploadersConfigFilename = "UploadersConfig.json";
+        private const string UploadersConfigFileName = "UploadersConfig.json";
 
         private static string UploadersConfigFilePath
         {
@@ -65,18 +65,18 @@ namespace ShareX
 
                 if (Settings != null && !string.IsNullOrEmpty(Settings.CustomUploadersConfigPath))
                 {
-                    uploadersConfigFolder = Helpers.ExpandFolderVariables(Settings.CustomUploadersConfigPath);
+                    uploadersConfigFolder = FileHelpers.ExpandFolderVariables(Settings.CustomUploadersConfigPath);
                 }
                 else
                 {
                     uploadersConfigFolder = Program.PersonalFolder;
                 }
 
-                return Path.Combine(uploadersConfigFolder, UploadersConfigFilename);
+                return Path.Combine(uploadersConfigFolder, UploadersConfigFileName);
             }
         }
 
-        private const string HotkeysConfigFilename = "HotkeysConfig.json";
+        private const string HotkeysConfigFileName = "HotkeysConfig.json";
 
         private static string HotkeysConfigFilePath
         {
@@ -88,14 +88,14 @@ namespace ShareX
 
                 if (Settings != null && !string.IsNullOrEmpty(Settings.CustomHotkeysConfigPath))
                 {
-                    hotkeysConfigFolder = Helpers.ExpandFolderVariables(Settings.CustomHotkeysConfigPath);
+                    hotkeysConfigFolder = FileHelpers.ExpandFolderVariables(Settings.CustomHotkeysConfigPath);
                 }
                 else
                 {
                     hotkeysConfigFolder = Program.PersonalFolder;
                 }
 
-                return Path.Combine(hotkeysConfigFolder, HotkeysConfigFilename);
+                return Path.Combine(hotkeysConfigFolder, HotkeysConfigFileName);
             }
         }
 
@@ -108,9 +108,6 @@ namespace ShareX
 
         private static ManualResetEvent uploadersConfigResetEvent = new ManualResetEvent(false);
         private static ManualResetEvent hotkeysConfigResetEvent = new ManualResetEvent(false);
-
-        private const int SettingsSaveFailWarningLimit = 3;
-        private static int settingsSaveFailWarningCount;
 
         public static void LoadInitialSettings()
         {
@@ -142,9 +139,9 @@ namespace ShareX
             }
         }
 
-        public static void LoadApplicationConfig()
+        public static void LoadApplicationConfig(bool fallbackSupport = true)
         {
-            Settings = ApplicationConfig.Load(ApplicationConfigFilePath, BackupFolder);
+            Settings = ApplicationConfig.Load(ApplicationConfigFilePath, BackupFolder, fallbackSupport);
             Settings.CreateBackup = true;
             Settings.CreateWeeklyBackup = true;
             Settings.SettingsSaveFailed += Settings_SettingsSaveFailed;
@@ -155,13 +152,11 @@ namespace ShareX
 
         private static void Settings_SettingsSaveFailed(Exception e)
         {
-            if (settingsSaveFailWarningCount == SettingsSaveFailWarningLimit) return;
-
             string message;
 
             if (e is UnauthorizedAccessException || e is FileNotFoundException)
             {
-                message = Resources.YourAntiVirusSoftwareOrTheControlledFolderAccessFeatureInWindows10CouldBeBlockingShareX;
+                message = Resources.YourAntiVirusSoftwareOrTheControlledFolderAccessFeatureInWindowsCouldBeBlockingShareX;
             }
             else
             {
@@ -169,22 +164,20 @@ namespace ShareX
             }
 
             TaskHelpers.ShowNotificationTip(message, "ShareX - " + Resources.FailedToSaveSettings, 5000);
-
-            settingsSaveFailWarningCount++;
         }
 
-        public static void LoadUploadersConfig()
+        public static void LoadUploadersConfig(bool fallbackSupport = true)
         {
-            UploadersConfig = UploadersConfig.Load(UploadersConfigFilePath, BackupFolder);
+            UploadersConfig = UploadersConfig.Load(UploadersConfigFilePath, BackupFolder, fallbackSupport);
             UploadersConfig.CreateBackup = true;
             UploadersConfig.CreateWeeklyBackup = true;
             UploadersConfig.SupportDPAPIEncryption = true;
             UploadersConfigBackwardCompatibilityTasks();
         }
 
-        public static void LoadHotkeysConfig()
+        public static void LoadHotkeysConfig(bool fallbackSupport = true)
         {
-            HotkeysConfig = HotkeysConfig.Load(HotkeysConfigFilePath, BackupFolder);
+            HotkeysConfig = HotkeysConfig.Load(HotkeysConfigFilePath, BackupFolder, fallbackSupport);
             HotkeysConfig.CreateBackup = true;
             HotkeysConfig.CreateWeeklyBackup = true;
             HotkeysConfigBackwardCompatibilityTasks();
@@ -252,7 +245,7 @@ namespace ShareX
                     }
                 }
 
-                Helpers.MoveFile(Program.HistoryFilePathOld, BackupFolder);
+                FileHelpers.MoveFile(Program.HistoryFilePathOld, BackupFolder);
             }
         }
 
@@ -344,13 +337,13 @@ namespace ShareX
         public static void ResetSettings()
         {
             if (File.Exists(ApplicationConfigFilePath)) File.Delete(ApplicationConfigFilePath);
-            LoadApplicationConfig();
+            LoadApplicationConfig(false);
 
             if (File.Exists(UploadersConfigFilePath)) File.Delete(UploadersConfigFilePath);
-            LoadUploadersConfig();
+            LoadUploadersConfig(false);
 
             if (File.Exists(HotkeysConfigFilePath)) File.Delete(HotkeysConfigFilePath);
-            LoadHotkeysConfig();
+            LoadHotkeysConfig(false);
         }
 
         public static bool Export(string archivePath, bool settings, bool history)
@@ -364,13 +357,13 @@ namespace ShareX
                 if (settings)
                 {
                     msApplicationConfig = Settings.SaveToMemoryStream(false);
-                    entries.Add(new ZipEntryInfo(msApplicationConfig, ApplicationConfigFilename));
+                    entries.Add(new ZipEntryInfo(msApplicationConfig, ApplicationConfigFileName));
 
                     msUploadersConfig = UploadersConfig.SaveToMemoryStream(false);
-                    entries.Add(new ZipEntryInfo(msUploadersConfig, UploadersConfigFilename));
+                    entries.Add(new ZipEntryInfo(msUploadersConfig, UploadersConfigFileName));
 
                     msHotkeysConfig = HotkeysConfig.SaveToMemoryStream(false);
-                    entries.Add(new ZipEntryInfo(msHotkeysConfig, HotkeysConfigFilename));
+                    entries.Add(new ZipEntryInfo(msHotkeysConfig, HotkeysConfigFileName));
                 }
 
                 if (history)
@@ -402,7 +395,7 @@ namespace ShareX
             {
                 ZipManager.Extract(archivePath, Program.PersonalFolder, true, entry =>
                 {
-                    return Helpers.CheckExtension(entry.Name, new string[] { "json", "xml" });
+                    return FileHelpers.CheckExtension(entry.Name, new string[] { "json", "xml" });
                 }, 1_000_000_000);
 
                 return true;

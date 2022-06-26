@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -125,9 +125,31 @@ namespace ShareX.HelpersLib
             return new IntPtr(GetClassLong(hWnd, nIndex));
         }
 
+        public static IntPtr GetWindowLong(IntPtr hWnd, int nIndex)
+        {
+            if (IntPtr.Size == 4)
+            {
+                return GetWindowLong32(hWnd, nIndex);
+            }
+
+            return GetWindowLongPtr64(hWnd, nIndex);
+        }
+
+        public static IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+        {
+            if (IntPtr.Size == 4)
+            {
+                return SetWindowLongPtr32(hWnd, nIndex, dwNewLong);
+            }
+
+            return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
+        }
+
         private static Icon GetSmallApplicationIcon(IntPtr handle)
         {
-            SendMessageTimeout(handle, (int)WindowsMessages.GETICON, NativeConstants.ICON_SMALL2, 0, SendMessageTimeoutFlags.SMTO_ABORTIFHUNG, 1000, out IntPtr iconHandle);
+            IntPtr iconHandle;
+
+            SendMessageTimeout(handle, (int)WindowsMessages.GETICON, NativeConstants.ICON_SMALL2, 0, SendMessageTimeoutFlags.SMTO_ABORTIFHUNG, 1000, out iconHandle);
 
             if (iconHandle == IntPtr.Zero)
             {
@@ -176,8 +198,7 @@ namespace ShareX.HelpersLib
 
         public static bool GetBorderSize(IntPtr handle, out Size size)
         {
-            WINDOWINFO wi = new WINDOWINFO();
-
+            WINDOWINFO wi = WINDOWINFO.Create();
             bool result = GetWindowInfo(handle, ref wi);
 
             if (result)
@@ -365,6 +386,11 @@ namespace ShareX.HelpersLib
             return false;
         }
 
+        public static bool IsActive(IntPtr handle)
+        {
+            return GetForegroundWindow() == handle;
+        }
+
         public static void RestoreWindow(IntPtr handle)
         {
             WINDOWPLACEMENT wp = new WINDOWPLACEMENT();
@@ -464,7 +490,7 @@ namespace ShareX.HelpersLib
 
         public static bool Is64Bit()
         {
-#if WindowsStore
+#if MicrosoftStore
             return true;
 #else
             return IntPtr.Size == 8 || (IntPtr.Size == 4 && Is32BitProcessOn64BitProcessor());
@@ -505,14 +531,14 @@ namespace ShareX.HelpersLib
 
         public static bool CreateProcess(string path, string arguments, CreateProcessFlags flags = CreateProcessFlags.NORMAL_PRIORITY_CLASS)
         {
-            PROCESS_INFORMATION pInfo = new PROCESS_INFORMATION();
+            //PROCESS_INFORMATION pInfo = new PROCESS_INFORMATION();
             STARTUPINFO sInfo = new STARTUPINFO();
             SECURITY_ATTRIBUTES pSec = new SECURITY_ATTRIBUTES();
             SECURITY_ATTRIBUTES tSec = new SECURITY_ATTRIBUTES();
             pSec.nLength = Marshal.SizeOf(pSec);
             tSec.nLength = Marshal.SizeOf(tSec);
 
-            return CreateProcess(path, $"\"{path}\" {arguments}", ref pSec, ref tSec, false, (uint)flags, IntPtr.Zero, null, ref sInfo, out pInfo);
+            return CreateProcess(path, $"\"{path}\" {arguments}", ref pSec, ref tSec, false, (uint)flags, IntPtr.Zero, null, ref sInfo, out _);
         }
 
         public static Icon GetFileIcon(string filePath, bool isSmallIcon)

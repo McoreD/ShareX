@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -133,7 +133,7 @@ namespace ShareX.MediaLib
 
         private void btnOutputFolder_Click(object sender, EventArgs e)
         {
-            Helpers.BrowseFolder(txtOutputFolder);
+            FileHelpers.BrowseFolder(txtOutputFolder);
         }
 
         private void txtOutputFilename_TextChanged(object sender, EventArgs e)
@@ -149,7 +149,7 @@ namespace ShareX.MediaLib
                 int height = (int)nudHeight.Value;
                 int quality = (int)nudQuality.Value;
                 string outputFolder = txtOutputFolder.Text;
-                string outputFilename = txtOutputFilename.Text;
+                string outputFileName = txtOutputFilename.Text;
 
                 Cursor = Cursors.WaitCursor;
 
@@ -167,10 +167,14 @@ namespace ShareX.MediaLib
                                 {
                                     using (Bitmap thumbnail = ImageHelpers.CreateThumbnail(bmp, width, height))
                                     {
-                                        string filename = Path.GetFileNameWithoutExtension(filePath);
-                                        string outputPath = Path.Combine(outputFolder, outputFilename.Replace("$filename", filename));
+                                        string fileName = Path.GetFileNameWithoutExtension(filePath);
+                                        string outputPath = Path.Combine(outputFolder, outputFileName.Replace("$filename", fileName));
                                         outputPath = Path.ChangeExtension(outputPath, "jpg");
-                                        thumbnail.SaveJPG(outputPath, quality);
+
+                                        using (Bitmap newImage = ImageHelpers.FillBackground(thumbnail, Color.White))
+                                        {
+                                            ImageHelpers.SaveJPEG(newImage, outputPath, quality);
+                                        }
                                     }
                                 }
                             }

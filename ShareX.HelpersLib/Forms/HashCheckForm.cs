@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -44,12 +44,15 @@ namespace ShareX.HelpersLib
 
             UpdateCompareControls();
             cbHashType.Items.AddRange(Helpers.GetEnumDescriptions<HashType>());
-            cbHashType.SelectedIndex = (int)HashType.SHA1;
+            cbHashType.SelectedIndex = (int)HashType.SHA256;
 
             hashCheck = new HashCheck();
             hashCheck.FileCheckProgressChanged += fileCheck_FileCheckProgressChanged;
 
             translator = new Translator();
+
+            txtResult.SupportSelectAll();
+            txtTarget.SupportSelectAll();
         }
 
         #region File hash check
@@ -96,12 +99,12 @@ namespace ShareX.HelpersLib
 
         private void btnFilePathBrowse_Click(object sender, EventArgs e)
         {
-            Helpers.BrowseFile(txtFilePath);
+            FileHelpers.BrowseFile(txtFilePath);
         }
 
         private void btnFilePathBrowse2_Click(object sender, EventArgs e)
         {
-            Helpers.BrowseFile(txtFilePath2);
+            FileHelpers.BrowseFile(txtFilePath2);
         }
 
         private void cbCompareTwoFiles_CheckedChanged(object sender, EventArgs e)
@@ -166,22 +169,6 @@ namespace ShareX.HelpersLib
         private void txtTarget_TextChanged(object sender, EventArgs e)
         {
             UpdateResult();
-        }
-
-        private void txtResult_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Control && e.KeyCode == Keys.A)
-            {
-                txtResult.SelectAll();
-            }
-        }
-
-        private void txtTarget_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Control && e.KeyCode == Keys.A)
-            {
-                txtTarget.SelectAll();
-            }
         }
 
         private void tpFileHashCheck_DragEnter(object sender, DragEventArgs e)

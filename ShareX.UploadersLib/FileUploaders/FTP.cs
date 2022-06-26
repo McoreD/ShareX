@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -167,7 +167,7 @@ namespace ShareX.UploadersLib.FileUploaders
         {
             UploadResult result = new UploadResult();
 
-            string subFolderPath = Account.GetSubFolderPath(null, NameParserType.FolderPath);
+            string subFolderPath = Account.GetSubFolderPath(null, NameParserType.FilePath);
             string path = URLHelpers.CombineURL(subFolderPath, fileName);
             string url = Account.GetUriPath(fileName, subFolderPath);
 
@@ -233,7 +233,7 @@ namespace ShareX.UploadersLib.FileUploaders
             {
                 try
                 {
-                    return UploadData2(localStream, remotePath);
+                    return UploadDataInternal(localStream, remotePath);
                 }
                 catch (FtpCommandException e)
                 {
@@ -242,7 +242,7 @@ namespace ShareX.UploadersLib.FileUploaders
                     {
                         CreateMultiDirectory(URLHelpers.GetDirectoryPath(remotePath));
 
-                        return UploadData2(localStream, remotePath);
+                        return UploadDataInternal(localStream, remotePath);
                     }
 
                     throw e;
@@ -252,7 +252,7 @@ namespace ShareX.UploadersLib.FileUploaders
             return false;
         }
 
-        private bool UploadData2(Stream localStream, string remotePath)
+        private bool UploadDataInternal(Stream localStream, string remotePath)
         {
             bool result;
             using (Stream remoteStream = client.OpenWrite(remotePath))
@@ -302,18 +302,18 @@ namespace ShareX.UploadersLib.FileUploaders
             {
                 if (!string.IsNullOrEmpty(file))
                 {
-                    string filename = Path.GetFileName(file);
+                    string fileName = Path.GetFileName(file);
 
                     if (File.Exists(file))
                     {
-                        UploadFile(file, URLHelpers.CombineURL(remotePath, filename));
+                        UploadFile(file, URLHelpers.CombineURL(remotePath, fileName));
                     }
                     else if (Directory.Exists(file))
                     {
                         List<string> filesList = new List<string>();
                         filesList.AddRange(Directory.GetFiles(file));
                         filesList.AddRange(Directory.GetDirectories(file));
-                        string path = URLHelpers.CombineURL(remotePath, filename);
+                        string path = URLHelpers.CombineURL(remotePath, fileName);
                         CreateDirectory(path);
                         UploadFiles(filesList.ToArray(), path);
                     }
@@ -454,8 +454,8 @@ namespace ShareX.UploadersLib.FileUploaders
         {
             if (Connect())
             {
-                string filename = URLHelpers.GetFileName(remotePath);
-                if (filename == "." || filename == "..")
+                string fileName = URLHelpers.GetFileName(remotePath);
+                if (fileName == "." || fileName == "..")
                 {
                     return;
                 }

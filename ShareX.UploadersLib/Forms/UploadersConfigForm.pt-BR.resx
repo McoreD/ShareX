@@ -161,9 +161,6 @@ Por exemplo, se o seu bucket é chamado bucket.example.com então o URL será ht
   <data name="tpSendSpace.Text" xml:space="preserve">
     <value>SendSpace</value>
   </data>
-  <data name="tpGe_tt.Text" xml:space="preserve">
-    <value>Ge.tt</value>
-  </data>
   <data name="tpHostr.Text" xml:space="preserve">
     <value>Hostr</value>
   </data>
@@ -419,18 +416,6 @@ Usar uma biblioteca encriptada desabilita o compartilhamento.</value>
   </data>
   <data name="cbLocalhostrDirectURL.Text" xml:space="preserve">
     <value>Usar URL direto se existir</value>
-  </data>
-  <data name="btnGe_ttLogin.Text" xml:space="preserve">
-    <value>Logar</value>
-  </data>
-  <data name="lblGe_ttEmail.Text" xml:space="preserve">
-    <value>Email:</value>
-  </data>
-  <data name="lblGe_ttPassword.Text" xml:space="preserve">
-    <value>Senha:</value>
-  </data>
-  <data name="lblGe_ttStatus.Text" xml:space="preserve">
-    <value>Login exigido.</value>
   </data>
   <data name="lblSendSpaceUsername.Text" xml:space="preserve">
     <value>Usuário:</value>
@@ -843,38 +828,8 @@ Usar uma biblioteca encriptada desabilita o compartilhamento.</value>
   <data name="cbHastebinUseFileExtension.Text" xml:space="preserve">
     <value>Utilizar extensão do arquivo para destaque de sintaxe (exceto .txt)</value>
   </data>
-  <data name="txtB2CustomUrl.ToolTip" xml:space="preserve">
-    <value>Insira uma URL personalizada aqui que substituirá o host e o caminho que o BackBlaze retorna.</value>
-  </data>
   <data name="cbB2CustomUrl.Text" xml:space="preserve">
     <value>Usar URL personalizada (suporta formato padrão):</value>
-  </data>
-  <data name="cbB2CustomUrl.ToolTip" xml:space="preserve">
-    <value>Se ativado, a URL que você recebe será o caminho de upload
-anexado à URL fornecida.
-
-Isso é útil em conjunto com um serviço como CloudFlare ou
-outro serviço atuando como front-end para o B2. Veja o artigo
-"Criando uma URL curta com B2" na base de conhecimento do B2.
-
-Se desativado, o URL que você receberá será determinado
-por Backblaze B2.</value>
-  </data>
-  <data name="txtB2Bucket.ToolTip" xml:space="preserve">
-    <value>Onde armazenar seus arquivos.
-
-Isso só tem efeito quando você não definiu
-"Permitir acesso a balde (s)" a um balde
-quando você fez a chave do aplicativo.</value>
-  </data>
-  <data name="txtB2UploadPath.ToolTip" xml:space="preserve">
-    <value>O caminho para seu arquivo. Usa o formato do padrão de nome.</value>
-  </data>
-  <data name="txtB2ApplicationKey.ToolTip" xml:space="preserve">
-    <value>A chave do aplicativo. Parece alfanumérico.</value>
-  </data>
-  <data name="txtB2ApplicationKeyId.ToolTip" xml:space="preserve">
-    <value>O chave do aplicativo. Parece uma string hexadecimal minúscula.</value>
   </data>
   <data name="cbPolrUseAPIv1.Text" xml:space="preserve">
     <value>Use API v1 obsoleta</value>
@@ -1196,18 +1151,6 @@ quando você fez a chave do aplicativo.</value>
   </data>
   <data name="gbPlikSettings.Text" xml:space="preserve">
     <value>Outros ajustes</value>
-  </data>
-  <data name="cbxPlikTTLUnit.Items" xml:space="preserve">
-    <value>dias</value>
-  </data>
-  <data name="cbxPlikTTLUnit.Items1" xml:space="preserve">
-    <value>horas</value>
-  </data>
-  <data name="cbxPlikTTLUnit.Items2" xml:space="preserve">
-    <value>minutos</value>
-  </data>
-  <data name="cbxPlikTTLUnit.Items3" xml:space="preserve">
-    <value>nunca</value>
   </data>
   <data name="lblPlikTTL.Text" xml:space="preserve">
     <value>Os arquivos serão removidos automaticamente em</value>

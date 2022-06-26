@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -46,17 +46,24 @@ namespace ShareX.ScreenCaptureLib
 
         public static bool GetRectangleRegion(out Rectangle rect, RegionCaptureOptions options)
         {
+            return GetRectangleRegion(out rect, out _, options);
+        }
+
+        public static bool GetRectangleRegion(out Rectangle rect, out WindowInfo windowInfo, RegionCaptureOptions options)
+        {
             RegionCaptureOptions newOptions = GetRegionCaptureOptions(options);
 
             using (RegionCaptureForm form = new RegionCaptureForm(RegionCaptureMode.Default, newOptions))
             {
                 form.ShowDialog();
 
+                windowInfo = form.GetWindowInfo();
+
                 if (form.Result == RegionResult.Region)
                 {
                     if (form.ShapeManager.IsCurrentShapeValid)
                     {
-                        rect = CaptureHelpers.ClientToScreen(form.ShapeManager.CurrentRectangle);
+                        rect = CaptureHelpers.ClientToScreen(form.ShapeManager.CurrentRectangle.Round());
                         return true;
                     }
                 }
@@ -146,7 +153,7 @@ namespace ShareX.ScreenCaptureLib
         public static void ShowScreenColorPickerDialog(RegionCaptureOptions options)
         {
             Color color = Color.Red;
-            ColorPickerForm colorPickerForm = new ColorPickerForm(color, true);
+            ColorPickerForm colorPickerForm = new ColorPickerForm(color, true, true, options.ColorPickerOptions);
             colorPickerForm.EnableScreenColorPickerButton(() => GetPointInfo(options));
             colorPickerForm.Show();
         }
@@ -168,8 +175,8 @@ namespace ShareX.ScreenCaptureLib
             if (bmp != null && gp != null)
             {
                 Rectangle regionArea = Rectangle.Round(gp.GetBounds());
-                Rectangle screenRectangle = CaptureHelpers.GetScreenBounds0Based();
-                resultArea = Rectangle.Intersect(regionArea, screenRectangle);
+                Rectangle screenRectangle = CaptureHelpers.GetScreenBounds();
+                resultArea = Rectangle.Intersect(regionArea, new Rectangle(0, 0, screenRectangle.Width, screenRectangle.Height));
 
                 if (resultArea.IsValid())
                 {

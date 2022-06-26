@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -93,6 +93,9 @@ namespace ShareX
                 pbProgress.MouseUp -= value;
             }
         }
+
+        public delegate void TaskThumbnailPanelEventHandler(TaskThumbnailPanel panel);
+        public event TaskThumbnailPanelEventHandler ImagePreviewRequested;
 
         public WorkerTask Task { get; private set; }
 
@@ -227,7 +230,7 @@ namespace ShareX
             }
         }
 
-        public bool ThumbnailSupportsClick { get; private set; }
+        public ThumbnailViewClickAction ClickAction { get; set; }
 
         private Rectangle dragBoxFromMouseDown;
 
@@ -238,6 +241,11 @@ namespace ShareX
             InitializeComponent();
             UpdateTheme();
             UpdateTitle();
+        }
+
+        protected void OnImagePreviewRequested()
+        {
+            ImagePreviewRequested?.Invoke(this);
         }
 
         public void UpdateTheme()
@@ -320,9 +328,8 @@ namespace ShareX
                 {
                     string filePath = Task.Info.FilePath;
 
-                    if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                    if (ClickAction != ThumbnailViewClickAction.Select && !string.IsNullOrEmpty(filePath) && File.Exists(filePath))
                     {
-                        ThumbnailSupportsClick = true;
                         pbThumbnail.Cursor = Cursors.Hand;
                     }
 
@@ -407,10 +414,84 @@ namespace ShareX
                 temp.Dispose();
             }
 
-            ThumbnailSupportsClick = false;
             pbThumbnail.Cursor = Cursors.Default;
 
             ThumbnailExists = false;
+        }
+
+        private void ExecuteClickAction(ThumbnailViewClickAction clickAction, TaskInfo info)
+        {
+            if (info != null)
+            {
+                string filePath = info.FilePath;
+
+                switch (clickAction)
+                {
+                    case ThumbnailViewClickAction.Default:
+                        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                        {
+                            if (FileHelpers.IsImageFile(filePath))
+                            {
+                                pbThumbnail.Enabled = false;
+
+                                try
+                                {
+                                    OnImagePreviewRequested();
+                                }
+                                finally
+                                {
+                                    pbThumbnail.Enabled = true;
+                                }
+                            }
+                            else if (FileHelpers.IsTextFile(filePath) || FileHelpers.IsVideoFile(filePath) ||
+                                MessageBox.Show("Would you like to open this file?" + "\r\n\r\n" + filePath,
+                                Resources.ShareXConfirmation, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                            {
+                                FileHelpers.OpenFile(filePath);
+                            }
+                        }
+                        break;
+                    case ThumbnailViewClickAction.OpenImageViewer:
+                        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && FileHelpers.IsImageFile(filePath))
+                        {
+                            pbThumbnail.Enabled = false;
+
+                            try
+                            {
+                                OnImagePreviewRequested();
+                            }
+                            finally
+                            {
+                                pbThumbnail.Enabled = true;
+                            }
+                        }
+                        break;
+                    case ThumbnailViewClickAction.OpenFile:
+                        if (!string.IsNullOrEmpty(filePath))
+                        {
+                            FileHelpers.OpenFile(filePath);
+                        }
+                        break;
+                    case ThumbnailViewClickAction.OpenFolder:
+                        if (!string.IsNullOrEmpty(filePath))
+                        {
+                            FileHelpers.OpenFolderWithFile(filePath);
+                        }
+                        break;
+                    case ThumbnailViewClickAction.OpenURL:
+                        if (info.Result != null)
+                        {
+                            URLHelpers.OpenURL(info.Result.ToString());
+                        }
+                        break;
+                    case ThumbnailViewClickAction.EditImage:
+                        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && FileHelpers.IsImageFile(filePath))
+                        {
+                            TaskHelpers.AnnotateImageFromFile(filePath);
+                        }
+                        break;
+                }
+            }
         }
 
         private void LblTitle_MouseClick(object sender, MouseEventArgs e)
@@ -430,7 +511,7 @@ namespace ShareX
 
                 if (!string.IsNullOrEmpty(Task.Info.FilePath))
                 {
-                    Helpers.OpenFile(Task.Info.FilePath);
+                    FileHelpers.OpenFile(Task.Info.FilePath);
                 }
             }
         }
@@ -459,31 +540,17 @@ namespace ShareX
 
         private void PbThumbnail_MouseClick(object sender, MouseEventArgs e)
         {
-            if (ThumbnailSupportsClick && ModifierKeys == Keys.None && e.Button == MouseButtons.Left && Task.Info != null)
+            if (ModifierKeys == Keys.None && e.Button == MouseButtons.Left)
             {
-                string filePath = Task.Info.FilePath;
+                ExecuteClickAction(ClickAction, Task.Info);
+            }
+        }
 
-                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
-                {
-                    if (Helpers.IsImageFile(filePath))
-                    {
-                        pbThumbnail.Enabled = false;
-
-                        try
-                        {
-                            ImageViewer.ShowImage(filePath);
-                        }
-                        finally
-                        {
-                            pbThumbnail.Enabled = true;
-                        }
-                    }
-                    else if (Helpers.IsTextFile(filePath) || Helpers.IsVideoFile(filePath) || MessageBox.Show("Would you like to open this file?" + "\r\n\r\n" + filePath,
-                        Resources.ShareXConfirmation, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    {
-                        Helpers.OpenFile(filePath);
-                    }
-                }
+        private void pbThumbnail_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (ModifierKeys == Keys.None && e.Button == MouseButtons.Left && ClickAction == ThumbnailViewClickAction.Select)
+            {
+                ExecuteClickAction(ThumbnailViewClickAction.OpenFile, Task.Info);
             }
         }
 

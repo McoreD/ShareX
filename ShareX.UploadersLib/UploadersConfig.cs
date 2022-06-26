@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -228,12 +228,6 @@ namespace ShareX.UploadersLib
 
         #endregion Box
 
-        #region Ge.tt
-
-        public Ge_ttLogin Ge_ttLogin { get; set; } = null;
-
-        #endregion Ge.tt
-
         #region Localhostr
 
         public string LocalhostrEmail { get; set; } = "";
@@ -304,6 +298,7 @@ namespace ShareX.UploadersLib
         public bool OwnCloudDirectLink { get; set; } = false;
         public bool OwnCloud81Compatibility { get; set; } = true;
         public bool OwnCloudUsePreviewLinks { get; set; } = false;
+        public bool OwnCloudAppendFileNameToURL { get; set; } = false;
         public bool OwnCloudAutoExpire { get; set; } = false;
 
         #endregion ownCloud / Nextcloud
@@ -330,11 +325,11 @@ namespace ShareX.UploadersLib
 
         #endregion Lambda
 
-        #region Lithiio
+        #region LobFile
 
-        public LithiioSettings LithiioSettings { get; set; } = new LithiioSettings();
+        public LobFileSettings LithiioSettings { get; set; } = new LobFileSettings();
 
-        #endregion Lithiio
+        #endregion
 
         #region Teknik
 
@@ -386,7 +381,6 @@ namespace ShareX.UploadersLib
 
         #region Streamable
 
-        public bool StreamableAnonymous { get; set; } = true;
         public string StreamableUsername { get; set; } = "";
         [JsonEncrypt]
         public string StreamablePassword { get; set; } = "";
@@ -429,6 +423,7 @@ namespace ShareX.UploadersLib
         public OAuth2Info YouTubeOAuth2Info { get; set; } = null;
         public YouTubeVideoPrivacy YouTubePrivacyType { get; set; } = YouTubeVideoPrivacy.Public;
         public bool YouTubeUseShortenedLink { get; set; } = false;
+        public bool YouTubeShowDialog { get; set; } = false;
 
         #endregion YouTube
 

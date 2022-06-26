@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -268,7 +268,7 @@ namespace ShareX.HelpersLib
 
             if (useRegex)
             {
-                // https://gist.github.com/729294
+                // Source: https://gist.github.com/729294
                 string pattern =
                     "^" +
                     // protocol identifier
@@ -418,7 +418,12 @@ namespace ShareX.HelpersLib
 
         public static bool HasPrefix(string url)
         {
-            return URLPrefixes.Any(x => url.StartsWith(x, StringComparison.InvariantCultureIgnoreCase));
+            return URLPrefixes.Any(x => url.StartsWith(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static string GetPrefix(string url)
+        {
+            return URLPrefixes.FirstOrDefault(x => url.StartsWith(x, StringComparison.OrdinalIgnoreCase));
         }
 
         public static string FixPrefix(string url, string prefix = "http://")
@@ -445,7 +450,7 @@ namespace ShareX.HelpersLib
         {
             foreach (string prefix in URLPrefixes)
             {
-                if (url.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+                if (url.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
                     url = url.Remove(0, prefix.Length);
                     break;
@@ -463,7 +468,7 @@ namespace ShareX.HelpersLib
 
                 if (!string.IsNullOrEmpty(host))
                 {
-                    if (host.StartsWith("www.", StringComparison.InvariantCultureIgnoreCase))
+                    if (host.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
                     {
                         host = host.Substring(4);
                     }

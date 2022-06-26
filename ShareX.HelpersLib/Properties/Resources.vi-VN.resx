@@ -672,9 +672,6 @@ Bạn có muốn tải về và cài đặt không?</value>
   <data name="ReplCodeMenuCategory_Computer" xml:space="preserve">
     <value>Máy tính</value>
   </data>
-  <data name="ReplCodeMenuCategory_Target" xml:space="preserve">
-    <value>Đối tượng</value>
-  </data>
   <data name="HotkeyType_ScrollingCapture" xml:space="preserve">
     <value>Chụp khi cuộn trang</value>
   </data>
@@ -972,12 +969,6 @@ Bạn có muốn tải về không?</value>
   </data>
   <data name="HotkeyType_ScreenRecorderCustomRegion_Category" xml:space="preserve">
     <value>Ghi lại màn hình</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD" xml:space="preserve">
-    <value>Lưu trữ tiêu chuẩn</value>
-  </data>
-  <data name="AmazonS3StorageClass_STANDARD_IA" xml:space="preserve">
-    <value>Lưu trữ ít truy cập tiêu chuẩn</value>
   </data>
   <data name="UpdateMessageBox_UpdateMessageBox_LatestVersion" xml:space="preserve">
     <value>Phiên bản mới nhất</value>

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -91,11 +91,11 @@ namespace ShareX.ScreenCaptureLib
 
             if (tscbStickers.SelectedItem is StickerPackInfo stickerPack && !string.IsNullOrEmpty(stickerPack.FolderPath))
             {
-                string folderPath = Helpers.GetAbsolutePath(stickerPack.FolderPath);
+                string folderPath = FileHelpers.GetAbsolutePath(stickerPack.FolderPath);
 
                 if (Directory.Exists(folderPath))
                 {
-                    imageFiles = Directory.GetFiles(folderPath).Where(x => Helpers.IsImageFile(x)).ToArray();
+                    imageFiles = Directory.GetFiles(folderPath).Where(x => FileHelpers.IsImageFile(x)).ToArray();
 
                     UpdateImageFiles();
                 }

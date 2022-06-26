@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -447,7 +447,7 @@ namespace ShareX.ScreenCaptureLib
             };
             tsMain.Items.Add(tsbHighlightColor);
 
-            tsddbShapeOptions = new ToolStripDropDownButton(Resources.ShapeManager_CreateToolbar_ShapeOptions);
+            tsddbShapeOptions = new ToolStripDropDownButton(Resources.ShapeManager_CreateToolbar_ToolOptions);
             tsddbShapeOptions.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsddbShapeOptions.Image = Resources.layer__pencil;
             tsMain.Items.Add(tsddbShapeOptions);
@@ -514,8 +514,7 @@ namespace ShareX.ScreenCaptureLib
             };
             tsddbShapeOptions.DropDownItems.Add(tslnudCornerRadius);
 
-            // TODO: Translate
-            tscbBorderStyle = new ToolStripLabeledComboBox("Border style:");
+            tscbBorderStyle = new ToolStripLabeledComboBox(Resources.ShapeManager_BorderStyle);
             tscbBorderStyle.Content.AddRange(Helpers.GetLocalizedEnumDescriptions<BorderStyle>());
             tscbBorderStyle.Content.SelectedIndexChanged += (sender, e) =>
             {
@@ -598,7 +597,7 @@ namespace ShareX.ScreenCaptureLib
             tsddbShapeOptions.DropDownItems.Add(tslnudStepFontSize);
 
             tslnudStartingStepValue = new ToolStripLabeledNumericUpDown(Resources.ShapeManager_CreateToolbar_StartingStepValue);
-            tslnudStartingStepValue.Content.Minimum = 1;
+            tslnudStartingStepValue.Content.Minimum = 0;
             tslnudStartingStepValue.Content.Maximum = 10000;
             tslnudStartingStepValue.Content.ValueChanged = (sender, e) =>
             {
@@ -886,6 +885,18 @@ namespace ShareX.ScreenCaptureLib
                     (sender, e) => Options.ImageEditorStartMode = (ImageEditorStartMode)tscbImageEditorStartMode.Content.SelectedIndex;
                 tsddbOptions.DropDownItems.Add(tscbImageEditorStartMode);
 
+                ToolStripMenuItem tsmiZoomToFitOnOpen = new ToolStripMenuItem(Resources.ShapeManager_CreateToolbar_ZoomToFitOnOpen);
+                tsmiZoomToFitOnOpen.Checked = Options.ZoomToFitOnOpen;
+                tsmiZoomToFitOnOpen.CheckOnClick = true;
+                tsmiZoomToFitOnOpen.Click += (sender, e) => Options.ZoomToFitOnOpen = tsmiZoomToFitOnOpen.Checked;
+                tsddbOptions.DropDownItems.Add(tsmiZoomToFitOnOpen);
+
+                ToolStripMenuItem tsmiEditorAutoCopyImage = new ToolStripMenuItem(Resources.AutoCopyImageToClipboard);
+                tsmiEditorAutoCopyImage.Checked = Options.EditorAutoCopyImage;
+                tsmiEditorAutoCopyImage.CheckOnClick = true;
+                tsmiEditorAutoCopyImage.Click += (sender, e) => Options.EditorAutoCopyImage = tsmiEditorAutoCopyImage.Checked;
+                tsddbOptions.DropDownItems.Add(tsmiEditorAutoCopyImage);
+
                 ToolStripMenuItem tsmiAutoCloseEditorOnTask = new ToolStripMenuItem(Resources.ShapeManager_CreateToolbar_AutoCloseEditorOnTask);
                 tsmiAutoCloseEditorOnTask.Checked = Options.AutoCloseEditorOnTask;
                 tsmiAutoCloseEditorOnTask.CheckOnClick = true;
@@ -984,6 +995,17 @@ namespace ShareX.ScreenCaptureLib
             };
             tsddbOptions.DropDownItems.Add(tsmiShowFPS);
 
+            ToolStripLabeledNumericUpDown tslnudFPSLimit = new ToolStripLabeledNumericUpDown(Resources.FPSLimit);
+            tslnudFPSLimit.Content.Minimum = 0;
+            tslnudFPSLimit.Content.Maximum = 300;
+            tslnudFPSLimit.Content.Value = Options.FPSLimit;
+            tslnudFPSLimit.Content.ValueChanged = (sender, e) =>
+            {
+                Options.FPSLimit = (int)tslnudFPSLimit.Content.Value;
+                Form.FPSManager.FPSLimit = Options.FPSLimit;
+            };
+            tsddbOptions.DropDownItems.Add(tslnudFPSLimit);
+
             ToolStripMenuItem tsmiSwitchToDrawingToolAfterSelection = new ToolStripMenuItem(Resources.ShapeManager_CreateContextMenu_SwitchToDrawingToolAfterSelection);
             tsmiSwitchToDrawingToolAfterSelection.Checked = Options.SwitchToDrawingToolAfterSelection;
             tsmiSwitchToDrawingToolAfterSelection.CheckOnClick = true;
@@ -1062,7 +1084,7 @@ namespace ShareX.ScreenCaptureLib
                     }
                 }
 
-                URLHelpers.OpenURL("https://getsharex.com/docs/region-capture");
+                URLHelpers.OpenURL(Links.DocsRegionCapture);
             };
             tsddbOptions.DropDownItems.Add(tsmiKeybinds);
 

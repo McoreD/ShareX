@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -93,10 +93,7 @@ namespace ShareX.MediaLib
             bool result = errorCode == 0;
             if (!result && ShowError)
             {
-                using (OutputBox outputBox = new OutputBox(Output.ToString(), Resources.FFmpegError))
-                {
-                    outputBox.ShowDialog();
-                }
+                OutputBox.Show(Output.ToString(), Resources.FFmpegError, true);
             }
             return result;
         }
@@ -187,7 +184,7 @@ namespace ShareX.MediaLib
             VideoInfo videoInfo = new VideoInfo();
             videoInfo.FilePath = videoPath;
 
-            Run($"-i \"{videoPath}\" -hide_banner");
+            Run($"-hide_banner -i \"{videoPath}\"");
             string output = Output.ToString();
 
             Match matchInput = Regex.Match(output, @"Duration: (?<Duration>\d{2}:\d{2}:\d{2}\.\d{2}),.+?start: (?<Start>\d+\.\d+),.+?bitrate: (?<Bitrate>\d+) kb/s",
@@ -229,24 +226,23 @@ namespace ShareX.MediaLib
         {
             DirectShowDevices devices = new DirectShowDevices();
 
-            Run("-list_devices true -f dshow -i dummy");
+            Run("-hide_banner -list_devices true -f dshow -i dummy");
 
             string output = Output.ToString();
             string[] lines = output.Lines();
-            bool isVideo = true;
-            Regex regex = new Regex(@"\[dshow @ \w+\]  ""(.+)""", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+            bool isAudio = false;
+            Regex regex = new Regex(@"\[dshow @ \w+\] +""(.+)""", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
             foreach (string line in lines)
             {
-                if (line.Contains("] DirectShow video devices", StringComparison.InvariantCulture))
+                if (line.Contains("] DirectShow video devices"))
                 {
-                    isVideo = true;
+                    isAudio = false;
                     continue;
                 }
-
-                if (line.Contains("] DirectShow audio devices", StringComparison.InvariantCulture))
+                else if (line.Contains("] DirectShow audio devices"))
                 {
-                    isVideo = false;
+                    isAudio = true;
                     continue;
                 }
 
@@ -254,15 +250,24 @@ namespace ShareX.MediaLib
 
                 if (match.Success)
                 {
-                    string value = match.Groups[1].Value;
-
-                    if (isVideo)
+                    if (line.EndsWith("\" (video)"))
                     {
-                        devices.VideoDevices.Add(value);
+                        isAudio = false;
+                    }
+                    else if (line.EndsWith("\" (audio)"))
+                    {
+                        isAudio = true;
+                    }
+
+                    string deviceName = match.Groups[1].Value;
+
+                    if (isAudio)
+                    {
+                        devices.AudioDevices.Add(deviceName);
                     }
                     else
                     {
-                        devices.AudioDevices.Add(value);
+                        devices.VideoDevices.Add(deviceName);
                     }
                 }
             }

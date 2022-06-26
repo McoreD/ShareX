@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2020 ShareX Team
+    Copyright (c) 2007-2022 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -122,6 +122,11 @@ namespace ShareX.HelpersLib
         public static explicit operator Point(Vector2 u)
         {
             return new Point((int)Math.Round(u.x), (int)Math.Round(u.y));
+        }
+
+        public static explicit operator PointF(Vector2 u)
+        {
+            return new PointF(u.x, u.y);
         }
 
         public static implicit operator Vector2(Point p)
