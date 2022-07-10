@@ -91,7 +91,7 @@ namespace ShareX
 
             if (!OcrEngine.IsLanguageSupported(language))
             {
-                throw new Exception($"{language.LanguageTag} is not supported in this system.");
+                throw new Exception($"{language.DisplayName} language is not available in this system for OCR.");
             }
 
             OcrEngine engine = OcrEngine.TryCreateFromLanguage(language);
@@ -104,7 +104,23 @@ namespace ShareX
                 using (SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync())
                 {
                     OcrResult ocrResult = await engine.RecognizeAsync(softwareBitmap);
-                    return string.Join("\r\n", ocrResult.Lines.Select(x => x.Text));
+
+                    if (language.LanguageTag.StartsWith("zh", StringComparison.OrdinalIgnoreCase) || // Chinese
+                        language.LanguageTag.StartsWith("ja", StringComparison.OrdinalIgnoreCase) || // Japanese
+                        language.LanguageTag.StartsWith("ko", StringComparison.OrdinalIgnoreCase)) // Korean
+                    {
+                        // If CJK language then remove spaces between words.
+                        return string.Join("\r\n", ocrResult.Lines.Select(line => string.Concat(line.Words.Select(word => word.Text))));
+                    }
+                    else if (language.LayoutDirection == LanguageLayoutDirection.Rtl)
+                    {
+                        // If RTL language then reverse order of words.
+                        return string.Join("\r\n", ocrResult.Lines.Select(line => string.Join(" ", line.Words.Reverse().Select(word => word.Text))));
+                    }
+                    else
+                    {
+                        return string.Join("\r\n", ocrResult.Lines.Select(line => line.Text));
+                    }
                 }
             }
         }

@@ -189,7 +189,13 @@
     <EmbeddedResource Include="Forms\ImageEffectPackagerForm.ja-JP.resx">
       <DependentUpon>ImageEffectPackagerForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImageEffectPackagerForm.pl.resx">
+      <DependentUpon>ImageEffectPackagerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageEffectPackagerForm.resx">
+      <DependentUpon>ImageEffectPackagerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImageEffectPackagerForm.ro.resx">
       <DependentUpon>ImageEffectPackagerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageEffectPackagerForm.ru.resx">
@@ -234,6 +240,9 @@
     <EmbeddedResource Include="Forms\ImageEffectsForm.nl-NL.resx">
       <DependentUpon>ImageEffectsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImageEffectsForm.pl.resx">
+      <DependentUpon>ImageEffectsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageEffectsForm.pt-BR.resx">
       <DependentUpon>ImageEffectsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -241,6 +250,9 @@
       <DependentUpon>ImageEffectsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageEffectsForm.resx">
+      <DependentUpon>ImageEffectsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImageEffectsForm.ro.resx">
       <DependentUpon>ImageEffectsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImageEffectsForm.ru.resx">
@@ -272,12 +284,14 @@
     <EmbeddedResource Include="Properties\Resources.ja-JP.resx" />
     <EmbeddedResource Include="Properties\Resources.ko-KR.resx" />
     <EmbeddedResource Include="Properties\Resources.nl-NL.resx" />
+    <EmbeddedResource Include="Properties\Resources.pl.resx" />
     <EmbeddedResource Include="Properties\Resources.pt-BR.resx" />
     <EmbeddedResource Include="Properties\Resources.pt-PT.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ro.resx" />
     <EmbeddedResource Include="Properties\Resources.ru.resx" />
     <EmbeddedResource Include="Properties\Resources.tr.resx" />
     <EmbeddedResource Include="Properties\Resources.uk.resx" />

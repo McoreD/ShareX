@@ -414,6 +414,9 @@
     <EmbeddedResource Include="Controls\AccountTypeControl.nl-NL.resx">
       <DependentUpon>AccountTypeControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\AccountTypeControl.pl.resx">
+      <DependentUpon>AccountTypeControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\AccountTypeControl.pt-BR.resx">
       <DependentUpon>AccountTypeControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -471,10 +474,16 @@
     <EmbeddedResource Include="Controls\OAuthControl.nl-NL.resx">
       <DependentUpon>OAuthControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\OAuthControl.pl.resx">
+      <DependentUpon>OAuthControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\OAuthControl.pt-BR.resx">
       <DependentUpon>OAuthControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\OAuthControl.pt-PT.resx">
+      <DependentUpon>OAuthControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\OAuthControl.ro.resx">
       <DependentUpon>OAuthControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\OAuthControl.ru.resx">
@@ -508,6 +517,9 @@
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.ko-KR.resx">
+      <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.pl.resx">
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.pt-PT.resx">
@@ -570,10 +582,16 @@
     <EmbeddedResource Include="Forms\EmailForm.nl-NL.resx">
       <DependentUpon>EmailForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EmailForm.pl.resx">
+      <DependentUpon>EmailForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\EmailForm.pt-BR.resx">
       <DependentUpon>EmailForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EmailForm.pt-PT.resx">
+      <DependentUpon>EmailForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EmailForm.ro.resx">
       <DependentUpon>EmailForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EmailForm.ru.resx">
@@ -627,10 +645,16 @@
     <EmbeddedResource Include="Forms\JiraUpload.nl-NL.resx">
       <DependentUpon>JiraUpload.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\JiraUpload.pl.resx">
+      <DependentUpon>JiraUpload.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\JiraUpload.pt-BR.resx">
       <DependentUpon>JiraUpload.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\JiraUpload.pt-PT.resx">
+      <DependentUpon>JiraUpload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\JiraUpload.ro.resx">
       <DependentUpon>JiraUpload.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\JiraUpload.ru.resx">
@@ -666,10 +690,16 @@
     <EmbeddedResource Include="Forms\PuushLoginForm.ko-KR.resx">
       <DependentUpon>PuushLoginForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PuushLoginForm.pl.resx">
+      <DependentUpon>PuushLoginForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\PuushLoginForm.pt-PT.resx">
       <DependentUpon>PuushLoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PuushLoginForm.resx">
+      <DependentUpon>PuushLoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PuushLoginForm.ro.resx">
       <DependentUpon>PuushLoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PuushLoginForm.ru.resx">
@@ -723,10 +753,16 @@
     <EmbeddedResource Include="Forms\ResponseForm.nl-NL.resx">
       <DependentUpon>ResponseForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ResponseForm.pl.resx">
+      <DependentUpon>ResponseForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ResponseForm.pt-BR.resx">
       <DependentUpon>ResponseForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ResponseForm.pt-PT.resx">
+      <DependentUpon>ResponseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ResponseForm.ro.resx">
       <DependentUpon>ResponseForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ResponseForm.ru.resx">
@@ -765,10 +801,16 @@
     <EmbeddedResource Include="Forms\TextUploadForm.ko-KR.resx">
       <DependentUpon>TextUploadForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.pl.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\TextUploadForm.pt-PT.resx">
       <DependentUpon>TextUploadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TextUploadForm.resx">
+      <DependentUpon>TextUploadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextUploadForm.ro.resx">
       <DependentUpon>TextUploadForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TextUploadForm.ru.resx">
@@ -820,6 +862,9 @@
       <DependentUpon>TwitterTweetForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TwitterTweetForm.nl-NL.resx">
+      <DependentUpon>TwitterTweetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TwitterTweetForm.pl.resx">
       <DependentUpon>TwitterTweetForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TwitterTweetForm.pt-BR.resx">
@@ -879,10 +924,16 @@
     <EmbeddedResource Include="Forms\UploadersConfigForm.nl-NL.resx">
       <DependentUpon>UploadersConfigForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UploadersConfigForm.pl.resx">
+      <DependentUpon>UploadersConfigForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\UploadersConfigForm.pt-BR.resx">
       <DependentUpon>UploadersConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UploadersConfigForm.pt-PT.resx">
+      <DependentUpon>UploadersConfigForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UploadersConfigForm.ro.resx">
       <DependentUpon>UploadersConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UploadersConfigForm.ru.resx">
@@ -936,10 +987,16 @@
     <EmbeddedResource Include="Forms\UserPassBox.nl-NL.resx">
       <DependentUpon>UserPassBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UserPassBox.pl.resx">
+      <DependentUpon>UserPassBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\UserPassBox.pt-BR.resx">
       <DependentUpon>UserPassBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UserPassBox.pt-PT.resx">
+      <DependentUpon>UserPassBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UserPassBox.ro.resx">
       <DependentUpon>UserPassBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UserPassBox.ru.resx">
@@ -987,7 +1044,13 @@
       <DependentUpon>TwitterTweetForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.pl.resx">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.resx">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.ro.resx">
       <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.ru.resx">
@@ -1016,6 +1079,7 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ro.resx" />
     <EmbeddedResource Include="Properties\Resources.ru.resx" />
     <EmbeddedResource Include="Properties\Resources.tr.resx" />
     <EmbeddedResource Include="Properties\Resources.uk.resx" />
@@ -1083,7 +1147,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP">
-      <Version>37.0.3</Version>
+      <Version>37.0.5</Version>
     </PackageReference>
     <PackageReference Include="MegaApiClient">
       <Version>1.10.2</Version>

@@ -178,6 +178,15 @@ namespace ShareX.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Polish.
+        /// </summary>
+        public static string AboutForm_AboutForm_Language_pl {
+            get {
+                return ResourceManager.GetString("AboutForm_AboutForm_Language_pl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Portuguese (Brazil).
         /// </summary>
         public static string AboutForm_AboutForm_Language_pt_BR {
@@ -192,6 +201,15 @@ namespace ShareX.Properties {
         public static string AboutForm_AboutForm_Language_pt_PT {
             get {
                 return ResourceManager.GetString("AboutForm_AboutForm_Language_pt_PT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Romanian.
+        /// </summary>
+        public static string AboutForm_AboutForm_Language_ro {
+            get {
+                return ResourceManager.GetString("AboutForm_AboutForm_Language_ro", resourceCulture);
             }
         }
         
@@ -2257,6 +2275,16 @@ namespace ShareX.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap pl {
+            get {
+                object obj = ResourceManager.GetObject("pl", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap printer {
             get {
                 object obj = ResourceManager.GetObject("printer", resourceCulture);
@@ -2299,6 +2327,16 @@ namespace ShareX.Properties {
         public static string QRCodeForm_InputTextToEncode {
             get {
                 return ResourceManager.GetString("QRCodeForm_InputTextToEncode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap question {
+            get {
+                object obj = ResourceManager.GetObject("question", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -2354,6 +2392,16 @@ namespace ShareX.Properties {
         public static System.Drawing.Bitmap Rectangle {
             get {
                 object obj = ResourceManager.GetObject("Rectangle", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap ro {
+            get {
+                object obj = ResourceManager.GetObject("ro", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -345,7 +345,7 @@ namespace ShareX
 
             try
             {
-                OCRLanguage[] languages = OCRHelper.AvailableLanguages;
+                OCRLanguage[] languages = OCRHelper.AvailableLanguages.OrderBy(x => x.DisplayName).ToArray();
 
                 if (languages.Length > 0)
                 {
@@ -1342,6 +1342,11 @@ namespace ShareX
             {
                 TaskSettings.CaptureSettings.OCROptions.Language = ((OCRLanguage)cbCaptureOCRDefaultLanguage.SelectedItem).LanguageTag;
             }
+        }
+
+        private void btnCaptureOCRHelp_Click(object sender, EventArgs e)
+        {
+            URLHelpers.OpenURL(Links.DocsOCR);
         }
 
         private void cbCaptureOCRSilent_CheckedChanged(object sender, EventArgs e)
