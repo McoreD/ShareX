@@ -1274,7 +1274,7 @@ namespace ShareX
 
             if (bmp != null)
             {
-                result = await OCRHelper.OCR(bmp, options.Language, options.ScaleFactor);
+                result = await OCRHelper.OCR(bmp, options.Language, options.ScaleFactor, options.SingleLine);
             }
 
             if (!string.IsNullOrEmpty(result))

@@ -82,8 +82,14 @@ namespace ShareX
             }
 
             nudScaleFactor.SetValue((decimal)Options.ScaleFactor);
+            cbSingleLine.Checked = Options.SingleLine;
 
-            if (Options.ServiceLinks != null && Options.ServiceLinks.Count > 0)
+            if (Options.ServiceLinks == null || Options.IsDefaultServiceLinks())
+            {
+                Options.ServiceLinks = OCROptions.DefaultServiceLinks;
+            }
+
+            if (Options.ServiceLinks.Count > 0)
             {
                 cbServices.Items.AddRange(Options.ServiceLinks.ToArray());
                 cbServices.SelectedIndex = Options.SelectedServiceLink;
@@ -124,6 +130,7 @@ namespace ShareX
             btnSelectRegion.Enabled = !busy;
             cbLanguages.Enabled = !busy;
             nudScaleFactor.Enabled = !busy;
+            cbSingleLine.Enabled = !busy;
         }
 
         private async Task OCR(Bitmap bmp)
@@ -136,7 +143,7 @@ namespace ShareX
 
                 try
                 {
-                    Result = await OCRHelper.OCR(bmp, Options.Language, Options.ScaleFactor);
+                    Result = await OCRHelper.OCR(bmp, Options.Language, Options.ScaleFactor, Options.SingleLine);
 
                     if (Options.AutoCopy && !string.IsNullOrEmpty(Result))
                     {
@@ -152,6 +159,8 @@ namespace ShareX
                 {
                     busy = false;
                     txtResult.Text = Result;
+                    txtResult.Focus();
+                    txtResult.DeselectAll();
                     UpdateControls();
                 }
             }
@@ -204,6 +213,16 @@ namespace ShareX
             }
         }
 
+        private async void cbSingleLine_CheckedChanged(object sender, EventArgs e)
+        {
+            if (loaded)
+            {
+                Options.SingleLine = cbSingleLine.Checked;
+
+                await OCR(bmpSource);
+            }
+        }
+
         private void cbServices_SelectedIndexChanged(object sender, EventArgs e)
         {
             Options.SelectedServiceLink = cbServices.SelectedIndex;
@@ -236,10 +255,15 @@ namespace ShareX
             }
         }
 
+        private void btnCopyAll_Click(object sender, EventArgs e)
+        {
+            ClipboardHelpers.CopyText(txtResult.Text);
+        }
+
         private void txtResult_TextChanged(object sender, EventArgs e)
         {
             Result = txtResult.Text.Trim();
-            btnOpenServiceLink.Enabled = !string.IsNullOrEmpty(Result);
+            btnOpenServiceLink.Enabled = btnCopyAll.Enabled = !string.IsNullOrEmpty(Result);
         }
     }
 }
