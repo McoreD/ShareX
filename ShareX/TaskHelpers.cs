@@ -1298,6 +1298,17 @@ namespace ShareX
             }
         }
 
+        public static void PinToScreen(Image image)
+        {
+            PinToScreenForm.PinToScreen(image);
+        }
+
+        public static void PinToScreen(string filePath)
+        {
+            Image image = ImageHelpers.LoadImage(filePath);
+            PinToScreen(image);
+        }
+
         public static void TweetMessage()
         {
             if (IsUploadAllowed())
@@ -1515,6 +1526,7 @@ namespace ShareX
                     case AfterCaptureTasks.AddImageEffects: return Resources.image_saturation;
                     case AfterCaptureTasks.AnnotateImage: return Resources.image_pencil;
                     case AfterCaptureTasks.CopyImageToClipboard: return Resources.clipboard_paste_image;
+                    case AfterCaptureTasks.PinToScreen: return Resources.pin;
                     case AfterCaptureTasks.SendImageToPrinter: return Resources.printer;
                     case AfterCaptureTasks.SaveImageToFile: return Resources.disk;
                     case AfterCaptureTasks.SaveImageToFileWithDialog: return Resources.disk_rename;

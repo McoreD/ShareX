@@ -218,6 +218,15 @@ namespace ShareX.HelpersLib.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pin to screen.
+        /// </summary>
+        internal static string AfterCaptureTasks_PinToScreen {
+            get {
+                return ResourceManager.GetString("AfterCaptureTasks_PinToScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save image to file.
         /// </summary>
         internal static string AfterCaptureTasks_SaveImageToFile {
@@ -3968,6 +3977,15 @@ namespace ShareX.HelpersLib.Properties {
         internal static string ToastClickAction_OpenUrl {
             get {
                 return ResourceManager.GetString("ToastClickAction_OpenUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pin to screen.
+        /// </summary>
+        internal static string ToastClickAction_PinToScreen {
+            get {
+                return ResourceManager.GetString("ToastClickAction_PinToScreen", resourceCulture);
             }
         }
         
