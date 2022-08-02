@@ -118,24 +118,21 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="$this.Text" xml:space="preserve">
-    <value>ShareX - 光学文字识别（OCR）</value>
+    <value>ShareX - YouTube video seçenekleri</value>
   </data>
-  <data name="btnOpen.Text" xml:space="preserve">
-    <value>打开...</value>
+  <data name="btnCancel.Text" xml:space="preserve">
+    <value>İptal</value>
   </data>
-  <data name="btnSelectRegion.Text" xml:space="preserve">
-    <value>选择区域...</value>
+  <data name="lblDescription.Text" xml:space="preserve">
+    <value>Açıklama:</value>
   </data>
-  <data name="lblResult.Text" xml:space="preserve">
-    <value>结果：</value>
+  <data name="btnOK.Text" xml:space="preserve">
+    <value>Tamam</value>
   </data>
-  <data name="lblLanguage.Text" xml:space="preserve">
-    <value>语言：</value>
+  <data name="lblTitle.Text" xml:space="preserve">
+    <value>Başlık:</value>
   </data>
-  <data name="lblStatus.Text" xml:space="preserve">
-    <value>OCR 处理中...</value>
-  </data>
-  <data name="lblScaleFactor.Text" xml:space="preserve">
-    <value>比例因子：</value>
+  <data name="lblVisibility.Text" xml:space="preserve">
+    <value>Görünürlük:</value>
   </data>
 </root>

@@ -120,7 +120,7 @@
   <data name="btnHotkey.Text" xml:space="preserve">
     <value>Skrót klawiszowy</value>
   </data>
-  <data name="lblHotkeyDescription.Text" xml:space="preserve">
-    <value>Opis</value>
+  <data name="btnTask.Text" xml:space="preserve">
+    <value>Zadanie...</value>
   </data>
 </root>

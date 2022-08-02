@@ -538,7 +538,7 @@
     <value>Renk seçici...</value>
   </data>
   <data name="tsmiTrayRecentItems.Text" xml:space="preserve">
-    <value>Son adresler</value>
+    <value>Son bağlantılar</value>
   </data>
   <data name="tsmiRectangleTransparent.Text" xml:space="preserve">
     <value>Bölge (Saydam)</value>
@@ -566,12 +566,6 @@
   </data>
   <data name="tsmiTrayScrollingCapture.Text" xml:space="preserve">
     <value>Kaydırarak yakalama...</value>
-  </data>
-  <data name="tsmiTextCapture.Text" xml:space="preserve">
-    <value>Yazı yakalama (OCR)...</value>
-  </data>
-  <data name="tsmiTrayTextCapture.Text" xml:space="preserve">
-    <value>Yazı yakalama (OCR)...</value>
   </data>
   <data name="tsmiShowCursor.Text" xml:space="preserve">
     <value>İmleç göster</value>
@@ -731,5 +725,32 @@
   </data>
   <data name="tsmiVideoConverter.Text" xml:space="preserve">
     <value>Video çevirici...</value>
+  </data>
+  <data name="tsmiImageViewer.Text" xml:space="preserve">
+    <value>Resim görüntüleyici...</value>
+  </data>
+  <data name="tsmiTrayImageViewer.Text" xml:space="preserve">
+    <value>Resim görüntüleyici...</value>
+  </data>
+  <data name="tsmiOCR.Text" xml:space="preserve">
+    <value>OCR...</value>
+  </data>
+  <data name="tsmiTrayOCR.Text" xml:space="preserve">
+    <value>OCR...</value>
+  </data>
+  <data name="tsmiPinSelectedFile.Text" xml:space="preserve">
+    <value>Ekrana sabitle</value>
+  </data>
+  <data name="tsmiTrayPinToScreen.Text" xml:space="preserve">
+    <value>Ekrana sabitle...</value>
+  </data>
+  <data name="tsmiPinToScreen.Text" xml:space="preserve">
+    <value>Ekrana sabitle...</value>
+  </data>
+  <data name="tsmiTrayBorderlessWindow.Text" xml:space="preserve">
+    <value>Kenarsız pencere...</value>
+  </data>
+  <data name="tsmiBorderlessWindow.Text" xml:space="preserve">
+    <value>Kenarsız pencere...</value>
   </data>
 </root>

@@ -178,6 +178,9 @@ namespace ShareX
                 case HotkeyType.Ruler:
                     OpenRuler(safeTaskSettings);
                     break;
+                case HotkeyType.PinToScreen:
+                    PinToScreen();
+                    break;
                 case HotkeyType.ImageEditor:
                     if (command != null && !string.IsNullOrEmpty(command.Parameter) && File.Exists(command.Parameter))
                     {
@@ -1298,9 +1301,27 @@ namespace ShareX
             }
         }
 
-        public static void PinToScreen(Image image)
+        public static void PinToScreen()
         {
-            PinToScreenForm.PinToScreen(image);
+            using (PinToScreenStartupForm form = new PinToScreenStartupForm())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    PinToScreen(form.Image, form.PinToScreenLocation);
+                }
+            }
+        }
+
+        public static void PinToScreen(Image image, Point? location = null)
+        {
+            if (image != null)
+            {
+                PinToScreenOptions options = new PinToScreenOptions();
+                options.BackgroundColor = ShareXResources.Theme.LightBackgroundColor;
+
+                PinToScreenForm form = new PinToScreenForm(image, options, location);
+                form.Show();
+            }
         }
 
         public static void PinToScreen(string filePath)
@@ -1599,6 +1620,7 @@ namespace ShareX
                     case HotkeyType.ColorPicker: return Resources.color;
                     case HotkeyType.ScreenColorPicker: return Resources.pipette;
                     case HotkeyType.Ruler: return Resources.ruler_triangle;
+                    case HotkeyType.PinToScreen: return Resources.pin;
                     case HotkeyType.ImageEditor: return Resources.image_pencil;
                     case HotkeyType.ImageEffects: return Resources.image_saturation;
                     case HotkeyType.ImageViewer: return Resources.images_flickr;

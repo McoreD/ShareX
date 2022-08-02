@@ -182,9 +182,6 @@ Mesela klasör ismi "bucket.example.com" ise o zaman adres "http://bucket.exampl
   <data name="lblStreamablePassword.Text" xml:space="preserve">
     <value>Şifre:</value>
   </data>
-  <data name="cbStreamableAnonymous.Text" xml:space="preserve">
-    <value>Anonim</value>
-  </data>
   <data name="tpSharedFolder.Text" xml:space="preserve">
     <value>Dizin paylaş</value>
   </data>
@@ -1088,5 +1085,14 @@ Mesela klasör ismi "bucket.example.com" ise o zaman adres "http://bucket.exampl
   </data>
   <data name="cbPlikTTLUnit.Items3" xml:space="preserve">
     <value>hiçbir zaman</value>
+  </data>
+  <data name="lblYouTubePermissionsTip.Text" xml:space="preserve">
+    <value>Aşağıdaki bağlantıyı kullanarak erişiminizi istediğiniz zaman iptal edebilirsiniz:</value>
+  </data>
+  <data name="cbOwnCloudAppendFileNameToURL.Text" xml:space="preserve">
+    <value>URL'ye dosya adı ekle</value>
+  </data>
+  <data name="cbYouTubeShowDialog.Text" xml:space="preserve">
+    <value>Video seçenekleri penceresini göster</value>
   </data>
 </root>

@@ -27,6 +27,7 @@ using ShareX.HelpersLib;
 using ShareX.Properties;
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace ShareX
@@ -37,7 +38,7 @@ namespace ShareX
         public event EventHandler SelectedChanged;
         public event EventHandler EditRequested;
 
-        public HotkeySettings Setting { get; set; }
+        public HotkeySettings HotkeySettings { get; private set; }
 
         private bool selected;
 
@@ -51,200 +52,142 @@ namespace ShareX
             {
                 selected = value;
 
-                UpdateTheme();
+                UpdateControls();
             }
         }
 
         public bool EditingHotkey { get; private set; }
 
-        private bool descriptionHover;
-
-        public HotkeySelectionControl(HotkeySettings setting)
+        public HotkeySelectionControl(HotkeySettings hotkeySettings)
         {
-            Setting = setting;
+            HotkeySettings = hotkeySettings;
 
             InitializeComponent();
-            UpdateDescription();
-            UpdateHotkeyText();
+            UpdateControls();
+
+            AddEnumItemsContextMenu<HotkeyType>(x =>
+            {
+                HotkeySettings.TaskSettings.Job = x;
+                UpdateControls();
+            }, cmsTask);
+            SetEnumCheckedContextMenu(HotkeySettings.TaskSettings.Job, cmsTask);
+
             if (ShareXResources.UseCustomTheme)
             {
                 ShareXResources.ApplyCustomThemeToControl(this);
             }
+
             UpdateHotkeyStatus();
-            UpdateTheme();
         }
 
-        public void UpdateTheme()
+        private void AddEnumItemsContextMenu<T>(Action<T> selectedEnum, params ToolStripDropDown[] parents) where T : Enum
         {
-            if (ShareXResources.UseCustomTheme)
+            EnumInfo[] enums = Helpers.GetEnums<T>().OfType<Enum>().Select(x => new EnumInfo(x)).ToArray();
+
+            foreach (ToolStripDropDown parent in parents)
             {
-                if (Selected)
+                foreach (EnumInfo enumInfo in enums)
                 {
-                    lblHotkeyDescription.ForeColor = SystemColors.ControlText;
-                    lblHotkeyDescription.BackColor = Color.FromArgb(200, 255, 200);
-                }
-                else if (descriptionHover)
-                {
-                    lblHotkeyDescription.ForeColor = SystemColors.ControlText;
-                    lblHotkeyDescription.BackColor = Color.FromArgb(220, 240, 255);
-                }
-                else
-                {
-                    lblHotkeyDescription.ForeColor = ShareXResources.Theme.TextColor;
-                    lblHotkeyDescription.BackColor = ShareXResources.Theme.LightBackgroundColor;
-                }
+                    ToolStripMenuItem tsmi = new ToolStripMenuItem(enumInfo.Description.Replace("&", "&&"));
+                    tsmi.Image = TaskHelpers.FindMenuIcon(enumInfo.Value);
+                    tsmi.Tag = enumInfo;
 
-                btnHotkey.BorderColor = ShareXResources.Theme.BorderColor;
+                    tsmi.Click += (sender, e) =>
+                    {
+                        SetEnumCheckedContextMenu(enumInfo, parents);
 
-                if (EditingHotkey)
-                {
-                    btnHotkey.ForeColor = SystemColors.ControlText;
-                    btnHotkey.BackColor = Color.FromArgb(225, 255, 225);
+                        selectedEnum((T)enumInfo.Value);
+
+                        UpdateControls();
+                    };
+
+                    if (!string.IsNullOrEmpty(enumInfo.Category))
+                    {
+                        ToolStripMenuItem tsmiParent = parent.Items.OfType<ToolStripMenuItem>().FirstOrDefault(x => x.Text == enumInfo.Category);
+
+                        if (tsmiParent == null)
+                        {
+                            tsmiParent = new ToolStripMenuItem(enumInfo.Category);
+                            parent.Items.Add(tsmiParent);
+                        }
+
+                        tsmiParent.DropDownItems.Add(tsmi);
+                    }
+                    else
+                    {
+                        parent.Items.Add(tsmi);
+                    }
                 }
-                else
+            }
+        }
+
+        private void SetEnumCheckedContextMenu(Enum value, params ToolStripDropDown[] parents)
+        {
+            SetEnumCheckedContextMenu(new EnumInfo(value), parents);
+        }
+
+        private void SetEnumCheckedContextMenu(EnumInfo enumInfo, params ToolStripDropDown[] parents)
+        {
+            foreach (ToolStripDropDown parent in parents)
+            {
+                foreach (ToolStripMenuItem tsmiParent in parent.Items)
                 {
-                    btnHotkey.ForeColor = ShareXResources.Theme.TextColor;
-                    btnHotkey.BackColor = ShareXResources.Theme.LightBackgroundColor;
+                    EnumInfo currentEnumInfo;
+
+                    if (tsmiParent.DropDownItems.Count > 0)
+                    {
+                        foreach (ToolStripMenuItem tsmiCategoryParent in tsmiParent.DropDownItems)
+                        {
+                            currentEnumInfo = (EnumInfo)tsmiCategoryParent.Tag;
+                            tsmiCategoryParent.Checked = currentEnumInfo.Value.Equals(enumInfo.Value);
+                        }
+                    }
+                    else
+                    {
+                        currentEnumInfo = (EnumInfo)tsmiParent.Tag;
+                        tsmiParent.Checked = currentEnumInfo.Value.Equals(enumInfo.Value);
+                    }
                 }
+            }
+        }
+
+        public void UpdateControls()
+        {
+            if (Selected)
+            {
+                btnTask.ChangeFontStyle(FontStyle.Bold);
             }
             else
             {
-                lblHotkeyDescription.ForeColor = SystemColors.ControlText;
-
-                if (Selected)
-                {
-                    lblHotkeyDescription.BackColor = Color.FromArgb(200, 255, 200);
-                }
-                else if (descriptionHover)
-                {
-                    lblHotkeyDescription.BackColor = Color.FromArgb(220, 240, 255);
-                }
-                else
-                {
-                    lblHotkeyDescription.BackColor = SystemColors.Window;
-                }
-
-                btnHotkey.ForeColor = SystemColors.ControlText;
-
-                if (EditingHotkey)
-                {
-                    btnHotkey.BackColor = Color.FromArgb(225, 255, 225);
-                }
-                else
-                {
-                    btnHotkey.BackColor = SystemColors.Control;
-                    btnHotkey.UseVisualStyleBackColor = true;
-                }
+                btnTask.ChangeFontStyle(FontStyle.Regular);
             }
-        }
 
-        public void UpdateDescription()
-        {
-            if (Setting.TaskSettings.IsUsingDefaultSettings)
+            btnTask.Image = TaskHelpers.FindMenuIcon(HotkeySettings.TaskSettings.Job);
+
+            string taskText = " " + HotkeySettings.TaskSettings.ToString();
+            if (!HotkeySettings.TaskSettings.IsUsingDefaultSettings)
             {
-                lblHotkeyDescription.ChangeFontStyle(FontStyle.Regular);
+                taskText += "*";
             }
-            else
-            {
-                lblHotkeyDescription.ChangeFontStyle(FontStyle.Bold);
-            }
-
-            lblHotkeyDescription.Image = TaskHelpers.FindMenuIcon(Setting.TaskSettings.Job);
-            lblHotkeyDescription.Text = Setting.TaskSettings.ToString();
-        }
-
-        private void UpdateHotkeyText()
-        {
-            btnHotkey.Text = Setting.HotkeyInfo.ToString();
+            btnTask.Text = taskText;
         }
 
         public void UpdateHotkeyStatus()
         {
-            switch (Setting.HotkeyInfo.Status)
+            btnHotkey.Text = HotkeySettings.HotkeyInfo.ToString();
+
+            switch (HotkeySettings.HotkeyInfo.Status)
             {
                 default:
                 case HotkeyStatus.NotConfigured:
-                    btnHotkey.Color = Color.LightGoldenrodYellow;
+                    btnHotkey.Image = Resources.status_away;
                     break;
                 case HotkeyStatus.Failed:
-                    btnHotkey.Color = Color.IndianRed;
+                    btnHotkey.Image = Resources.status_busy;
                     break;
                 case HotkeyStatus.Registered:
-                    btnHotkey.Color = Color.PaleGreen;
+                    btnHotkey.Image = Resources.status;
                     break;
-            }
-        }
-
-        private void btnHotkey_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if (EditingHotkey)
-            {
-                // For handle Tab key etc.
-                e.IsInputKey = true;
-            }
-        }
-
-        private void btnHotkey_KeyDown(object sender, KeyEventArgs e)
-        {
-            e.SuppressKeyPress = true;
-
-            if (EditingHotkey)
-            {
-                if (e.KeyData == Keys.Escape)
-                {
-                    Setting.HotkeyInfo.Hotkey = Keys.None;
-                    StopEditing();
-                }
-                else if (e.KeyCode == Keys.LWin || e.KeyCode == Keys.RWin)
-                {
-                    Setting.HotkeyInfo.Win = !Setting.HotkeyInfo.Win;
-                    UpdateHotkeyText();
-                }
-                else if (new HotkeyInfo(e.KeyData).IsValidHotkey)
-                {
-                    Setting.HotkeyInfo.Hotkey = e.KeyData;
-                    StopEditing();
-                }
-                else
-                {
-                    Setting.HotkeyInfo.Hotkey = e.KeyData;
-                    UpdateHotkeyText();
-                }
-            }
-        }
-
-        private void btnHotkey_KeyUp(object sender, KeyEventArgs e)
-        {
-            e.SuppressKeyPress = true;
-
-            if (EditingHotkey)
-            {
-                // PrintScreen not trigger KeyDown event
-                if (e.KeyCode == Keys.PrintScreen)
-                {
-                    Setting.HotkeyInfo.Hotkey = e.KeyData;
-                    StopEditing();
-                }
-            }
-        }
-
-        private void btnHotkey_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (EditingHotkey)
-            {
-                StopEditing();
-            }
-            else
-            {
-                StartEditing();
-            }
-        }
-
-        private void btnHotkey_Leave(object sender, EventArgs e)
-        {
-            if (EditingHotkey)
-            {
-                StopEditing();
             }
         }
 
@@ -254,13 +197,11 @@ namespace ShareX
 
             Program.HotkeyManager.IgnoreHotkeys = true;
 
-            btnHotkey.Text = Resources.HotkeySelectionControl_StartEditing_Select_a_hotkey___;
-            UpdateTheme();
-
-            Setting.HotkeyInfo.Hotkey = Keys.None;
-            Setting.HotkeyInfo.Win = false;
+            HotkeySettings.HotkeyInfo.Hotkey = Keys.None;
+            HotkeySettings.HotkeyInfo.Win = false;
             OnHotkeyChanged();
             UpdateHotkeyStatus();
+            btnHotkey.Text = Resources.HotkeySelectionControl_StartEditing_Select_a_hotkey___;
         }
 
         private void StopEditing()
@@ -269,15 +210,19 @@ namespace ShareX
 
             Program.HotkeyManager.IgnoreHotkeys = false;
 
-            if (Setting.HotkeyInfo.IsOnlyModifiers)
+            if (HotkeySettings.HotkeyInfo.IsOnlyModifiers)
             {
-                Setting.HotkeyInfo.Hotkey = Keys.None;
+                HotkeySettings.HotkeyInfo.Hotkey = Keys.None;
             }
 
-            UpdateTheme();
             OnHotkeyChanged();
             UpdateHotkeyStatus();
-            UpdateHotkeyText();
+        }
+
+        private void SelectControl()
+        {
+            Selected = true;
+            OnSelectedChanged();
         }
 
         protected void OnHotkeyChanged()
@@ -295,41 +240,88 @@ namespace ShareX
             EditRequested?.Invoke(this, EventArgs.Empty);
         }
 
+        private void btnTask_Click(object sender, EventArgs e)
+        {
+            SelectControl();
+        }
+
         private void btnEdit_Click(object sender, EventArgs e)
         {
+            SelectControl();
             OnEditRequested();
         }
 
-        private void lblHotkeyDescription_MouseEnter(object sender, EventArgs e)
+        private void btnHotkey_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (!Selected)
+            if (EditingHotkey)
             {
-                descriptionHover = true;
-                UpdateTheme();
+                // To handle "Tab" key etc.
+                e.IsInputKey = true;
             }
         }
 
-        private void lblHotkeyDescription_MouseLeave(object sender, EventArgs e)
+        private void btnHotkey_KeyDown(object sender, KeyEventArgs e)
         {
-            descriptionHover = false;
-            UpdateTheme();
-        }
+            e.SuppressKeyPress = true;
 
-        private void lblHotkeyDescription_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
+            if (EditingHotkey)
             {
-                Selected = true;
-                OnSelectedChanged();
-                Focus();
+                if (e.KeyData == Keys.Escape)
+                {
+                    HotkeySettings.HotkeyInfo.Hotkey = Keys.None;
+                    StopEditing();
+                }
+                else if (e.KeyCode == Keys.LWin || e.KeyCode == Keys.RWin)
+                {
+                    HotkeySettings.HotkeyInfo.Win = !HotkeySettings.HotkeyInfo.Win;
+                    UpdateHotkeyStatus();
+                }
+                else if (new HotkeyInfo(e.KeyData).IsValidHotkey)
+                {
+                    HotkeySettings.HotkeyInfo.Hotkey = e.KeyData;
+                    StopEditing();
+                }
+                else
+                {
+                    HotkeySettings.HotkeyInfo.Hotkey = e.KeyData;
+                    UpdateHotkeyStatus();
+                }
             }
         }
 
-        private void lblHotkeyDescription_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void btnHotkey_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            e.SuppressKeyPress = true;
+
+            if (EditingHotkey)
             {
-                OnEditRequested();
+                // PrintScreen not trigger KeyDown event
+                if (e.KeyCode == Keys.PrintScreen)
+                {
+                    HotkeySettings.HotkeyInfo.Hotkey = e.KeyData;
+                    StopEditing();
+                }
+            }
+        }
+
+        private void btnHotkey_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (EditingHotkey)
+            {
+                StopEditing();
+            }
+            else
+            {
+                SelectControl();
+                StartEditing();
+            }
+        }
+
+        private void btnHotkey_Leave(object sender, EventArgs e)
+        {
+            if (EditingHotkey)
+            {
+                StopEditing();
             }
         }
     }
