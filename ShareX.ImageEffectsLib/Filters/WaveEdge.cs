@@ -1,4 +1,4 @@
-#region License Information (GPL v3)
+﻿#region License Information (GPL v3)
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
@@ -23,12 +23,33 @@
 
 #endregion License Information (GPL v3)
 
-using System.Reflection;
-using System.Runtime.InteropServices;
+using ShareX.HelpersLib;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
-[assembly: AssemblyCompany("ShareX Team")]
-[assembly: AssemblyProduct("ShareX")]
-[assembly: AssemblyCopyright("Copyright (c) 2007-2022 ShareX Team")]
-[assembly: ComVisible(false)]
-[assembly: AssemblyVersion("14.1.2")]
-[assembly: AssemblyFileVersion("14.1.2")]
+namespace ShareX.ImageEffectsLib
+{
+    [Description("Wave edge")]
+    internal class WaveEdge : ImageEffect
+    {
+        [DefaultValue(15)]
+        public int Depth { get; set; }
+
+        [DefaultValue(20)]
+        public int Range { get; set; }
+
+        [DefaultValue(AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right)]
+        public AnchorStyles Sides { get; set; }
+
+        public WaveEdge()
+        {
+            this.ApplyDefaultPropertyValues();
+        }
+
+        public override Bitmap Apply(Bitmap bmp)
+        {
+            return ImageHelpers.WavyEdges(bmp, Depth, Range, Sides);
+        }
+    }
+}

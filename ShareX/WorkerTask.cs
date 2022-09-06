@@ -32,7 +32,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -1052,6 +1051,16 @@ namespace ShareX
             string url = Info.Result.URL.Trim();
             Info.Result.URL = "";
 
+            if (!Info.TaskSettings.UploadSettings.FileUploadUseNamePattern)
+            {
+                string fileName = URLHelpers.GetFileNameFromWebServer(url);
+
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    Info.FileName = FileHelpers.SanitizeFileName(fileName);
+                }
+            }
+
             string screenshotsFolder = TaskHelpers.GetScreenshotsFolder(Info.TaskSettings);
             Info.FilePath = TaskHelpers.HandleExistsFile(screenshotsFolder, Info.FileName, Info.TaskSettings);
 
@@ -1062,14 +1071,7 @@ namespace ShareX
 
                 try
                 {
-                    FileHelpers.CreateDirectoryFromFilePath(Info.FilePath);
-
-                    using (WebClient wc = new WebClient())
-                    {
-                        wc.Headers.Add(HttpRequestHeader.UserAgent, ShareXResources.UserAgent);
-                        wc.Proxy = HelpersOptions.CurrentProxy.GetWebProxy();
-                        wc.DownloadFile(url, Info.FilePath);
-                    }
+                    URLHelpers.DownloadFile(url, Info.FilePath);
 
                     if (upload)
                     {

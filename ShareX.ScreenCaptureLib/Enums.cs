@@ -291,7 +291,8 @@ namespace ShareX.ScreenCaptureLib
         EffectBlur,
         EffectPixelate,
         EffectHighlight,
-        ToolCrop
+        ToolCrop,
+        ToolCutOut
     }
 
     public enum ScrollingCaptureScrollMethod // Localized
@@ -338,6 +339,11 @@ namespace ShareX.ScreenCaptureLib
 
     public enum ScreenRecordState
     {
-        Waiting, BeforeStart, AfterStart, AfterRecordingStart, Encoding
+        Waiting, BeforeStart, AfterStart, AfterRecordingStart, RecordingEnd, Encoding
+    }
+
+    public enum ScreenRecordingStatus
+    {
+        Waiting, Working, Recording, Paused, Stopped, Aborted
     }
 }

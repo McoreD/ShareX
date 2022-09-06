@@ -686,6 +686,42 @@ namespace ShareX.HelpersLib.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No effect.
+        /// </summary>
+        internal static string CutOutEffectType_None {
+            get {
+                return ResourceManager.GetString("CutOutEffectType_None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Torn edges.
+        /// </summary>
+        internal static string CutOutEffectType_TornEdge {
+            get {
+                return ResourceManager.GetString("CutOutEffectType_TornEdge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wave.
+        /// </summary>
+        internal static string CutOutEffectType_Wave {
+            get {
+                return ResourceManager.GetString("CutOutEffectType_Wave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sawtooth.
+        /// </summary>
+        internal static string CutOutEffectType_ZigZag {
+            get {
+                return ResourceManager.GetString("CutOutEffectType_ZigZag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse for a folder....
         /// </summary>
         internal static string DirectoryNameEditor_EditValue_Browse_for_a_folder___ {
@@ -1786,6 +1822,24 @@ namespace ShareX.HelpersLib.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pause screen recording.
+        /// </summary>
+        internal static string HotkeyType_PauseScreenRecording {
+            get {
+                return ResourceManager.GetString("HotkeyType_PauseScreenRecording", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Screen record.
+        /// </summary>
+        internal static string HotkeyType_PauseScreenRecording_Category {
+            get {
+                return ResourceManager.GetString("HotkeyType_PauseScreenRecording_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pin to screen.
         /// </summary>
         internal static string HotkeyType_PinToScreen {
@@ -1800,6 +1854,60 @@ namespace ShareX.HelpersLib.Properties {
         internal static string HotkeyType_PinToScreen_Category {
             get {
                 return ResourceManager.GetString("HotkeyType_PinToScreen_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pin to screen (From clipboard).
+        /// </summary>
+        internal static string HotkeyType_PinToScreenFromClipboard {
+            get {
+                return ResourceManager.GetString("HotkeyType_PinToScreenFromClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        internal static string HotkeyType_PinToScreenFromClipboard_Category {
+            get {
+                return ResourceManager.GetString("HotkeyType_PinToScreenFromClipboard_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pin to screen (From file).
+        /// </summary>
+        internal static string HotkeyType_PinToScreenFromFile {
+            get {
+                return ResourceManager.GetString("HotkeyType_PinToScreenFromFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        internal static string HotkeyType_PinToScreenFromFile_Category {
+            get {
+                return ResourceManager.GetString("HotkeyType_PinToScreenFromFile_Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pin to screen (From screen).
+        /// </summary>
+        internal static string HotkeyType_PinToScreenFromScreen {
+            get {
+                return ResourceManager.GetString("HotkeyType_PinToScreenFromScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        internal static string HotkeyType_PinToScreenFromScreen_Category {
+            get {
+                return ResourceManager.GetString("HotkeyType_PinToScreenFromScreen_Category", resourceCulture);
             }
         }
         
@@ -3649,6 +3757,15 @@ namespace ShareX.HelpersLib.Properties {
         internal static string ShapeType_ToolCrop {
             get {
                 return ResourceManager.GetString("ShapeType_ToolCrop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cut out (X).
+        /// </summary>
+        internal static string ShapeType_ToolCutOut {
+            get {
+                return ResourceManager.GetString("ShapeType_ToolCutOut", resourceCulture);
             }
         }
         

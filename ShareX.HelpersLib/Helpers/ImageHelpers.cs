@@ -223,6 +223,71 @@ namespace ShareX.HelpersLib
             return null;
         }
 
+        private static Bitmap ApplyCutOutEffect(Bitmap bmp, AnchorStyles effectEdge, CutOutEffectType effectType, int effectSize)
+        {
+            switch (effectType)
+            {
+                case CutOutEffectType.None:
+                    return bmp;
+
+                case CutOutEffectType.ZigZag:
+                    return TornEdges(bmp, effectSize, effectSize, effectEdge, false, false);
+
+                case CutOutEffectType.TornEdge:
+                    return TornEdges(bmp, effectSize, effectSize * 2, effectEdge, false, true);
+
+                case CutOutEffectType.Wave:
+                    return WavyEdges(bmp, effectSize, effectSize * 5, effectEdge);
+            }
+
+            throw new NotImplementedException(); // should not be reachable
+        }
+
+        public static Bitmap CutOutBitmapMiddle(Bitmap bmp, Orientation orientation, int start, int size, CutOutEffectType effectType, int effectSize)
+        {
+            if (bmp != null && size > 0)
+            {
+                Bitmap firstPart = null, secondPart = null;
+
+                if (start > 0)
+                {
+                    Rectangle r = orientation == Orientation.Horizontal
+                        ? new Rectangle(0, 0, Math.Min(start, bmp.Width), bmp.Height)
+                        : new Rectangle(0, 0, bmp.Width, Math.Min(start, bmp.Height));
+                    firstPart = CropBitmap(bmp, r);
+                    AnchorStyles effectEdge = orientation == Orientation.Horizontal ? AnchorStyles.Right : AnchorStyles.Bottom;
+                    firstPart = ApplyCutOutEffect(firstPart, effectEdge, effectType, effectSize);
+                }
+
+                int cutDimension = orientation == Orientation.Horizontal ? bmp.Width : bmp.Height;
+                if (start + size < cutDimension)
+                {
+                    int end = Math.Max(start + size, 0);
+                    Rectangle r = orientation == Orientation.Horizontal
+                        ? new Rectangle(end, 0, bmp.Width - end, bmp.Height)
+                        : new Rectangle(0, end, bmp.Width, bmp.Height - end);
+                    secondPart = CropBitmap(bmp, r);
+                    AnchorStyles effectEdge = orientation == Orientation.Horizontal ? AnchorStyles.Left : AnchorStyles.Top;
+                    secondPart = ApplyCutOutEffect(secondPart, effectEdge, effectType, effectSize);
+                }
+
+                if (firstPart != null && secondPart != null)
+                {
+                    return CombineImages(new List<Bitmap> { firstPart, secondPart }, orientation);
+                }
+                else if (firstPart != null)
+                {
+                    return firstPart;
+                }
+                else if (secondPart != null)
+                {
+                    return secondPart;
+                }
+            }
+
+            return bmp;
+        }
+
         /// <summary>Automatically crop image to remove transparent outside area.</summary>
         public static Bitmap AutoCropTransparent(Bitmap bmp)
         {
@@ -1596,7 +1661,102 @@ namespace ShareX.HelpersLib
             }
         }
 
-        public static Bitmap TornEdges(Bitmap bmp, int tornDepth, int tornRange, AnchorStyles sides, bool curvedEdges)
+        public static Bitmap WavyEdges(Bitmap bmp, int waveDepth, int waveRange, AnchorStyles sides)
+        {
+            if (waveDepth < 1 || waveRange < 1 || sides == AnchorStyles.None)
+            {
+                return bmp;
+            }
+
+            List<Point> points = new List<Point>();
+
+            int horizontalWaveCount = Math.Max(2, (bmp.Width / waveRange + 1) / 2 * 2) - 1;
+            int verticalWaveCount = Math.Max(2, (bmp.Height / waveRange + 1) / 2 * 2) - 1;
+            int horizontalWaveRange = bmp.Width / horizontalWaveCount;
+            int verticalWaveRange = bmp.Height / verticalWaveCount;
+
+            int step = Math.Min(Math.Max(1, waveRange / waveDepth), 10);
+
+            int waveFunction(int t, int max, int depth) => (int)((1 - Math.Cos(t * Math.PI / max)) * depth / 2);
+
+            if (sides.HasFlag(AnchorStyles.Top))
+            {
+                int startX = sides.HasFlag(AnchorStyles.Left) ? waveDepth : 0;
+                int endX = sides.HasFlag(AnchorStyles.Right) ? bmp.Width - waveDepth : bmp.Width;
+                for (int x = startX; x < endX; x += step)
+                {
+                    points.Add(new Point(x, waveFunction(x, horizontalWaveRange, waveDepth)));
+                }
+                points.Add(new Point(endX, waveFunction(endX, horizontalWaveRange, waveDepth)));
+            }
+            else
+            {
+                points.Add(new Point(0, 0));
+            }
+
+            if (sides.HasFlag(AnchorStyles.Right))
+            {
+                int startY = sides.HasFlag(AnchorStyles.Top) ? waveDepth : 0;
+                int endY = sides.HasFlag(AnchorStyles.Bottom) ? bmp.Height - waveDepth : bmp.Height;
+                for (int y = startY; y < endY; y += step)
+                {
+                    points.Add(new Point(bmp.Width - waveDepth + waveFunction(y, verticalWaveRange, waveDepth), y));
+                }
+                points.Add(new Point(bmp.Width - waveDepth + waveFunction(endY, verticalWaveRange, waveDepth), endY));
+            }
+            else
+            {
+                points.Add(new Point(bmp.Width, points[points.Count - 1].Y));
+            }
+
+            if (sides.HasFlag(AnchorStyles.Bottom))
+            {
+                int startX = sides.HasFlag(AnchorStyles.Right) ? bmp.Width - waveDepth : bmp.Width;
+                int endX = sides.HasFlag(AnchorStyles.Left) ? waveDepth : 0;
+                for (int x = startX; x >= endX; x -= step)
+                {
+                    points.Add(new Point(x, bmp.Height - waveDepth + waveFunction(x, horizontalWaveRange, waveDepth)));
+                }
+                points.Add(new Point(endX, bmp.Height - waveDepth + waveFunction(endX, horizontalWaveRange, waveDepth)));
+            }
+            else
+            {
+                points.Add(new Point(points[points.Count - 1].X, bmp.Height));
+            }
+
+            if (sides.HasFlag(AnchorStyles.Left))
+            {
+                int startY = sides.HasFlag(AnchorStyles.Bottom) ? bmp.Height - waveDepth : bmp.Height;
+                int endY = sides.HasFlag(AnchorStyles.Top) ? waveDepth : 0;
+                for (int y = startY; y >= endY; y -= step)
+                {
+                    points.Add(new Point(waveFunction(y, verticalWaveRange, waveDepth), y));
+                }
+                points.Add(new Point(waveFunction(endY, verticalWaveRange, waveDepth), endY));
+            }
+            else
+            {
+                points.Add(new Point(0, points[points.Count - 1].Y));
+            }
+
+            if (!sides.HasFlag(AnchorStyles.Top))
+            {
+                points[0] = new Point(points[points.Count - 1].X, 0);
+            }
+
+            Bitmap bmpResult = bmp.CreateEmptyBitmap();
+            using (bmp)
+            using (Graphics g = Graphics.FromImage(bmpResult))
+            using (TextureBrush brush = new TextureBrush(bmp))
+            {
+                g.SetHighQuality();
+                g.PixelOffsetMode = PixelOffsetMode.Half;
+                g.FillPolygon(brush, points.ToArray());
+            }
+            return bmpResult;
+        }
+
+        public static Bitmap TornEdges(Bitmap bmp, int tornDepth, int tornRange, AnchorStyles sides, bool curvedEdges, bool random)
         {
             if (tornDepth < 1 || tornRange < 1 || sides == AnchorStyles.None)
             {
@@ -1615,53 +1775,65 @@ namespace ShareX.HelpersLib
 
             if (sides.HasFlag(AnchorStyles.Top) && horizontalTornCount > 1)
             {
-                for (int x = 0; x < horizontalTornCount - 1; x++)
+                int startX = (sides.HasFlag(AnchorStyles.Left) && verticalTornCount > 1) ? tornDepth : 0;
+                int endX = (sides.HasFlag(AnchorStyles.Right) && verticalTornCount > 1) ? bmp.Width - tornDepth : bmp.Width;
+                for (int x = startX; x < endX; x += tornRange)
                 {
-                    points.Add(new Point(tornRange * x, RandomFast.Next(0, tornDepth)));
+                    int y = random ? RandomFast.Next(0, tornDepth) : ((x / tornRange) & 1) * tornDepth;
+                    points.Add(new Point(x, y));
                 }
             }
             else
             {
                 points.Add(new Point(0, 0));
-                points.Add(new Point(bmp.Width - 1, 0));
+                points.Add(new Point(bmp.Width, 0));
             }
 
             if (sides.HasFlag(AnchorStyles.Right) && verticalTornCount > 1)
             {
-                for (int y = 0; y < verticalTornCount - 1; y++)
+                int startY = (sides.HasFlag(AnchorStyles.Top) && horizontalTornCount > 1) ? tornDepth : 0;
+                int endY = (sides.HasFlag(AnchorStyles.Bottom) && horizontalTornCount > 1) ? bmp.Height - tornDepth : bmp.Height;
+                for (int y = startY; y < endY; y += tornRange)
                 {
-                    points.Add(new Point(bmp.Width - 1 - RandomFast.Next(0, tornDepth), tornRange * y));
+                    int x = random ? RandomFast.Next(0, tornDepth) : ((y / tornRange) & 1) * tornDepth;
+                    points.Add(new Point(bmp.Width - tornDepth + x, y));
                 }
             }
             else
             {
-                points.Add(new Point(bmp.Width - 1, 0));
-                points.Add(new Point(bmp.Width - 1, bmp.Height - 1));
+                points.Add(new Point(bmp.Width, 0));
+                points.Add(new Point(bmp.Width, bmp.Height));
             }
 
             if (sides.HasFlag(AnchorStyles.Bottom) && horizontalTornCount > 1)
             {
-                for (int x = 0; x < horizontalTornCount - 1; x++)
+                int startX = (sides.HasFlag(AnchorStyles.Right) && verticalTornCount > 1) ? bmp.Width - tornDepth : bmp.Width;
+                int endX = (sides.HasFlag(AnchorStyles.Left) && verticalTornCount > 1) ? tornDepth : 0;
+                for (int x = startX; x >= endX; x = (x / tornRange - 1) * tornRange)
                 {
-                    points.Add(new Point(bmp.Width - 1 - (tornRange * x), bmp.Height - 1 - RandomFast.Next(0, tornDepth)));
+                    int y = random ? RandomFast.Next(0, tornDepth) : ((x / tornRange) & 1) * tornDepth;
+                    points.Add(new Point(x, bmp.Height - tornDepth + y));
                 }
             }
             else
             {
-                points.Add(new Point(bmp.Width - 1, bmp.Height - 1));
-                points.Add(new Point(0, bmp.Height - 1));
+                points.Add(new Point(bmp.Width, bmp.Height));
+                points.Add(new Point(0, bmp.Height));
             }
 
             if (sides.HasFlag(AnchorStyles.Left) && verticalTornCount > 1)
             {
-                for (int y = 0; y < verticalTornCount - 1; y++)
+                int startY = (sides.HasFlag(AnchorStyles.Bottom) && horizontalTornCount > 1) ? bmp.Height - tornDepth : bmp.Height;
+                int endY = (sides.HasFlag(AnchorStyles.Top) && horizontalTornCount > 1) ? tornDepth : 0;
+                for (int y = startY; y >= endY; y = (y / tornRange - 1) * tornRange)
                 {
-                    points.Add(new Point(RandomFast.Next(0, tornDepth), bmp.Height - 1 - (tornRange * y)));
+                    int x = random ? RandomFast.Next(0, tornDepth) : ((y / tornRange) & 1) * tornDepth;
+                    points.Add(new Point(x, y));
                 }
             }
             else
             {
-                points.Add(new Point(0, bmp.Height - 1));
+                points.Add(new Point(0, bmp.Height));
                 points.Add(new Point(0, 0));
             }
 
@@ -1672,6 +1844,7 @@ namespace ShareX.HelpersLib
             using (TextureBrush brush = new TextureBrush(bmp))
             {
                 g.SetHighQuality();
+                g.PixelOffsetMode = PixelOffsetMode.Half;
 
                 Point[] fillPoints = points.Distinct().ToArray();
 

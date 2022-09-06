@@ -226,6 +226,7 @@
     <Compile Include="Animations\TextAnimation.cs" />
     <Compile Include="RegionHelpers\WindowsList.cs" />
     <Compile Include="RegionHelpers\WindowsRectangleList.cs" />
+    <Compile Include="Shapes\Tool\CutOutTool.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ShareX.HelpersLib\ShareX.HelpersLib.csproj">
@@ -977,6 +978,9 @@
     <PackageReference Include="ImageListView">
       <Version>13.8.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\table-delete-column.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
