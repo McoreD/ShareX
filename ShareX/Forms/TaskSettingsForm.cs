@@ -1273,7 +1273,6 @@ namespace ShareX
 
             using (FFmpegOptionsForm form = new FFmpegOptionsForm(options))
             {
-                form.DefaultToolsFolder = Program.ToolsFolder;
                 form.ShowDialog();
 
                 TaskSettings.CaptureSettings.FFmpegOptions = form.Options.FFmpeg;
