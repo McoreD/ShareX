@@ -466,9 +466,6 @@
   <data name="IntegrationHelpers_EditWithShareX" xml:space="preserve">
     <value>Редактировать в ShareX</value>
   </data>
-  <data name="ApplicationSettingsForm_btnCheckDevBuild_Click_DevBuilds_Warning" xml:space="preserve">
-    <value>Dev сборки могут быть нестабильными и должны использоваться только для тестирования. Хотите установить?</value>
-  </data>
   <data name="ApplicationSettingsForm_btnResetSettings_Click_WouldYouLikeToResetShareXSettings" xml:space="preserve">
     <value>Хотите сбросить настройки ShareX?</value>
   </data>
@@ -643,5 +640,14 @@
   </data>
   <data name="OpticalCharacterRecognitionFeatureIsOnlyAvailableWithWindowsVersion0OrNewer" xml:space="preserve">
     <value>Функция распознавания текста доступна только в версий Windows {0} или новее.</value>
+  </data>
+  <data name="FFmpegOnlySupports64BitOperatingSystems" xml:space="preserve">
+    <value>FFmpeg, поставляемый с ShareX, поддерживает только 64-битные операционные системы.</value>
+  </data>
+  <data name="FFmpegIsMissing" xml:space="preserve">
+    <value>FFmpeg отсутствует</value>
+  </data>
+  <data name="FFmpegDoesNotExistAtTheFollowingPath" xml:space="preserve">
+    <value>FFmpeg отсутствует по следующему пути:</value>
   </data>
 </root>

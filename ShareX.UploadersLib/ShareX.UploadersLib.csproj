@@ -123,6 +123,12 @@
     <Compile Include="BaseServices\IUploaderService.cs" />
     <Compile Include="BaseUploaders\GenericUploader.cs" />
     <Compile Include="BaseUploaders\URLSharer.cs" />
+    <Compile Include="Controls\OAuthLoopbackControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\OAuthLoopbackControl.Designer.cs">
+      <DependentUpon>OAuthLoopbackControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="CustomUploader\Functions\CustomUploaderFunction.cs" />
     <Compile Include="CustomUploader\Functions\CustomUploaderFunctionBase64.cs" />
     <Compile Include="CustomUploader\Functions\CustomUploaderFunctionFileName.cs" />
@@ -254,11 +260,20 @@
     <Compile Include="Helpers\MimeTypes.cs" />
     <Compile Include="Helpers\ResponseInfo.cs" />
     <Compile Include="Helpers\RequestHelpers.cs" />
+    <Compile Include="Helpers\UploaderErrorManager.cs" />
     <Compile Include="OAuth\GoogleOAuth2.cs" />
+    <Compile Include="OAuth\IOauth2Loopback.cs" />
     <Compile Include="OAuth\IOAuthBase.cs" />
     <Compile Include="OAuth\OAuth2ProofKey.cs" />
     <Compile Include="Helpers\SSLBypassHelper.cs" />
     <Compile Include="BaseServices\URLSharingService.cs" />
+    <Compile Include="OAuth\OAuthListener.cs" />
+    <Compile Include="OAuth\OAuthListenerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OAuth\OAuthListenerForm.Designer.cs">
+      <DependentUpon>OAuthListenerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="OAuth\OAuthUserInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -284,6 +299,7 @@
     <Compile Include="BaseServices\TextUploaderService.cs" />
     <Compile Include="TextUploaders\Pastie.cs" />
     <Compile Include="TextUploaders\TeknikPastebin.cs" />
+    <Compile Include="Helpers\UploaderErrorInfo.cs" />
     <Compile Include="UploaderFactory.cs" />
     <Compile Include="ImageUploaders\Chevereto.cs" />
     <Compile Include="ImageUploaders\CheveretoUploader.cs" />
@@ -503,6 +519,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\OAuthControl.zh-TW.resx">
       <DependentUpon>OAuthControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\OAuthLoopbackControl.resx">
+      <DependentUpon>OAuthLoopbackControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CustomUploaderSettingsForm.de.resx">
       <DependentUpon>CustomUploaderSettingsForm.cs</DependentUpon>
@@ -1059,8 +1078,14 @@
     <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.tr.resx">
       <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.vi-VN.resx">
+      <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\YouTubeVideoOptionsForm.zh-CN.resx">
       <DependentUpon>YouTubeVideoOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OAuth\OAuthListenerForm.resx">
+      <DependentUpon>OAuthListenerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.de.resx">
       <SubType>Designer</SubType>
@@ -1150,13 +1175,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP">
-      <Version>39.4.0</Version>
+      <Version>42.1.0</Version>
     </PackageReference>
     <PackageReference Include="MegaApiClient">
-      <Version>1.10.2</Version>
+      <Version>1.10.3</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
+      <Version>13.0.2</Version>
     </PackageReference>
     <PackageReference Include="SSH.NET">
       <Version>2020.0.2</Version>
@@ -1179,6 +1204,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Favicons\LobFile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\OAuthCallbackPage.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

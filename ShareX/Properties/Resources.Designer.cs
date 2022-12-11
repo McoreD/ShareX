@@ -585,17 +585,6 @@ namespace ShareX.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Development builds are for testing bug fixes and trying out new features early. Sometimes they can be less stable.
-        ///
-        ///Do you wish to continue?.
-        /// </summary>
-        public static string ApplicationSettingsForm_btnCheckDevBuild_Click_DevBuilds_Warning {
-            get {
-                return ResourceManager.GetString("ApplicationSettingsForm_btnCheckDevBuild_Click_DevBuilds_Warning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Would you like to reset ShareX settings?.
         /// </summary>
         public static string ApplicationSettingsForm_btnResetSettings_Click_WouldYouLikeToResetShareXSettings {
@@ -1431,6 +1420,33 @@ namespace ShareX.Properties {
         public static string FFmpeg_FFmpeg_video_and_audio_source_both_can_t_be__None__ {
             get {
                 return ResourceManager.GetString("FFmpeg_FFmpeg_video_and_audio_source_both_can_t_be__None__", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FFmpeg does not exist at the following path:.
+        /// </summary>
+        public static string FFmpegDoesNotExistAtTheFollowingPath {
+            get {
+                return ResourceManager.GetString("FFmpegDoesNotExistAtTheFollowingPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FFmpeg is missing.
+        /// </summary>
+        public static string FFmpegIsMissing {
+            get {
+                return ResourceManager.GetString("FFmpegIsMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FFmpeg that comes with ShareX only supports 64-bit operating systems..
+        /// </summary>
+        public static string FFmpegOnlySupports64BitOperatingSystems {
+            get {
+                return ResourceManager.GetString("FFmpegOnlySupports64BitOperatingSystems", resourceCulture);
             }
         }
         

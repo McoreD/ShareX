@@ -857,7 +857,8 @@ namespace ShareX
             if (taskSettings == null) taskSettings = TaskSettings.GetDefaultTaskSettings();
 
             Bitmap output = ImageHelpers.CombineImages(imageFiles, orientation, taskSettings.ToolsSettings.ImageCombinerOptions.Alignment,
-                taskSettings.ToolsSettings.ImageCombinerOptions.Space, taskSettings.ToolsSettings.ImageCombinerOptions.AutoFillBackground);
+                taskSettings.ToolsSettings.ImageCombinerOptions.Space, taskSettings.ToolsSettings.ImageCombinerOptions.WrapAfter,
+                taskSettings.ToolsSettings.ImageCombinerOptions.AutoFillBackground);
 
             if (output != null)
             {
@@ -1448,9 +1449,8 @@ namespace ShareX
         {
             if (!Environment.Is64BitOperatingSystem && !taskSettings.CaptureSettings.FFmpegOptions.OverrideCLIPath)
             {
-                // TODO: Translate
-                MessageBox.Show("FFmpeg that comes with ShareX only supports 64-bit operating systems.",
-                    "ShareX - " + "FFmpeg is missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Resources.FFmpegOnlySupports64BitOperatingSystems,
+                    "ShareX - " + Resources.FFmpegIsMissing, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 return false;
             }
@@ -1459,9 +1459,8 @@ namespace ShareX
 
             if (!File.Exists(ffmpegPath))
             {
-                // TODO: Translate
-                MessageBox.Show("FFmpeg does not exist at the following path:\r\n" + ffmpegPath,
-                    "ShareX - " + "FFmpeg is missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Resources.FFmpegDoesNotExistAtTheFollowingPath + "\r\n" + ffmpegPath,
+                    "ShareX - " + Resources.FFmpegIsMissing, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 return false;
             }
@@ -1887,21 +1886,31 @@ namespace ShareX
             }
         }
 
+        public static async Task DownloadDevBuild()
+        {
+            GitHubUpdateChecker updateChecker = new GitHubUpdateChecker("ShareX", "DevBuilds")
+            {
+                IsDev = true,
+                IsPortable = Program.Portable
+            };
+
+            await updateChecker.CheckUpdateAsync();
+
+            UpdateMessageBox.Start(updateChecker, true, true);
+        }
+
         public static async Task DownloadAppVeyorBuild()
         {
             AppVeyorUpdateChecker updateChecker = new AppVeyorUpdateChecker()
             {
-                IsBeta = Program.Dev,
+                IsDev = true,
                 IsPortable = Program.Portable,
                 Branch = "develop"
             };
 
             await updateChecker.CheckUpdateAsync();
 
-            if (updateChecker.Status == UpdateStatus.UpdateAvailable)
-            {
-                updateChecker.DownloadUpdate();
-            }
+            UpdateMessageBox.Start(updateChecker, true, true);
         }
 
         public static Image CreateQRCode(string text, int width, int height)
