@@ -13,7 +13,7 @@ a:link, a:visited {
 
 ul {
     margin: 0px 0px 8px 0px;
-    list-style-type: none;
+    list-style-type: disc;
     padding-left: 10px;
 }
 
@@ -62,7 +62,7 @@ h6 {
 
 .MainFolderBorder, .FolderBorder {
     border-style: solid;
-    border-width: 0px 1px 1px 1px;
+    border-width: 0px 1px 0px 0px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     padding: 20px 0px 0px 0px;
