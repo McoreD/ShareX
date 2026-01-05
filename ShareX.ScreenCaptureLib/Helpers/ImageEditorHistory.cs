@@ -77,7 +77,8 @@ namespace ShareX.ScreenCaptureLib
 
         public void CreateShapesMemento()
         {
-            if (!shapeManager.IsCurrentShapeTypeRegion && shapeManager.CurrentTool != ShapeType.ToolCrop && shapeManager.CurrentTool != ShapeType.ToolCutOut)
+            if (!shapeManager.IsCurrentShapeTypeRegion && shapeManager.CurrentTool != ShapeType.ToolSpotlight &&
+                shapeManager.CurrentTool != ShapeType.ToolCrop && shapeManager.CurrentTool != ShapeType.ToolCutOut)
             {
                 ImageEditorMemento memento = GetMementoFromShapes();
                 AddMemento(memento);

@@ -117,21 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnYes.Text" xml:space="preserve">
-    <value>Tak</value>
-  </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>ShareX - Ostrzeżenie przy pierwszym przesłaniu</value>
+    <value>ShareX — Імпортувати теку</value>
   </data>
-  <data name="btnNo.Text" xml:space="preserve">
-    <value>Nie</value>
+  <data name="cbSkipDuplicates.Text" xml:space="preserve">
+    <value>Пропускати дублікати файлів</value>
   </data>
-  <data name="lblHeader.Text" xml:space="preserve">
-    <value>Uwaga!</value>
+  <data name="btnImport.Text" xml:space="preserve">
+    <value>Імпортувати</value>
   </data>
-  <data name="lblInfo.Text" xml:space="preserve">
-    <value>Czy chcesz, aby ShareX przesyłał zrzuty ekranu?
-
-Naciśnij "Nie", aby anulować bieżące przesyłanie i wyłączyć automatyczne przesyłanie zrzutów ekranu.</value>
+  <data name="cbOnlyImportImageFiles.Text" xml:space="preserve">
+    <value>Імпортувати лише файли зображень</value>
+  </data>
+  <data name="lblFolderPath.Text" xml:space="preserve">
+    <value>Шлях до теки:</value>
+  </data>
+  <data name="btnBrowse.Text" xml:space="preserve">
+    <value>Огляд...</value>
   </data>
 </root>

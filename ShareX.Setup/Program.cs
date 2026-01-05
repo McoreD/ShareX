@@ -93,8 +93,8 @@ namespace ShareX.Setup
         private static string MakeAppxPath => Path.Combine(WindowsKitsDir, "x64", "makeappx.exe");
 
         private const string InnoSetupCompilerPath = @"C:\Program Files (x86)\Inno Setup 6\ISCC.exe";
-        private const string FFmpegVersion = "7.1";
-        private static string FFmpegDownloadURL = $"https://github.com/ShareX/FFmpeg/releases/download/v{FFmpegVersion}/ffmpeg-{FFmpegVersion}-win64.zip";
+        private const string FFmpegVersion = "8.0";
+        private static string FFmpegDownloadURL = $"https://github.com/ShareX/FFmpeg/releases/download/v{FFmpegVersion}/ffmpeg-{FFmpegVersion}-win-x64.zip";
         private const string RecorderDevicesVersion = "0.12.10";
         private static string RecorderDevicesDownloadURL = $"https://github.com/ShareX/RecorderDevices/releases/download/v{RecorderDevicesVersion}/recorder-devices-{RecorderDevicesVersion}-setup.exe";
         private const string ExifToolVersion = "13.29";
@@ -217,7 +217,7 @@ namespace ShareX.Setup
             {
                 Console.WriteLine("Invalid parent directory: " + ParentDir);
 
-                ParentDir = FileHelpers.GetAbsolutePath(@"..\..\..\");
+                ParentDir = FileHelpers.GetAbsolutePath(@"..\..\..\..\");
 
                 if (!File.Exists(SolutionPath))
                 {
@@ -384,7 +384,7 @@ namespace ShareX.Setup
 
                 if (Regex.IsMatch(language, "^[a-z]{2}(?:-[A-Z]{2})?$"))
                 {
-                    FileHelpers.CopyFiles(Path.Combine(source, language), Path.Combine(destination, language), "*.resources.dll");
+                    FileHelpers.CopyFiles(Path.Combine(source, language), Path.Combine(destination, "Languages", language), "*.resources.dll");
                 }
             }
 

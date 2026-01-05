@@ -47,8 +47,10 @@ namespace ShareX.HistoryLib
         private HistoryItemManager him;
         private string defaultTitle;
         private List<HistoryItem> allHistoryItems;
+        private int index;
 
-        public ImageHistoryForm(HistoryManagerSQLite historyManager, ImageHistorySettings settings, Action<string> uploadFile = null, Action<string> editImage = null, Action<string> pinToScreen = null)
+        public ImageHistoryForm(HistoryManagerSQLite historyManager, ImageHistorySettings settings, Action<string> uploadFile = null,
+            Action<string> editImage = null, Action<string> pinToScreen = null, Action<string> analyzeImage = null)
         {
             InitializeComponent();
             tsMain.Renderer = new ToolStripRoundedEdgeRenderer();
@@ -60,7 +62,7 @@ namespace ShareX.HistoryLib
             ilvImages.ThumbnailSize = Settings.ThumbnailSize;
             ilvImages.BorderStyle = BorderStyle.None;
 
-            him = new HistoryItemManager(uploadFile, editImage, pinToScreen);
+            him = new HistoryItemManager(uploadFile, editImage, pinToScreen, analyzeImage);
             him.GetHistoryItems += him_GetHistoryItems;
             him.FavoriteRequested += him_FavoriteRequested;
             him.EditRequested += him_EditRequested;
@@ -144,11 +146,14 @@ namespace ShareX.HistoryLib
             return historyItems;
         }
 
-        private void ApplyFilter()
+        private void ApplyFilter(bool reset = true)
         {
             UpdateSearchText();
 
-            ilvImages.Items.Clear();
+            if (reset)
+            {
+                ilvImages.Items.Clear();
+            }
 
             List<HistoryItem> filteredHistoryItems = new List<HistoryItem>();
 
@@ -160,7 +165,14 @@ namespace ShareX.HistoryLib
                 regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
             }
 
-            for (int i = 0; i < allHistoryItems.Count; i++)
+            if (reset)
+            {
+                index = 0;
+            }
+
+            int i = index;
+
+            for (; i < allHistoryItems.Count; i++)
             {
                 HistoryItem hi = allHistoryItems[i];
 
@@ -185,10 +197,15 @@ namespace ShareX.HistoryLib
                 }
             }
 
-            UpdateTitle(allHistoryItems.Count, filteredHistoryItems.Count);
+            if (filteredHistoryItems.Count > 0)
+            {
+                index = i + 1;
 
-            ImageListViewItem[] ilvItems = filteredHistoryItems.Select(hi => new ImageListViewItem(hi.FilePath) { Tag = hi }).ToArray();
-            ilvImages.Items.AddRange(ilvItems);
+                ImageListViewItem[] ilvItems = filteredHistoryItems.Select(hi => new ImageListViewItem(hi.FilePath) { Tag = hi }).ToArray();
+                ilvImages.Items.AddRange(ilvItems);
+
+                UpdateTitle(allHistoryItems.Count, ilvImages.Items.Count);
+            }
         }
 
         private HistoryItem[] him_GetHistoryItems()
@@ -358,6 +375,15 @@ namespace ShareX.HistoryLib
         private void ilvImages_KeyDown(object sender, KeyEventArgs e)
         {
             e.SuppressKeyPress = him.HandleKeyInput(e);
+        }
+
+        private void ilvImages_ThumbnailCached(object sender, ThumbnailCachedEventArgs e)
+        {
+            if (Settings.AutoLoadMoreItems && Settings.MaxItemCount > 0 && ilvImages.Items.Count >= Settings.MaxItemCount &&
+                e.Item == ilvImages.Items[ilvImages.Items.Count - 1])
+            {
+                ApplyFilter(false);
+            }
         }
 
         #endregion Form events

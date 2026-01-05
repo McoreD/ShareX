@@ -36,7 +36,7 @@ namespace ShareX.ScreenCaptureLib
         public override bool LimitRectangleToInsideCanvas { get; } = true;
 
         private ImageEditorButton confirmButton, cancelButton;
-        private Size buttonSize = new Size(80, 40);
+        private Size buttonSize = new Size(50, 40);
         private int buttonOffset = 15;
 
         public override void OnUpdate()
@@ -69,7 +69,8 @@ namespace ShareX.ScreenCaptureLib
             if (IsValidShape)
             {
                 Manager.DrawRegionArea(g, Rectangle, true, Manager.Options.ShowInfo);
-                g.DrawCross(Pens.Black, Rectangle.Center(), 10);
+                g.DrawCross(Pens.Black, Rectangle.Center().Add(-1, -1), 10);
+                g.DrawCross(Pens.White, Rectangle.Center(), 10);
             }
         }
 
@@ -78,7 +79,8 @@ namespace ShareX.ScreenCaptureLib
             confirmButton = new ImageEditorButton()
             {
                 Text = "\u2714",
-                ButtonColor = Color.ForestGreen,
+                ButtonColor = ShareXResources.Theme.LightBackgroundColor,
+                IconColor = Color.ForestGreen,
                 Rectangle = new Rectangle(new Point(), buttonSize),
                 Visible = true
             };
@@ -90,7 +92,8 @@ namespace ShareX.ScreenCaptureLib
             cancelButton = new ImageEditorButton()
             {
                 Text = "\u2716",
-                ButtonColor = Color.FromArgb(227, 45, 45),
+                ButtonColor = ShareXResources.Theme.LightBackgroundColor,
+                IconColor = Color.FromArgb(227, 45, 45),
                 Rectangle = new Rectangle(new Point(), buttonSize),
                 Visible = true
             };
