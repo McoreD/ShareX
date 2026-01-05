@@ -33,9 +33,11 @@ namespace ShareX
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ApplicationSettingsForm));
             this.tcSettings = new System.Windows.Forms.TabControl();
             this.tpGeneral = new System.Windows.Forms.TabPage();
+            this.cbUpdateChannel = new System.Windows.Forms.ComboBox();
+            this.lblUpdateChannel = new System.Windows.Forms.Label();
+            this.cbAutoCheckUpdate = new System.Windows.Forms.CheckBox();
             this.cbUseWhiteShareXIcon = new System.Windows.Forms.CheckBox();
             this.btnCheckDevBuild = new System.Windows.Forms.Button();
-            this.cbCheckPreReleaseUpdates = new System.Windows.Forms.CheckBox();
             this.cbTrayMiddleClickAction = new System.Windows.Forms.ComboBox();
             this.lblTrayMiddleClickAction = new System.Windows.Forms.Label();
             this.cbTrayLeftDoubleClickAction = new System.Windows.Forms.ComboBox();
@@ -58,7 +60,6 @@ namespace ShareX
             this.btnThemeAdd = new System.Windows.Forms.Button();
             this.cbThemes = new System.Windows.Forms.ComboBox();
             this.pgTheme = new System.Windows.Forms.PropertyGrid();
-            this.cbUseCustomTheme = new System.Windows.Forms.CheckBox();
             this.eiTheme = new ShareX.HelpersLib.ExportImportControl();
             this.tpIntegration = new System.Windows.Forms.TabPage();
             this.gbFirefox = new System.Windows.Forms.GroupBox();
@@ -75,6 +76,8 @@ namespace ShareX
             this.cbSendToMenu = new System.Windows.Forms.CheckBox();
             this.cbShellContextMenu = new System.Windows.Forms.CheckBox();
             this.tpPaths = new System.Windows.Forms.TabPage();
+            this.txtSaveImageSubFolderPatternWindow = new System.Windows.Forms.TextBox();
+            this.lblSaveImageSubFolderPatternWindow = new System.Windows.Forms.Label();
             this.btnPersonalFolderPathApply = new System.Windows.Forms.Button();
             this.btnOpenScreenshotsFolder = new System.Windows.Forms.Button();
             this.lblPreviewPersonalFolderPath = new System.Windows.Forms.Label();
@@ -179,8 +182,6 @@ namespace ShareX
             this.tpAdvanced = new System.Windows.Forms.TabPage();
             this.pgSettings = new System.Windows.Forms.PropertyGrid();
             this.tttvMain = new ShareX.HelpersLib.TabToTreeView();
-            this.lblSaveImageSubFolderPatternWindow = new System.Windows.Forms.Label();
-            this.txtSaveImageSubFolderPatternWindow = new System.Windows.Forms.TextBox();
             this.tcSettings.SuspendLayout();
             this.tpGeneral.SuspendLayout();
             this.tpTheme.SuspendLayout();
@@ -236,9 +237,11 @@ namespace ShareX
             // tpGeneral
             // 
             this.tpGeneral.BackColor = System.Drawing.SystemColors.Window;
+            this.tpGeneral.Controls.Add(this.cbUpdateChannel);
+            this.tpGeneral.Controls.Add(this.lblUpdateChannel);
+            this.tpGeneral.Controls.Add(this.cbAutoCheckUpdate);
             this.tpGeneral.Controls.Add(this.cbUseWhiteShareXIcon);
             this.tpGeneral.Controls.Add(this.btnCheckDevBuild);
-            this.tpGeneral.Controls.Add(this.cbCheckPreReleaseUpdates);
             this.tpGeneral.Controls.Add(this.cbTrayMiddleClickAction);
             this.tpGeneral.Controls.Add(this.lblTrayMiddleClickAction);
             this.tpGeneral.Controls.Add(this.cbTrayLeftDoubleClickAction);
@@ -257,6 +260,26 @@ namespace ShareX
             resources.ApplyResources(this.tpGeneral, "tpGeneral");
             this.tpGeneral.Name = "tpGeneral";
             // 
+            // cbUpdateChannel
+            // 
+            this.cbUpdateChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbUpdateChannel.FormattingEnabled = true;
+            resources.ApplyResources(this.cbUpdateChannel, "cbUpdateChannel");
+            this.cbUpdateChannel.Name = "cbUpdateChannel";
+            this.cbUpdateChannel.SelectedIndexChanged += new System.EventHandler(this.cbUpdateChannel_SelectedIndexChanged);
+            // 
+            // lblUpdateChannel
+            // 
+            resources.ApplyResources(this.lblUpdateChannel, "lblUpdateChannel");
+            this.lblUpdateChannel.Name = "lblUpdateChannel";
+            // 
+            // cbAutoCheckUpdate
+            // 
+            resources.ApplyResources(this.cbAutoCheckUpdate, "cbAutoCheckUpdate");
+            this.cbAutoCheckUpdate.Name = "cbAutoCheckUpdate";
+            this.cbAutoCheckUpdate.UseVisualStyleBackColor = true;
+            this.cbAutoCheckUpdate.CheckedChanged += new System.EventHandler(this.cbAutoCheckUpdate_CheckedChanged);
+            // 
             // cbUseWhiteShareXIcon
             // 
             resources.ApplyResources(this.cbUseWhiteShareXIcon, "cbUseWhiteShareXIcon");
@@ -270,13 +293,6 @@ namespace ShareX
             this.btnCheckDevBuild.Name = "btnCheckDevBuild";
             this.btnCheckDevBuild.UseVisualStyleBackColor = true;
             this.btnCheckDevBuild.Click += new System.EventHandler(this.btnCheckDevBuild_Click);
-            // 
-            // cbCheckPreReleaseUpdates
-            // 
-            resources.ApplyResources(this.cbCheckPreReleaseUpdates, "cbCheckPreReleaseUpdates");
-            this.cbCheckPreReleaseUpdates.Name = "cbCheckPreReleaseUpdates";
-            this.cbCheckPreReleaseUpdates.UseVisualStyleBackColor = true;
-            this.cbCheckPreReleaseUpdates.CheckedChanged += new System.EventHandler(this.cbCheckPreReleaseUpdates_CheckedChanged);
             // 
             // cbTrayMiddleClickAction
             // 
@@ -390,7 +406,6 @@ namespace ShareX
             this.tpTheme.Controls.Add(this.btnThemeAdd);
             this.tpTheme.Controls.Add(this.cbThemes);
             this.tpTheme.Controls.Add(this.pgTheme);
-            this.tpTheme.Controls.Add(this.cbUseCustomTheme);
             this.tpTheme.Controls.Add(this.eiTheme);
             resources.ApplyResources(this.tpTheme, "tpTheme");
             this.tpTheme.Name = "tpTheme";
@@ -432,13 +447,6 @@ namespace ShareX
             this.pgTheme.PropertySort = System.Windows.Forms.PropertySort.NoSort;
             this.pgTheme.ToolbarVisible = false;
             this.pgTheme.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.pgTheme_PropertyValueChanged);
-            // 
-            // cbUseCustomTheme
-            // 
-            resources.ApplyResources(this.cbUseCustomTheme, "cbUseCustomTheme");
-            this.cbUseCustomTheme.Name = "cbUseCustomTheme";
-            this.cbUseCustomTheme.UseVisualStyleBackColor = true;
-            this.cbUseCustomTheme.CheckedChanged += new System.EventHandler(this.CbUseCustomTheme_CheckedChanged);
             // 
             // eiTheme
             // 
@@ -576,6 +584,17 @@ namespace ShareX
             this.tpPaths.Controls.Add(this.txtSaveImageSubFolderPattern);
             resources.ApplyResources(this.tpPaths, "tpPaths");
             this.tpPaths.Name = "tpPaths";
+            // 
+            // txtSaveImageSubFolderPatternWindow
+            // 
+            resources.ApplyResources(this.txtSaveImageSubFolderPatternWindow, "txtSaveImageSubFolderPatternWindow");
+            this.txtSaveImageSubFolderPatternWindow.Name = "txtSaveImageSubFolderPatternWindow";
+            this.txtSaveImageSubFolderPatternWindow.TextChanged += new System.EventHandler(this.txtSaveImageSubFolderPatternWindow_TextChanged);
+            // 
+            // lblSaveImageSubFolderPatternWindow
+            // 
+            resources.ApplyResources(this.lblSaveImageSubFolderPatternWindow, "lblSaveImageSubFolderPatternWindow");
+            this.lblSaveImageSubFolderPatternWindow.Name = "lblSaveImageSubFolderPatternWindow";
             // 
             // btnPersonalFolderPathApply
             // 
@@ -1403,17 +1422,6 @@ namespace ShareX
             this.tttvMain.TreeViewSize = 175;
             this.tttvMain.TabChanged += new ShareX.HelpersLib.TabToTreeView.TabChangedEventHandler(this.tttvMain_TabChanged);
             // 
-            // lblSaveImageSubFolderPatternWindow
-            // 
-            resources.ApplyResources(this.lblSaveImageSubFolderPatternWindow, "lblSaveImageSubFolderPatternWindow");
-            this.lblSaveImageSubFolderPatternWindow.Name = "lblSaveImageSubFolderPatternWindow";
-            // 
-            // txtSaveImageSubFolderPatternWindow
-            // 
-            resources.ApplyResources(this.txtSaveImageSubFolderPatternWindow, "txtSaveImageSubFolderPatternWindow");
-            this.txtSaveImageSubFolderPatternWindow.Name = "txtSaveImageSubFolderPatternWindow";
-            this.txtSaveImageSubFolderPatternWindow.TextChanged += new System.EventHandler(this.txtSaveImageSubFolderPatternWindow_TextChanged);
-            // 
             // ApplicationSettingsForm
             // 
             resources.ApplyResources(this, "$this");
@@ -1429,7 +1437,6 @@ namespace ShareX
             this.tpGeneral.ResumeLayout(false);
             this.tpGeneral.PerformLayout();
             this.tpTheme.ResumeLayout(false);
-            this.tpTheme.PerformLayout();
             this.tpIntegration.ResumeLayout(false);
             this.gbFirefox.ResumeLayout(false);
             this.gbFirefox.PerformLayout();
@@ -1578,7 +1585,6 @@ namespace ShareX
         private System.Windows.Forms.ComboBox cbTrayMiddleClickAction;
         private System.Windows.Forms.ComboBox cbTrayLeftDoubleClickAction;
         private System.Windows.Forms.ComboBox cbTrayLeftClickAction;
-        private System.Windows.Forms.CheckBox cbCheckPreReleaseUpdates;
         private System.Windows.Forms.Button btnChromeOpenExtensionPage;
         private System.Windows.Forms.GroupBox gbFirefox;
         private System.Windows.Forms.Button btnFirefoxOpenAddonPage;
@@ -1588,7 +1594,6 @@ namespace ShareX
         private System.Windows.Forms.CheckBox cbEditWithShareX;
         private System.Windows.Forms.Button btnCheckDevBuild;
         private System.Windows.Forms.Button btnPersonalFolderPathApply;
-        private System.Windows.Forms.CheckBox cbUseCustomTheme;
         private System.Windows.Forms.CheckBox cbUseWhiteShareXIcon;
         private System.Windows.Forms.TabPage tpTheme;
         private System.Windows.Forms.PropertyGrid pgTheme;
@@ -1632,5 +1637,8 @@ namespace ShareX
         private System.Windows.Forms.Label lblClipboardFormatsTip;
         private System.Windows.Forms.TextBox txtSaveImageSubFolderPatternWindow;
         private System.Windows.Forms.Label lblSaveImageSubFolderPatternWindow;
+        private System.Windows.Forms.CheckBox cbAutoCheckUpdate;
+        private System.Windows.Forms.ComboBox cbUpdateChannel;
+        private System.Windows.Forms.Label lblUpdateChannel;
     }
 }

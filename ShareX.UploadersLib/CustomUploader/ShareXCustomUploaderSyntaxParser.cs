@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 using ShareX.HelpersLib;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ShareX.UploadersLib
 {
@@ -72,7 +73,8 @@ namespace ShareX.UploadersLib
 
             foreach (CustomUploaderFunction function in Functions)
             {
-                if (function.Name.Equals(functionName, StringComparison.OrdinalIgnoreCase))
+                if (function.Name.Equals(functionName, StringComparison.OrdinalIgnoreCase) ||
+                    (function.Aliases != null && function.Aliases.Any(x => x.Equals(functionName, StringComparison.OrdinalIgnoreCase))))
                 {
                     if (function.MinParameterCount > 0 && (parameters == null || parameters.Length < function.MinParameterCount))
                     {

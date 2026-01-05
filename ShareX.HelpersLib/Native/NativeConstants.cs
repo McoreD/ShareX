@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -27,6 +27,27 @@ namespace ShareX.HelpersLib
 {
     public static class NativeConstants
     {
+        /// <summary>
+        /// Places the window at the top of the Z order.
+        /// </summary>
+        public const int HWND_TOP = 0;
+
+        /// <summary>
+        /// Places the window at the bottom of the Z order.
+        /// If the hWnd parameter identifies a topmost window, the window loses its topmost status and is placed at the bottom of all other windows.
+        /// </summary>
+        public const int HWND_BOTTOM = 1;
+
+        /// <summary>
+        /// Places the window above all non-topmost windows. The window maintains its topmost position even when it is deactivated.
+        /// </summary>
+        public const int HWND_TOPMOST = -1;
+
+        /// <summary>
+        /// Places the window above all non-topmost windows (that is, behind all topmost windows). This flag has no effect if the window is already a non-topmost window.
+        /// </summary>
+        public const int HWND_NOTOPMOST = -2;
+
         public const int GWL_WNDPROC = -4;
         public const int GWL_HINSTANCE = -6;
         public const int GWL_HWNDPARENT = -8;
@@ -88,7 +109,6 @@ namespace ShareX.HelpersLib
 
         public const uint ECM_FIRST = 0x1500;
         public const uint EM_SETCUEBANNER = ECM_FIRST + 1;
-        public const int IDC_HAND = 32649;
         public const uint MA_ACTIVATE = 1;
         public const uint MA_ACTIVATEANDEAT = 2;
         public const uint MA_NOACTIVATE = 3;
@@ -107,5 +127,8 @@ namespace ShareX.HelpersLib
 
         public const int ILD_TRANSPARENT = 0x00000001;
         public const int ILD_IMAGE = 0x00000020;
+
+        public const int LWA_COLORKEY = 0x1;
+        public const int LWA_ALPHA = 0x2;
     }
 }

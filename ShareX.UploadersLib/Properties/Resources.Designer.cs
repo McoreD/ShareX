@@ -63,16 +63,6 @@ namespace ShareX.UploadersLib.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon AdFly {
-            get {
-                object obj = ResourceManager.GetObject("AdFly", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
         internal static System.Drawing.Icon AmazonS3 {
             get {
                 object obj = ResourceManager.GetObject("AmazonS3", resourceCulture);
@@ -140,6 +130,15 @@ namespace ShareX.UploadersLib.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connect....
+        /// </summary>
+        internal static string Connect {
+            get {
+                return ResourceManager.GetString("Connect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;File form name&quot; must be configured..
         /// </summary>
         internal static string CustomUploaderItem_GetFileFormName_FileFormNameMustBeConfigured {
@@ -163,6 +162,15 @@ namespace ShareX.UploadersLib.Properties {
         internal static string DeletionURL {
             get {
                 return ResourceManager.GetString("DeletionURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnect.
+        /// </summary>
+        internal static string Disconnect {
+            get {
+                return ResourceManager.GetString("Disconnect", resourceCulture);
             }
         }
         
@@ -272,16 +280,6 @@ namespace ShareX.UploadersLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Gfycat {
-            get {
-                object obj = ResourceManager.GetObject("Gfycat", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon GitHub {
@@ -333,16 +331,6 @@ namespace ShareX.UploadersLib.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap GooglePhotos {
-            get {
-                object obj = ResourceManager.GetObject("GooglePhotos", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Hastebin {
             get {
                 object obj = ResourceManager.GetObject("Hastebin", resourceCulture);
@@ -386,16 +374,6 @@ namespace ShareX.UploadersLib.Properties {
             get {
                 object obj = ResourceManager.GetObject("Imgur", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap jira {
-            get {
-                object obj = ResourceManager.GetObject("jira", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -785,31 +763,11 @@ namespace ShareX.UploadersLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon Teknik {
-            get {
-                object obj = ResourceManager.GetObject("Teknik", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Thumbnail URL.
         /// </summary>
         internal static string ThumbnailURL {
             get {
                 return ResourceManager.GetString("ThumbnailURL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon Twitter {
-            get {
-                object obj = ResourceManager.GetObject("Twitter", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
@@ -987,16 +945,6 @@ namespace ShareX.UploadersLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Refresh authorization is not supported..
-        /// </summary>
-        internal static string UploadersConfigForm_oAuthJira_RefreshButtonClicked_Refresh_authorization_is_not_supported_ {
-            get {
-                return ResourceManager.GetString("UploadersConfigForm_oAuthJira_RefreshButtonClicked_Refresh_authorization_is_not_s" +
-                        "upported_", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Querying folders....
         /// </summary>
         internal static string UploadersConfigForm_OneDriveAddFolder_Querying_folders___ {
@@ -1108,12 +1056,12 @@ namespace ShareX.UploadersLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon YouTube {
+        internal static System.Drawing.Bitmap YouTube {
             get {
                 object obj = ResourceManager.GetObject("YouTube", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

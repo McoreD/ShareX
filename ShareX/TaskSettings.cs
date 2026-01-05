@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -65,7 +65,7 @@ namespace ShareX
         public FileDestination TextFileDestination = FileDestination.Dropbox;
         public FileDestination FileDestination = FileDestination.Dropbox;
         public UrlShortenerType URLShortenerDestination = UrlShortenerType.BITLY;
-        public URLSharingServices URLSharingServiceDestination = URLSharingServices.Twitter;
+        public URLSharingServices URLSharingServiceDestination = URLSharingServices.Email;
 
         public bool OverrideFTP = false;
         public int FTPIndex = 0;
@@ -185,7 +185,7 @@ namespace ShareX
             return safeTaskSettings;
         }
 
-        private void SetDefaultSettings()
+        public void SetDefaultSettings()
         {
             if (Program.DefaultTaskSettings != null)
             {
@@ -249,6 +249,44 @@ namespace ShareX
             }
         }
 
+        public void Cleanup()
+        {
+            if (UseDefaultGeneralSettings)
+            {
+                GeneralSettings = null;
+            }
+
+            if (UseDefaultImageSettings)
+            {
+                ImageSettings = null;
+            }
+
+            if (UseDefaultCaptureSettings)
+            {
+                CaptureSettings = null;
+            }
+
+            if (UseDefaultUploadSettings)
+            {
+                UploadSettings = null;
+            }
+
+            if (UseDefaultActions)
+            {
+                ExternalPrograms = null;
+            }
+
+            if (UseDefaultToolsSettings)
+            {
+                ToolsSettings = null;
+            }
+
+            if (UseDefaultAdvancedSettings)
+            {
+                AdvancedSettings = null;
+            }
+        }
+
         public FileDestination GetFileDestinationByDataType(EDataType dataType)
         {
             switch (dataType)
@@ -270,6 +308,7 @@ namespace ShareX
 
         public bool PlaySoundAfterCapture = true;
         public bool PlaySoundAfterUpload = true;
+        public bool PlaySoundAfterAction = true;
         public bool ShowToastNotificationAfterTaskCompleted = true;
         public float ToastWindowDuration = 3f;
         public float ToastWindowFadeDuration = 1f;
@@ -279,16 +318,15 @@ namespace ShareX
         public ToastClickAction ToastWindowRightClickAction = ToastClickAction.CloseNotification;
         public ToastClickAction ToastWindowMiddleClickAction = ToastClickAction.AnnotateImage;
         public bool ToastWindowAutoHide = true;
+        public bool DisableNotificationsOnFullscreen = false;
         public bool UseCustomCaptureSound = false;
         public string CustomCaptureSoundPath = "";
         public bool UseCustomTaskCompletedSound = false;
         public string CustomTaskCompletedSoundPath = "";
+        public bool UseCustomActionCompletedSound = false;
+        public string CustomActionCompletedSoundPath = "";
         public bool UseCustomErrorSound = false;
         public string CustomErrorSoundPath = "";
-        public bool DisableNotifications = false;
-        public bool DisableNotificationsOnFullscreen = false;
-
-        public PopUpNotificationType PopUpNotification = PopUpNotificationType.ToastNotification;
 
         #endregion
     }
@@ -315,6 +353,7 @@ namespace ShareX
 
         public bool ShowImageEffectsWindowAfterCapture = false;
         public bool ImageEffectOnlyRegionCapture = false;
+        public bool UseRandomImageEffect = false;
 
         #endregion Image / Effects
 
@@ -339,7 +378,9 @@ namespace ShareX
         public int CaptureShadowOffset = 100;
         public bool CaptureClientArea = false;
         public bool CaptureAutoHideTaskbar = false;
+        public bool CaptureAutoHideDesktopIcons = false;
         public Rectangle CaptureCustomRegion = new Rectangle(0, 0, 0, 0);
+        public string CaptureCustomWindow = "";
 
         #endregion Capture / General
 
@@ -415,7 +456,9 @@ namespace ShareX
         public string ScreenColorPickerFormat = "$hex";
         public string ScreenColorPickerFormatCtrl = "$r255, $g255, $b255";
         public string ScreenColorPickerInfoText = "RGB: $r255, $g255, $b255$nHex: $hex$nX: $x Y: $y";
+        public PinToScreenOptions PinToScreenOptions = new PinToScreenOptions();
         public IndexerSettings IndexerSettings = new IndexerSettings();
+        public ImageBeautifierOptions ImageBeautifierOptions = new ImageBeautifierOptions();
         public ImageCombinerOptions ImageCombinerOptions = new ImageCombinerOptions();
         public VideoConverterOptions VideoConverterOptions = new VideoConverterOptions();
         public VideoThumbnailOptions VideoThumbnailOptions = new VideoThumbnailOptions();
@@ -427,8 +470,11 @@ namespace ShareX
         [Category("General"), DefaultValue(false), Description("Allow after capture tasks for image files by loading them as bitmap when files are handled during file upload, clipboard file upload, drag && drop file upload, watch folder and other image file tasks.")]
         public bool ProcessImagesDuringFileUpload { get; set; }
 
-        [Category("General"), DefaultValue(false), Description("Use after capture tasks for clipboard image upload.")]
+        [Category("General"), DefaultValue(false), Description("Use after capture tasks for clipboard image uploads.")]
         public bool ProcessImagesDuringClipboardUpload { get; set; }
+
+        [Category("General"), DefaultValue(false), Description("Use after capture tasks for browser extension image uploads.")]
+        public bool ProcessImagesDuringExtensionUpload { get; set; }
 
         [Category("General"), DefaultValue(true), Description("Allows file related after capture tasks (\"Perform actions\", \"Copy file to clipboard\" etc.) to be used when doing file upload.")]
         public bool UseAfterCaptureTasksDuringFileUpload { get; set; }
@@ -490,9 +536,6 @@ namespace ShareX
 
         [Category("Name pattern"), DefaultValue(50), Description("Maximum name pattern title (%t) length for file name.")]
         public int NamePatternMaxTitleLength { get; set; }
-
-        // TEMP: For backward compatibility
-        public string CapturePath;
 
         public TaskSettingsAdvanced()
         {

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 using ShareX.HelpersLib;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -44,29 +45,32 @@ namespace ShareX
 
         public async Task UseCommandLineArgs(List<CLICommand> commands)
         {
-            TaskSettings taskSettings = FindCLITask(commands);
-
-            foreach (CLICommand command in commands)
+            if (commands != null && commands.Count > 0)
             {
-                DebugHelper.WriteLine("CommandLine: " + command);
+                TaskSettings taskSettings = FindCLITask(commands);
 
-                if (command.IsCommand)
+                foreach (CLICommand command in commands)
                 {
-                    if (CheckCustomUploader(command) || CheckImageEffect(command) || await CheckCLIHotkey(command) || await CheckCLIWorkflow(command) ||
-                        CheckNativeMessagingInput(command))
+                    DebugHelper.WriteLine("CommandLine: " + command);
+
+                    if (command.IsCommand)
                     {
+                        if (CheckCustomUploader(command) || CheckImageEffect(command) || await CheckCLIHotkey(command) || await CheckCLIWorkflow(command) ||
+                            await CheckNativeMessagingInput(command))
+                        {
+                        }
+
+                        continue;
                     }
 
-                    continue;
-                }
-
-                if (URLHelpers.IsValidURL(command.Command))
-                {
-                    UploadManager.DownloadAndUploadFile(command.Command, taskSettings);
-                }
-                else
-                {
-                    UploadManager.UploadFile(command.Command, taskSettings);
+                    if (URLHelpers.IsValidURL(command.Command))
+                    {
+                        UploadManager.DownloadAndUploadFile(command.Command, taskSettings);
+                    }
+                    else
+                    {
+                        UploadManager.UploadFile(command.Command, taskSettings);
+                    }
                 }
             }
         }
@@ -83,7 +87,7 @@ namespace ShareX
                     {
                         if (command.Parameter == hotkeySetting.TaskSettings.ToString())
                         {
-                            return hotkeySetting.TaskSettings;
+                            return TaskSettings.GetSafeTaskSettings(hotkeySetting.TaskSettings);
                         }
                     }
                 }
@@ -128,13 +132,43 @@ namespace ShareX
             {
                 if (command.CheckCommand(job.ToString()))
                 {
-                    await TaskHelpers.ExecuteJob(job, command);
+                    string filePath = null;
+
+                    try
+                    {
+                        filePath = CheckParameterForFilePath(command);
+                    }
+                    catch (Exception e)
+                    {
+                        DebugHelper.WriteException(e);
+
+                        return true;
+                    }
+
+                    await TaskHelpers.ExecuteJob(job, filePath);
 
                     return true;
                 }
             }
 
             return false;
+        }
+
+        private string CheckParameterForFilePath(CLICommand command)
+        {
+            if (command != null && !string.IsNullOrEmpty(command.Parameter))
+            {
+                string filePath = FileHelpers.GetAbsolutePath(command.Parameter);
+
+                if (!File.Exists(filePath))
+                {
+                    throw new FileNotFoundException();
+                }
+
+                return filePath;
+            }
+
+            return null;
         }
 
         private async Task<bool> CheckCLIWorkflow(CLICommand command)
@@ -158,13 +192,13 @@ namespace ShareX
             return false;
         }
 
-        private bool CheckNativeMessagingInput(CLICommand command)
+        private async Task<bool> CheckNativeMessagingInput(CLICommand command)
         {
             if (command.Command.Equals("NativeMessagingInput", StringComparison.OrdinalIgnoreCase))
             {
                 if (!string.IsNullOrEmpty(command.Parameter) && command.Parameter.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                 {
-                    TaskHelpers.HandleNativeMessagingInput(command.Parameter);
+                    await TaskHelpers.HandleNativeMessagingInput(command.Parameter);
                 }
 
                 return true;

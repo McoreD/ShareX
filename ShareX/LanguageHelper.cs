@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -77,6 +77,9 @@ namespace ShareX
                 case SupportedLanguage.Automatic:
                     icon = Resources.globe;
                     break;
+                case SupportedLanguage.Arabic:
+                    icon = Resources.ye;
+                    break;
                 case SupportedLanguage.Dutch:
                     icon = Resources.nl;
                     break;
@@ -88,6 +91,9 @@ namespace ShareX
                     break;
                 case SupportedLanguage.German:
                     icon = Resources.de;
+                    break;
+                case SupportedLanguage.Hebrew:
+                    icon = Resources.il;
                     break;
                 case SupportedLanguage.Hungarian:
                     icon = Resources.hu;
@@ -154,6 +160,9 @@ namespace ShareX
 
             switch (language)
             {
+                case SupportedLanguage.Arabic:
+                    cultureName = "ar-YE";
+                    break;
                 case SupportedLanguage.Dutch:
                     cultureName = "nl-NL";
                     break;
@@ -166,6 +175,9 @@ namespace ShareX
                     break;
                 case SupportedLanguage.German:
                     cultureName = "de-DE";
+                    break;
+                case SupportedLanguage.Hebrew:
+                    cultureName = "he-IL";
                     break;
                 case SupportedLanguage.Hungarian:
                     cultureName = "hu-HU";

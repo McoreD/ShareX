@@ -120,14 +120,8 @@
   <data name="FFmpegOptionsForm_buttonFFmpegBrowse_Click_Browse_for_ffmpeg_exe" xml:space="preserve">
     <value>ffmpeg.exe için gözat</value>
   </data>
-  <data name="FFmpegOptionsForm_UpdateUI_Quality_" xml:space="preserve">
-    <value>Kalite:</value>
-  </data>
   <data name="BaseRegionForm_InitializeComponent_Region_capture" xml:space="preserve">
     <value>Yakalama bölgesi</value>
-  </data>
-  <data name="FFmpegOptionsForm_UpdateUI_Bitrate___0_k" xml:space="preserve">
-    <value>Bit hızı: {0}k</value>
   </data>
   <data name="RectangleRegion_GetAreaText_Area" xml:space="preserve">
     <value>X: {0} Y: {1} G: {2} Y: {3}</value>
@@ -310,7 +304,7 @@
     <value>Son bölgeyi yakala</value>
   </data>
   <data name="ShapeManager_CreateToolbar_CopyImageToClipboard" xml:space="preserve">
-    <value>Resimi panoya kopyala (Ctrl + Shift + C)</value>
+    <value>Resimi panoya kopyala (Ctrl + C)</value>
   </data>
   <data name="ShapeManager_CreateToolbar_CropImage" xml:space="preserve">
     <value>Resimi kırp...</value>
@@ -386,10 +380,6 @@
   </data>
   <data name="OpenKeybindsPage" xml:space="preserve">
     <value>Tuşlar web sayfasını aç...</value>
-  </data>
-  <data name="RegionCaptureForm_ShowExitConfirmation_Text" xml:space="preserve">
-    <value>Kaydedilmemiş değişiklikler var.
-Resim düzenleyiciyi kapatmak ister misiniz?</value>
   </data>
   <data name="RegionCaptureForm_TipYouCanPanImageByHoldingMouseMiddleButtonAndDragging" xml:space="preserve">
     <value>İpucu: Farenin orta düğmesini basılı tutup sürükleyerek resmi kaydırabilirsiniz.</value>
@@ -486,5 +476,14 @@ Resim düzenleyiciyi kapatmak ister misiniz?</value>
   </data>
   <data name="CutOutEffectType" xml:space="preserve">
     <value>Kesip çıkarma efekti:</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Duraklat</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Devam et</value>
+  </data>
+  <data name="ShapeManager_CreateToolbar_Redo" xml:space="preserve">
+    <value>Yeniden yap</value>
   </data>
 </root>

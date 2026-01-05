@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -71,6 +71,9 @@ namespace ShareX.ImageEffectsLib
         [DefaultValue(typeof(Point), "0, 0")]
         public Point Offset { get; set; }
 
+        [DefaultValue(true)]
+        public bool AutoResize { get; set; }
+
         public Shadow()
         {
             this.ApplyDefaultPropertyValues();
@@ -78,7 +81,12 @@ namespace ShareX.ImageEffectsLib
 
         public override Bitmap Apply(Bitmap bmp)
         {
-            return ImageHelpers.AddShadow(bmp, Opacity, Size, Darkness + 1, Color, Offset);
+            return ImageHelpers.AddShadow(bmp, Opacity, Size, Darkness + 1, Color, Offset, AutoResize);
+        }
+
+        protected override string GetSummary()
+        {
+            return Size.ToString();
         }
     }
 }

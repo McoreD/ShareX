@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ namespace ShareX
         public PinToScreenStartupForm()
         {
             InitializeComponent();
-            ShareXResources.ApplyTheme(this);
+            ShareXResources.ApplyTheme(this, true);
         }
 
         private void btnFromScreen_Click(object sender, EventArgs e)
@@ -49,21 +49,19 @@ namespace ShareX
             Hide();
             Thread.Sleep(250);
 
-            if (RegionCaptureTasks.GetRectangleRegion(out Rectangle rect))
+            Image = RegionCaptureTasks.GetRegionImage(out Rectangle rect);
+
+            if (Image != null)
             {
-                Image = new Screenshot().CaptureRectangle(rect);
+                PinToScreenLocation = rect.Location;
 
-                if (Image != null)
-                {
-                    PinToScreenLocation = rect.Location;
-
-                    DialogResult = DialogResult.OK;
-                    Close();
-                    return;
-                }
+                DialogResult = DialogResult.OK;
+                Close();
             }
-
-            Show();
+            else
+            {
+                Show();
+            }
         }
 
         private void btnFromClipboard_Click(object sender, EventArgs e)

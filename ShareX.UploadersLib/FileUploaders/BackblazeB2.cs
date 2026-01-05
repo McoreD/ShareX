@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -397,7 +397,7 @@ namespace ShareX.UploadersLib.FileUploaders
 
             // compute SHA1 hash without loading the file fully into memory
             string sha1Hash;
-            using (SHA1CryptoServiceProvider cryptoProvider = new SHA1CryptoServiceProvider())
+            using (HashAlgorithm cryptoProvider = SHA1.Create())
             {
                 file.Seek(0, SeekOrigin.Begin);
                 byte[] bytes = cryptoProvider.ComputeHash(file);
@@ -418,7 +418,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 ["X-Bz-Info-b2-content-disposition"] = URLHelpers.URLEncode(contentDisposition.ToString()),
             };
 
-            string contentType = RequestHelpers.GetMimeType(destinationPath);
+            string contentType = MimeTypes.GetMimeTypeFromFileName(destinationPath);
 
             using (HttpWebResponse res = GetResponse(HttpMethod.POST, b2UploadUrl.uploadUrl,
                 contentType: contentType, headers: headers, data: file, allowNon2xxResponses: true))
@@ -493,7 +493,10 @@ namespace ShareX.UploadersLib.FileUploaders
         /// <exception cref="IOException">If the response body cannot be read.</exception>
         private static B2Error ParseB2Error(HttpWebResponse res)
         {
-            if (RequestHelpers.IsSuccessStatusCode(res.StatusCode)) return null;
+            if (WebHelpers.IsSuccessStatusCode(res.StatusCode))
+            {
+                return null;
+            }
 
             try
             {

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -31,7 +31,6 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ShareX.HelpersLib
@@ -239,7 +238,7 @@ namespace ShareX.HelpersLib
 
         private async void tsmiImportURL_Click(object sender, EventArgs e)
         {
-            string url = InputBox.GetInputText(Resources.ExportImportControl_tsmiImportURL_Click_URL_to_download_settings_from);
+            string url = InputBox.Show(Resources.ExportImportControl_tsmiImportURL_Click_URL_to_download_settings_from);
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -247,19 +246,16 @@ namespace ShareX.HelpersLib
 
                 string json = null;
 
-                await Task.Run(() =>
+                try
                 {
-                    try
-                    {
-                        json = URLHelpers.DownloadString(url);
-                    }
-                    catch (Exception ex)
-                    {
-                        DebugHelper.WriteException(ex);
-                        MessageBox.Show(Resources.Helpers_DownloadString_Download_failed_ + "\r\n" + ex, "ShareX - " + Resources.Error,
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                });
+                    json = await WebHelpers.DownloadStringAsync(url);
+                }
+                catch (Exception ex)
+                {
+                    DebugHelper.WriteException(ex);
+                    MessageBox.Show(Resources.Helpers_DownloadString_Download_failed_ + "\r\n" + ex, "ShareX - " + Resources.Error,
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
                 OnImportRequested(json);
                 OnImportCompleted();

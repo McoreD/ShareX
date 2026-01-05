@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ namespace ShareX.ScreenCaptureLib
 
             InitializeComponent();
             tsMain.Renderer = new ToolStripRoundedEdgeRenderer();
-            ShareXResources.ApplyTheme(this);
+            ShareXResources.ApplyTheme(this, true);
 
             tsnudSize.NumericUpDownControl.Minimum = 16;
             tsnudSize.NumericUpDownControl.Maximum = 256;
@@ -149,7 +149,6 @@ namespace ShareX.ScreenCaptureLib
         {
             if (e.KeyCode == Keys.Enter)
             {
-                e.Handled = true;
                 e.SuppressKeyPress = true;
             }
         }
@@ -158,7 +157,6 @@ namespace ShareX.ScreenCaptureLib
         {
             if (e.KeyCode == Keys.Enter)
             {
-                e.Handled = true;
                 e.SuppressKeyPress = true;
 
                 if (ilvStickers.Items.Count > 0)

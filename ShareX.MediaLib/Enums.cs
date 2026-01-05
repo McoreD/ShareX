@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -43,10 +43,24 @@ namespace ShareX.MediaLib
         x264,
         [Description("H.265 / x265")]
         x265,
-        [Description("VP8 (WebM)")]
+        [Description("H.264 / NVENC")]
+        h264_nvenc,
+        [Description("HEVC / NVENC")]
+        hevc_nvenc,
+        [Description("H.264 / AMF")]
+        h264_amf,
+        [Description("HEVC / AMF")]
+        hevc_amf,
+        [Description("H.264 / Quick Sync")]
+        h264_qsv,
+        [Description("HEVC / Quick Sync")]
+        hevc_qsv,
+        [Description("VP8")]
         vp8,
-        [Description("VP9 (WebM)")]
+        [Description("VP9")]
         vp9,
+        [Description("AV1")]
+        av1,
         [Description("MPEG-4 / Xvid")]
         xvid,
         [Description("GIF")]
@@ -55,5 +69,14 @@ namespace ShareX.MediaLib
         webp,
         [Description("APNG")]
         apng
+    }
+
+    public enum ImageBeautifierBackgroundType
+    {
+        Gradient,
+        Color,
+        Image,
+        Desktop,
+        Transparent
     }
 }

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
+using ShareX.HistoryLib;
 using ShareX.Properties;
 using ShareX.UploadersLib;
 using System;
@@ -44,7 +45,9 @@ namespace ShareX
 {
     internal static class Program
     {
-        public const string Name = "ShareX";
+        public const string AppName = "ShareX";
+        public const string MutexName = "82E6AC09-0FEF-4390-AD9F-0DD3F5561EFC";
+        public static readonly string PipeName = $"{Environment.MachineName}-{Environment.UserName}-{AppName}";
 
         public const ShareXBuild Build =
 #if RELEASE
@@ -78,7 +81,7 @@ namespace ShareX
         {
             get
             {
-                string title = $"{Name} {VersionText}";
+                string title = $"{AppName} {VersionText}";
 
                 if (Settings != null && Settings.DevMode)
                 {
@@ -105,11 +108,11 @@ namespace ShareX
                     return Title;
                 }
 
-                return Name;
+                return AppName;
             }
         }
 
-        public static bool Dev { get; } = true;
+        public static bool Dev { get; } = false;
         public static bool MultiInstance { get; private set; }
         public static bool Portable { get; private set; }
         public static bool SilentRun { get; private set; }
@@ -123,20 +126,21 @@ namespace ShareX
         internal static TaskSettings DefaultTaskSettings { get; set; }
         internal static UploadersConfig UploadersConfig { get; set; }
         internal static HotkeysConfig HotkeysConfig { get; set; }
+        internal static HistoryManagerSQLite HistoryManager { get; set; }
 
         internal static MainForm MainForm { get; private set; }
         internal static Stopwatch StartTimer { get; private set; }
         internal static HotkeyManager HotkeyManager { get; set; }
         internal static WatchFolderManager WatchFolderManager { get; set; }
-        internal static GitHubUpdateManager UpdateManager { get; private set; }
+        internal static ShareXUpdateManager UpdateManager { get; private set; }
         internal static ShareXCLIManager CLI { get; private set; }
 
         #region Paths
 
         private const string PersonalPathConfigFileName = "PersonalPath.cfg";
 
-        public static readonly string DefaultPersonalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Name);
-        public static readonly string PortablePersonalFolder = FileHelpers.GetAbsolutePath(Name);
+        public static readonly string DefaultPersonalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppName);
+        public static readonly string PortablePersonalFolder = FileHelpers.GetAbsolutePath(AppName);
 
         private static string PersonalPathConfigFilePath
         {
@@ -156,10 +160,9 @@ namespace ShareX
         private static readonly string CurrentPersonalPathConfigFilePath = Path.Combine(DefaultPersonalFolder, PersonalPathConfigFileName);
 
         private static readonly string PreviousPersonalPathConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            Name, PersonalPathConfigFileName);
+            AppName, PersonalPathConfigFileName);
 
         private static readonly string PortableCheckFilePath = FileHelpers.GetAbsolutePath("Portable");
-        public static readonly string NativeMessagingHostFilePath = FileHelpers.GetAbsolutePath("ShareX_NativeMessagingHost.exe");
         public static readonly string SteamInAppFilePath = FileHelpers.GetAbsolutePath("Steam");
 
         private static string CustomPersonalPath { get; set; }
@@ -177,7 +180,7 @@ namespace ShareX
             }
         }
 
-        public const string HistoryFileName = "History.json";
+        public const string HistoryFileName = "History.db";
 
         public static string HistoryFilePath
         {
@@ -189,7 +192,7 @@ namespace ShareX
             }
         }
 
-        public const string HistoryFileNameOld = "History.xml";
+        public const string HistoryFileNameOld = "History.json";
 
         public static string HistoryFilePathOld
         {
@@ -209,12 +212,15 @@ namespace ShareX
         {
             get
             {
+                if (SystemOptions.DisableLogging)
+                {
+                    return null;
+                }
+
                 string fileName = string.Format("ShareX-Log-{0:yyyy-MM}.txt", DateTime.Now);
                 return Path.Combine(LogsFolder, fileName);
             }
         }
-
-        public static string RequestLogsFilePath => Path.Combine(LogsFolder, "ShareX-Request-Logs.txt");
 
         public static string ScreenshotsParentFolder
         {
@@ -250,10 +256,7 @@ namespace ShareX
             }
         }
 
-        public static string ToolsFolder => Path.Combine(PersonalFolder, "Tools");
         public static string ImageEffectsFolder => Path.Combine(PersonalFolder, "ImageEffects");
-        public static string ChromeHostManifestFilePath => Path.Combine(ToolsFolder, "Chrome-host-manifest.json");
-        public static string FirefoxHostManifestFilePath => Path.Combine(ToolsFolder, "Firefox-host-manifest.json");
 
         private static string PersonalPathDetectionMethod;
 
@@ -264,19 +267,9 @@ namespace ShareX
         [STAThread]
         private static void Main(string[] args)
         {
-            // Allow Visual Studio to break on exceptions in Debug builds
-#if !DEBUG
-            // Add the event handler for handling UI thread exceptions to the event
-            Application.ThreadException += Application_ThreadException;
+            HandleExceptions();
 
-            // Set the unhandled exception mode to force all Windows Forms errors to go through our handler
-            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
-
-            // Add the event handler for handling non-UI thread exceptions to the event
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-#endif
-
-            StartTimer = Stopwatch.StartNew(); // For be able to show startup time
+            StartTimer = Stopwatch.StartNew();
 
             CLI = new ShareXCLIManager(args);
             CLI.ParseCommands();
@@ -285,40 +278,47 @@ namespace ShareX
             if (CheckUninstall()) return; // Steam will run ShareX with -Uninstall when uninstalling
 #endif
 
-            if (CheckAdminTasks()) return; // If ShareX opened just for be able to execute task as Admin
-
             SystemOptions.UpdateSystemOptions();
             UpdatePersonalPath();
 
             DebugHelper.Init(LogsFilePath);
 
+            IsAdmin = Helpers.IsAdministrator();
             MultiInstance = CLI.IsCommandExist("multi", "m");
 
-            using (ApplicationInstanceManager instanceManager = new ApplicationInstanceManager(!MultiInstance, args, SingleInstanceCallback))
-            using (TimerResolutionManager timerResolutionManager = new TimerResolutionManager())
+            using (SingleInstanceManager singleInstanceManager = new SingleInstanceManager(MutexName, PipeName, !MultiInstance, args))
             {
-                Run();
+                if (!singleInstanceManager.IsSingleInstance || singleInstanceManager.IsFirstInstance)
+                {
+                    singleInstanceManager.ArgumentsReceived += SingleInstanceManager_ArgumentsReceived;
+
+                    using (TimerResolutionManager timerResolutionManager = new TimerResolutionManager())
+                    {
+                        Run();
+                    }
+
+                    if (restartRequested)
+                    {
+                        DebugHelper.WriteLine("ShareX restarting.");
+
+                        if (restartAsAdmin)
+                        {
+                            TaskHelpers.RunShareXAsAdmin("-silent");
+                        }
+                        else
+                        {
+                            Process.Start(Application.ExecutablePath);
+                        }
+                    }
+                }
             }
 
-            if (restartRequested)
-            {
-                DebugHelper.WriteLine("ShareX restarting.");
-
-                if (restartAsAdmin)
-                {
-                    TaskHelpers.RunShareXAsAdmin("-silent");
-                }
-                else
-                {
-                    Process.Start(Application.ExecutablePath);
-                }
-            }
+            DebugHelper.Flush();
         }
 
         private static void Run()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            ApplicationConfiguration.Initialize();
 
             DebugHelper.WriteLine("ShareX starting.");
             DebugHelper.WriteLine("Version: " + VersionText);
@@ -330,7 +330,7 @@ namespace ShareX
                 DebugHelper.WriteLine("Personal path detection method: " + PersonalPathDetectionMethod);
             }
             DebugHelper.WriteLine("Operating system: " + Helpers.GetOperatingSystemProductName(true));
-            IsAdmin = Helpers.IsAdministrator();
+            DebugHelper.WriteLine(".NET version: " + Environment.Version);
             DebugHelper.WriteLine("Running as elevated process: " + IsAdmin);
 
             SilentRun = CLI.IsCommandExist("silent", "s");
@@ -351,11 +351,9 @@ namespace ShareX
 
             SettingManager.LoadInitialSettings();
 
-            Uploader.UpdateServicePointManager();
-            UpdateManager = new GitHubUpdateManager("ShareX", "ShareX", Dev, Portable);
+            UpdateManager = new ShareXUpdateManager();
             LanguageHelper.ChangeLanguage(Settings.Language);
             CleanupManager.CleanupAsync();
-            Helpers.TryFixHandCursor();
 
             DebugHelper.WriteLine("MainForm init started.");
             MainForm = new MainForm();
@@ -372,10 +370,10 @@ namespace ShareX
             {
                 closeSequenceStarted = true;
 
-                DebugHelper.Logger.AsyncWrite = false;
                 DebugHelper.WriteLine("ShareX closing.");
 
-                if (WatchFolderManager != null) WatchFolderManager.Dispose();
+                WatchFolderManager?.Dispose();
+                SettingManager.HistoryClose();
                 SettingManager.SaveAllSettings();
 
                 DebugHelper.WriteLine("ShareX closed.");
@@ -389,13 +387,26 @@ namespace ShareX
             Application.Exit();
         }
 
-        private static void SingleInstanceCallback(object sender, InstanceCallbackEventArgs args)
+        private static void SingleInstanceManager_ArgumentsReceived(string[] arguments)
         {
+            string message = "Arguments received: ";
+
+            if (arguments == null)
+            {
+                message += "null";
+            }
+            else
+            {
+                message += "\"" + string.Join(" ", arguments) + "\"";
+            }
+
+            DebugHelper.WriteLine(message);
+
             if (WaitFormLoad(5000))
             {
                 MainForm.InvokeSafe(async () =>
                 {
-                    await UseCommandLineArgs(args.CommandLineArgs);
+                    await UseCommandLineArgs(arguments);
                 });
             }
         }
@@ -510,9 +521,7 @@ namespace ShareX
             {
                 FileHelpers.CreateDirectory(SettingManager.BackupFolder);
                 FileHelpers.CreateDirectory(ImageEffectsFolder);
-                FileHelpers.CreateDirectory(LogsFolder);
                 FileHelpers.CreateDirectory(ScreenshotsParentFolder);
-                FileHelpers.CreateDirectory(ToolsFolder);
             }
         }
 
@@ -615,6 +624,25 @@ namespace ShareX
             return false;
         }
 
+        private static void HandleExceptions()
+        {
+#if DEBUG
+            if (Debugger.IsAttached)
+            {
+                return;
+            }
+#endif
+
+            // Add the event handler for handling UI thread exceptions to the event
+            Application.ThreadException += Application_ThreadException;
+
+            // Set the unhandled exception mode to force all Windows Forms errors to go through our handler
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+
+            // Add the event handler for handling non-UI thread exceptions to the event
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
             OnError(e.Exception);
@@ -631,20 +659,6 @@ namespace ShareX
             {
                 errorForm.ShowDialog();
             }
-        }
-
-        private static bool CheckAdminTasks()
-        {
-            if (CLI.IsCommandExist("dnschanger"))
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Helpers.TryFixHandCursor();
-                Application.Run(new DNSChangerForm());
-                return true;
-            }
-
-            return false;
         }
 
         private static bool CheckUninstall()
@@ -685,6 +699,7 @@ namespace ShareX
             if (IgnoreHotkeyWarning) flags.Add(nameof(IgnoreHotkeyWarning));
             if (SystemOptions.DisableUpdateCheck) flags.Add(nameof(SystemOptions.DisableUpdateCheck));
             if (SystemOptions.DisableUpload) flags.Add(nameof(SystemOptions.DisableUpload));
+            if (SystemOptions.DisableLogging) flags.Add(nameof(SystemOptions.DisableLogging));
             if (PuushMode) flags.Add(nameof(PuushMode));
 
             string output = string.Join(", ", flags);

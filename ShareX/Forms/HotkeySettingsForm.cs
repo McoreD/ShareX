@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -64,6 +64,7 @@ namespace ShareX
             {
                 manager = hotkeyManager;
                 manager.HotkeysToggledTrigger += HandleHotkeysToggle;
+                manager.RegisterFailedHotkeys();
 
                 AddControls();
             }
@@ -113,21 +114,12 @@ namespace ShareX
             }
         }
 
-        private void RegisterFailedHotkeys()
-        {
-            foreach (HotkeySettings hotkeySettings in manager.Hotkeys.Where(x => x.HotkeyInfo.Status == HotkeyStatus.Failed))
-            {
-                manager.RegisterHotkey(hotkeySettings);
-            }
-
-            UpdateHotkeyStatus();
-        }
-
         private void control_HotkeyChanged(object sender, EventArgs e)
         {
             HotkeySelectionControl control = (HotkeySelectionControl)sender;
             manager.RegisterHotkey(control.HotkeySettings);
-            RegisterFailedHotkeys();
+            manager.RegisterFailedHotkeys();
+            UpdateHotkeyStatus();
         }
 
         private HotkeySelectionControl AddHotkeySelectionControl(HotkeySettings hotkeySettings)
@@ -143,7 +135,10 @@ namespace ShareX
 
         private void Edit(HotkeySelectionControl selectionControl)
         {
-            using (TaskSettingsForm taskSettingsForm = new TaskSettingsForm(selectionControl.HotkeySettings.TaskSettings))
+            TaskSettings taskSettings = selectionControl.HotkeySettings.TaskSettings;
+            taskSettings.SetDefaultSettings();
+
+            using (TaskSettingsForm taskSettingsForm = new TaskSettingsForm(taskSettings))
             {
                 taskSettingsForm.ShowDialog();
                 selectionControl.UpdateControls();

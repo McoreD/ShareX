@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ namespace ShareX.ScreenCaptureLib
         public ImageSizeForm(Size size, ImageInterpolationMode interpolationMode)
         {
             InitializeComponent();
-            ShareXResources.ApplyTheme(this);
+            ShareXResources.ApplyTheme(this, true);
 
             ImageSize = size;
             InterpolationMode = interpolationMode;
@@ -74,7 +74,7 @@ namespace ShareX.ScreenCaptureLib
                 if (cbAspectRatio.Checked)
                 {
                     ignoreValueChanged = true;
-                    nudHeight.Value = (int)Math.Round((double)nudWidth.Value * heightRatio);
+                    nudHeight.SetValue((int)Math.Round((double)nudWidth.Value * heightRatio));
                     ignoreValueChanged = false;
                 }
 
@@ -89,7 +89,7 @@ namespace ShareX.ScreenCaptureLib
                 if (cbAspectRatio.Checked)
                 {
                     ignoreValueChanged = true;
-                    nudWidth.Value = (int)Math.Round((double)nudHeight.Value * widthRatio);
+                    nudWidth.SetValue((int)Math.Round((double)nudHeight.Value * widthRatio));
                     ignoreValueChanged = false;
                 }
 

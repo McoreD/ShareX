@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
+using ShareX.Properties;
 using System;
 using System.Drawing;
 using System.IO;
@@ -136,10 +137,10 @@ namespace ShareX
             buffer = new Bitmap(Config.Size.Width, Config.Size.Height);
             gBuffer = Graphics.FromImage(buffer);
 
-            Point position = Helpers.GetPosition(Config.Placement, Config.Offset, Screen.PrimaryScreen.WorkingArea.Size, Config.Size);
+            Point position = Helpers.GetPosition(Config.Placement, Config.Offset, Screen.PrimaryScreen.WorkingArea, Config.Size);
 
-            NativeMethods.SetWindowPos(Handle, (IntPtr)SpecialWindowHandles.HWND_TOPMOST, position.X + Screen.PrimaryScreen.WorkingArea.X,
-                position.Y + Screen.PrimaryScreen.WorkingArea.Y, Config.Size.Width, Config.Size.Height, SetWindowPosFlags.SWP_NOACTIVATE);
+            NativeMethods.SetWindowPos(Handle, (IntPtr)NativeConstants.HWND_TOPMOST, position.X, position.Y, Config.Size.Width, Config.Size.Height,
+                SetWindowPosFlags.SWP_NOACTIVATE);
 
             tDuration.Stop();
             tOpacity.Stop();
@@ -403,6 +404,14 @@ namespace ShareX
                     if (!string.IsNullOrEmpty(Config.FilePath) && FileHelpers.IsImageFile(Config.FilePath))
                     {
                         TaskHelpers.PinToScreen(Config.FilePath);
+                    }
+                    break;
+                case ToastClickAction.DeleteFile:
+                    if (!string.IsNullOrEmpty(Config.FilePath) &&
+                        MessageBox.Show(Resources.MainForm_tsmiDeleteSelectedFile_Click_Do_you_really_want_to_delete_this_file_,
+                        "ShareX - " + Resources.MainForm_tsmiDeleteSelectedFile_Click_File_delete_confirmation, MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        FileHelpers.DeleteFile(Config.FilePath, true);
                     }
                     break;
             }

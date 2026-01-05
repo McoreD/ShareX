@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -46,6 +46,11 @@ namespace ShareX.ImageEffectsLib
 
         public abstract Bitmap Apply(Bitmap bmp);
 
+        protected virtual string GetSummary()
+        {
+            return null;
+        }
+
         public override string ToString()
         {
             if (!string.IsNullOrEmpty(Name))
@@ -53,7 +58,15 @@ namespace ShareX.ImageEffectsLib
                 return Name;
             }
 
-            return GetType().GetDescription();
+            string name = GetType().GetDescription();
+            string summary = GetSummary();
+
+            if (!string.IsNullOrEmpty(summary))
+            {
+                name = $"{name}: {summary}";
+            }
+
+            return name;
         }
     }
 }

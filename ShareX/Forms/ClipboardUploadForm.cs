@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -43,13 +43,10 @@ namespace ShareX
         public ClipboardUploadForm(TaskSettings taskSettings, bool showCheckBox = false)
         {
             InitializeComponent();
-            ShareXResources.ApplyTheme(this);
+            ShareXResources.ApplyTheme(this, true);
             this.taskSettings = taskSettings;
 
-            if (ShareXResources.UseCustomTheme)
-            {
-                lblQuestion.BackColor = ShareXResources.Theme.BorderColor;
-            }
+            lblQuestion.BackColor = ShareXResources.Theme.BorderColor;
 
             cbDontShowThisWindow.Visible = showCheckBox;
 
@@ -147,11 +144,14 @@ namespace ShareX
         private void btnUpload_Click(object sender, EventArgs e)
         {
             ClipboardUpload();
+
+            DialogResult = DialogResult.OK;
             Close();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            DialogResult = DialogResult.Cancel;
             Close();
         }
     }

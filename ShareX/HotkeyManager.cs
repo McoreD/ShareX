@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,9 +25,7 @@
 
 using ShareX.HelpersLib;
 using ShareX.Properties;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -49,8 +47,29 @@ namespace ShareX
         public HotkeyManager(HotkeyForm form)
         {
             hotkeyForm = form;
-            hotkeyForm.HotkeyPress += hotkeyForm_HotkeyPress;
-            hotkeyForm.FormClosed += (sender, e) => hotkeyForm.InvokeSafe(() => UnregisterAllHotkeys(false));
+            hotkeyForm.HotkeyPress += HotkeyForm_HotkeyPress;
+            hotkeyForm.FormClosed += HotkeyForm_FormClosed;
+        }
+
+        private void HotkeyForm_HotkeyPress(ushort id, Keys key, Modifiers modifier)
+        {
+            if (!IgnoreHotkeys && (!Program.Settings.DisableHotkeysOnFullscreen || !CaptureHelpers.IsActiveWindowFullscreen()))
+            {
+                HotkeySettings hotkeySetting = Hotkeys.Find(x => x.HotkeyInfo.ID == id);
+
+                if (hotkeySetting != null)
+                {
+                    OnHotkeyTrigger(hotkeySetting);
+                }
+            }
+        }
+
+        private void HotkeyForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (hotkeyForm != null && !hotkeyForm.IsDisposed)
+            {
+                UnregisterAllHotkeys(false);
+            }
         }
 
         public void UpdateHotkeys(List<HotkeySettings> hotkeys, bool showFailedHotkeys)
@@ -67,19 +86,6 @@ namespace ShareX
             if (showFailedHotkeys)
             {
                 ShowFailedHotkeys();
-            }
-        }
-
-        private void hotkeyForm_HotkeyPress(ushort id, Keys key, Modifiers modifier)
-        {
-            if (!IgnoreHotkeys && (!Program.Settings.DisableHotkeysOnFullscreen || !CaptureHelpers.IsActiveWindowFullscreen()))
-            {
-                HotkeySettings hotkeySetting = Hotkeys.Find(x => x.HotkeyInfo.ID == id);
-
-                if (hotkeySetting != null)
-                {
-                    OnHotkeyTrigger(hotkeySetting);
-                }
             }
         }
 
@@ -122,6 +128,14 @@ namespace ShareX
         public void RegisterAllHotkeys()
         {
             foreach (HotkeySettings hotkeySetting in Hotkeys.ToArray())
+            {
+                RegisterHotkey(hotkeySetting);
+            }
+        }
+
+        public void RegisterFailedHotkeys()
+        {
+            foreach (HotkeySettings hotkeySetting in Hotkeys.Where(x => x.HotkeyInfo.Status == HotkeyStatus.Failed))
             {
                 RegisterHotkey(hotkeySetting);
             }
@@ -183,20 +197,9 @@ namespace ShareX
 
             if (failedHotkeysList.Count > 0)
             {
-                string failedHotkeys = string.Join("\r\n", failedHotkeysList.Select(x => x.TaskSettings.ToString() + ": " + x.HotkeyInfo.ToString()));
+                string failedHotkeys = string.Join("\r\n", failedHotkeysList.Select(x => $"[{x.HotkeyInfo}] {x.TaskSettings}"));
                 string hotkeyText = failedHotkeysList.Count > 1 ? Resources.HotkeyManager_ShowFailedHotkeys_hotkeys : Resources.HotkeyManager_ShowFailedHotkeys_hotkey;
                 string text = string.Format(Resources.HotkeyManager_ShowFailedHotkeys_Unable_to_register_hotkey, hotkeyText, failedHotkeys);
-
-                string[] processNames = new string[] { "ShareX", "OneDrive", "Dropbox", "Greenshot", "ScreenshotCaptor", "FSCapture", "Snagit32", "puush", "Lightshot" };
-                int ignoreProcess = Process.GetCurrentProcess().Id;
-                List<string> conflictProcessNames = Process.GetProcesses().Where(x => x.Id != ignoreProcess && !string.IsNullOrEmpty(x.ProcessName) &&
-                    processNames.Any(x2 => x.ProcessName.Equals(x2, StringComparison.OrdinalIgnoreCase))).
-                    Select(x => string.Format("{0} ({1})", x.MainModule.FileVersionInfo.ProductName, x.MainModule.ModuleName)).Distinct().ToList();
-
-                if (conflictProcessNames != null && conflictProcessNames.Count > 0)
-                {
-                    text += "\r\n\r\n" + Resources.HotkeyManager_ShowFailedHotkeys_These_applications_could_be_conflicting_ + "\r\n\r\n" + string.Join("\r\n", conflictProcessNames);
-                }
 
                 MessageBox.Show(text, "ShareX - " + Resources.HotkeyManager_ShowFailedHotkeys_Hotkey_registration_failed, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }

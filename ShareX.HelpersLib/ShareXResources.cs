@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,7 +24,6 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib.Properties;
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
@@ -40,26 +39,11 @@ namespace ShareX.HelpersLib
         {
             get
             {
-                Version version = Version.Parse(Application.ProductVersion);
-                return $"{Name}/{version.Major}.{version.Minor}.{version.Build}";
+                return $"{Name}/{Helpers.GetApplicationVersion()}";
             }
         }
 
-        private static bool useCustomTheme;
-
-        public static bool UseCustomTheme
-        {
-            get
-            {
-                return useCustomTheme && Theme != null;
-            }
-            set
-            {
-                useCustomTheme = value;
-            }
-        }
-
-        public static bool IsDarkTheme => UseCustomTheme && Theme.IsDarkTheme;
+        public static bool IsDarkTheme => Theme.IsDarkTheme;
 
         private static bool useWhiteIcon;
 
@@ -125,28 +109,30 @@ namespace ShareX.HelpersLib
 
         public static ShareXTheme Theme { get; set; } = ShareXTheme.DarkTheme;
 
-        public static void ApplyTheme(Form form, bool setIcon = true)
+        public static void ApplyTheme(Form form, bool closeOnEscape = false, bool setIcon = true)
         {
+            if (closeOnEscape)
+            {
+                form.CloseOnEscape();
+            }
+
             if (setIcon)
             {
                 form.Icon = Icon;
             }
 
-            if (UseCustomTheme)
+            ApplyCustomThemeToControl(form);
+
+            IContainer components = form.GetType().GetField("components", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(form) as IContainer;
+            ApplyCustomThemeToComponents(components);
+
+            if (form.IsHandleCreated)
             {
-                ApplyCustomThemeToControl(form);
-
-                IContainer components = form.GetType().GetField("components", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(form) as IContainer;
-                ApplyCustomThemeToComponents(components);
-
-                if (form.IsHandleCreated)
-                {
-                    NativeMethods.UseImmersiveDarkMode(form.Handle, Theme.IsDarkTheme);
-                }
-                else
-                {
-                    form.HandleCreated += (s, e) => NativeMethods.UseImmersiveDarkMode(form.Handle, Theme.IsDarkTheme);
-                }
+                NativeMethods.UseImmersiveDarkMode(form.Handle, Theme.IsDarkTheme);
+            }
+            else
+            {
+                form.HandleCreated += (s, e) => NativeMethods.UseImmersiveDarkMode(form.Handle, Theme.IsDarkTheme);
             }
         }
 

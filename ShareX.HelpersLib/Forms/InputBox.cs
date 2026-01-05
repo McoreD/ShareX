@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -33,17 +33,30 @@ namespace ShareX.HelpersLib
     {
         public string InputText { get; private set; }
 
-        public InputBox(string title = null, string inputText = null, string okText = null, string cancelText = null)
+        private InputBox(string title, string inputText = null, string okText = null, string cancelText = null)
         {
             InitializeComponent();
-            ShareXResources.ApplyTheme(this);
+            ShareXResources.ApplyTheme(this, true);
 
             InputText = inputText;
 
-            if (!string.IsNullOrEmpty(title)) Text = title;
+            Text = "ShareX - " + title;
             if (!string.IsNullOrEmpty(InputText)) txtInputText.Text = InputText;
             if (!string.IsNullOrEmpty(okText)) btnOK.Text = okText;
             if (!string.IsNullOrEmpty(cancelText)) btnCancel.Text = cancelText;
+        }
+
+        public static string Show(string title, string inputText = null, string okText = null, string cancelText = null)
+        {
+            using (InputBox form = new InputBox(title, inputText, okText, cancelText))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    return form.InputText;
+                }
+
+                return null;
+            }
         }
 
         private void InputBox_Shown(object sender, EventArgs e)
@@ -69,19 +82,6 @@ namespace ShareX.HelpersLib
             Close();
         }
 
-        public static string GetInputText(string title = null, string inputText = null, string okText = null, string cancelText = null)
-        {
-            using (InputBox form = new InputBox(title, inputText, okText, cancelText))
-            {
-                if (form.ShowDialog() == DialogResult.OK)
-                {
-                    return form.InputText;
-                }
-
-                return null;
-            }
-        }
-
         #region Windows Form Designer generated code
 
         private System.ComponentModel.IContainer components = null;
@@ -98,36 +98,36 @@ namespace ShareX.HelpersLib
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InputBox));
-            btnOK = new System.Windows.Forms.Button();
-            btnCancel = new System.Windows.Forms.Button();
-            txtInputText = new System.Windows.Forms.TextBox();
+            btnOK = new Button();
+            btnCancel = new Button();
+            txtInputText = new TextBox();
             SuspendLayout();
-            //
+            // 
             // btnOK
-            //
+            // 
             resources.ApplyResources(btnOK, "btnOK");
             btnOK.Name = "btnOK";
             btnOK.UseVisualStyleBackColor = true;
-            btnOK.Click += new System.EventHandler(btnOK_Click);
-            //
+            btnOK.Click += btnOK_Click;
+            // 
             // btnCancel
-            //
+            // 
             resources.ApplyResources(btnCancel, "btnCancel");
             btnCancel.Name = "btnCancel";
             btnCancel.UseVisualStyleBackColor = true;
-            btnCancel.Click += new System.EventHandler(btnCancel_Click);
-            //
+            btnCancel.Click += btnCancel_Click;
+            // 
             // txtInputText
-            //
+            // 
             resources.ApplyResources(txtInputText, "txtInputText");
             txtInputText.Name = "txtInputText";
-            //
+            // 
             // InputBox
-            //
+            // 
             AcceptButton = btnOK;
             resources.ApplyResources(this, "$this");
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            BackColor = System.Drawing.SystemColors.Window;
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.Window;
             Controls.Add(txtInputText);
             Controls.Add(btnCancel);
             Controls.Add(btnOK);
@@ -135,9 +135,9 @@ namespace ShareX.HelpersLib
             MinimizeBox = false;
             Name = "InputBox";
             ShowInTaskbar = false;
-            SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            SizeGripStyle = SizeGripStyle.Hide;
             TopMost = true;
-            Shown += new System.EventHandler(InputBox_Shown);
+            Shown += InputBox_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,15 +26,20 @@
 using ShareX.HelpersLib;
 using ShareX.Properties;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ShareX
 {
     public partial class PinToScreenForm : Form
     {
+        private static readonly object syncLock = new object();
+        private static readonly List<PinToScreenForm> forms = new List<PinToScreenForm>();
+
         public Image Image { get; private set; }
 
         private int imageScale = 100;
@@ -57,6 +62,8 @@ namespace ShareX
                     {
                         AutoSizeForm();
                     }
+
+                    UpdateControls();
                 }
             }
         }
@@ -66,6 +73,30 @@ namespace ShareX
             get
             {
                 return new Size((int)Math.Round(Image.Width * (ImageScale / 100f)), (int)Math.Round(Image.Height * (ImageScale / 100f)));
+            }
+        }
+
+        public Size FormSize
+        {
+            get
+            {
+                Size size;
+
+                if (Minimized)
+                {
+                    size = Options.MinimizeSize;
+                }
+                else
+                {
+                    size = ImageSize;
+                }
+
+                if (Options.Border)
+                {
+                    size = size.Offset(Options.BorderSize * 2);
+                }
+
+                return size;
             }
         }
 
@@ -116,31 +147,80 @@ namespace ShareX
             ImageOpacity = Options.InitialOpacity;
 
             InitializeComponent();
+            ShareXResources.ApplyTheme(this, true);
             TopMost = Options.TopMost;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
 
+            tsMain.Cursor = Cursors.Arrow;
             openHandCursor = Helpers.CreateCursor(Resources.openhand);
             closedHandCursor = Helpers.CreateCursor(Resources.closedhand);
             SetHandCursor(false);
 
             isDWMEnabled = NativeMethods.IsDWMEnabled();
 
+            UpdateControls();
+
             loaded = true;
         }
 
-        public PinToScreenForm(Image image, PinToScreenOptions options, Point? location = null) : this(options)
+        private PinToScreenForm(Image image, PinToScreenOptions options, Point? location = null) : this(options)
         {
             Image = image;
             AutoSizeForm();
 
-            if (location != null)
+            if (location == null)
             {
-                Location = location.Value;
+                location = Helpers.GetPosition(Options.Placement, Options.PlacementOffset, CaptureHelpers.GetActiveScreenWorkingArea(), FormSize);
             }
-            else
+            else if (Options.Border)
             {
-                Rectangle rectScreen = CaptureHelpers.GetActiveScreenWorkingArea();
-                Location = Helpers.GetPosition(Options.Placement, Options.PlacementOffset, rectScreen.Size, ImageSize);
+                location = location.Value.Add(-Options.BorderSize);
+            }
+
+            Location = location.Value;
+        }
+
+        public static void PinToScreenAsync(Image image, PinToScreenOptions options = null, Point? location = null)
+        {
+            if (image != null)
+            {
+                if (options == null)
+                {
+                    options = new PinToScreenOptions();
+                }
+
+                Thread thread = new Thread(() =>
+                {
+                    using (PinToScreenForm form = new PinToScreenForm(image, options, location))
+                    {
+                        lock (syncLock)
+                        {
+                            forms.Add(form);
+                        }
+
+                        form.ShowDialog();
+
+                        lock (syncLock)
+                        {
+                            forms.Remove(form);
+                        }
+                    }
+                });
+
+                thread.IsBackground = true;
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+            }
+        }
+
+        public static void CloseAll()
+        {
+            lock (syncLock)
+            {
+                foreach (PinToScreenForm form in forms)
+                {
+                    form.InvokeSafe(form.Close);
+                }
             }
         }
 
@@ -157,7 +237,44 @@ namespace ShareX
             base.Dispose(disposing);
         }
 
-        public void SetHandCursor(bool grabbing)
+        private void UpdateControls()
+        {
+            int toolbarMargin = 20;
+            tsMain.Visible = ClientRectangle.Contains(PointToClient(MousePosition)) &&
+                ClientRectangle.Contains(new Rectangle(0, 0, (Options.Border ? Options.BorderSize * 2 : 0) + tsMain.Width + toolbarMargin,
+                (Options.Border ? Options.BorderSize * 2 : 0) + tsMain.Height + toolbarMargin));
+            tslScale.Text = ImageScale + "%";
+        }
+
+        private void AutoSizeForm()
+        {
+            Size previousSize = Size;
+            Size newSize = FormSize;
+
+            Point newLocation = Location;
+            IntPtr insertAfter = Options.TopMost ? (IntPtr)NativeConstants.HWND_TOPMOST : (IntPtr)NativeConstants.HWND_TOP;
+            SetWindowPosFlags flags = SetWindowPosFlags.SWP_NOACTIVATE | SetWindowPosFlags.SWP_NOSENDCHANGING;
+
+            if (Options.KeepCenterLocation)
+            {
+                Point locationOffset = new Point((previousSize.Width - newSize.Width) / 2, (previousSize.Height - newSize.Height) / 2);
+                newLocation = new Point(newLocation.X + locationOffset.X, newLocation.Y + locationOffset.Y);
+            }
+            else
+            {
+                flags |= SetWindowPosFlags.SWP_NOMOVE;
+            }
+
+            NativeMethods.SetWindowPos(Handle, insertAfter, newLocation.X, newLocation.Y, newSize.Width, newSize.Height, flags);
+
+            tsMain.Location = new Point(Width / 2 - tsMain.Width / 2, Options.Border ? Options.BorderSize : 0);
+
+            UpdateControls();
+
+            Refresh();
+        }
+
+        private void SetHandCursor(bool grabbing)
         {
             if (grabbing)
             {
@@ -181,39 +298,6 @@ namespace ShareX
             ImageOpacity = 100;
         }
 
-        private void AutoSizeForm()
-        {
-            Size previousSize = Size;
-            Size newSize;
-
-            if (Minimized)
-            {
-                newSize = Options.MinimizeSize;
-            }
-            else
-            {
-                newSize = ImageSize;
-            }
-
-            Point newLocation = Location;
-            SpecialWindowHandles insertAfter = Options.TopMost ? SpecialWindowHandles.HWND_TOPMOST : SpecialWindowHandles.HWND_TOP;
-            SetWindowPosFlags flags = SetWindowPosFlags.SWP_NOACTIVATE | SetWindowPosFlags.SWP_NOSENDCHANGING;
-
-            if (Options.KeepCenterLocation)
-            {
-                Point locationOffset = new Point((previousSize.Width - newSize.Width) / 2, (previousSize.Height - newSize.Height) / 2);
-                newLocation = new Point(newLocation.X + locationOffset.X, newLocation.Y + locationOffset.Y);
-            }
-            else
-            {
-                flags |= SetWindowPosFlags.SWP_NOMOVE;
-            }
-
-            NativeMethods.SetWindowPos(Handle, (IntPtr)insertAfter, newLocation.X, newLocation.Y, newSize.Width, newSize.Height, flags);
-
-            Refresh();
-        }
-
         private void ToggleMinimize()
         {
             Minimized = !Minimized;
@@ -233,11 +317,52 @@ namespace ShareX
             AutoSizeForm();
         }
 
+        private void tsbCopy_Click(object sender, EventArgs e)
+        {
+            ClipboardHelpers.CopyImage(Image);
+        }
+
+        private void tslScale_Click(object sender, EventArgs e)
+        {
+            if (!Minimized)
+            {
+                ImageScale = 100;
+            }
+        }
+
+        private void tsbOptions_Click(object sender, EventArgs e)
+        {
+            tsMain.Visible = false;
+
+            using (PinToScreenOptionsForm pinToScreenOptionsForm = new PinToScreenOptionsForm(Options))
+            {
+                if (pinToScreenOptionsForm.ShowDialogTopMost(this) == DialogResult.OK)
+                {
+                    if (TopMost != Options.TopMost)
+                    {
+                        TopMost = Options.TopMost;
+                    }
+
+                    AutoSizeForm();
+                }
+            }
+        }
+
+        private void tsbClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
         protected override void WndProc(ref Message m)
         {
-            if (Options.ShowShadow && m.Msg == (int)WindowsMessages.NCPAINT && isDWMEnabled)
+            if (Options.Shadow && m.Msg == (int)WindowsMessages.NCPAINT && isDWMEnabled)
             {
-                NativeMethods.SetNCRenderingPolicy(Handle, DwmNCRenderingPolicy.Enabled);
+                NativeMethods.SetNCRenderingPolicy(Handle, DWMNCRENDERINGPOLICY.DWMNCRP_ENABLED);
+
+                if (Helpers.IsWindows11OrGreater())
+                {
+                    NativeMethods.SetWindowCornerPreference(Handle, DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND);
+                }
 
                 MARGINS margins = new MARGINS()
                 {
@@ -266,18 +391,29 @@ namespace ShareX
 
             if (Image != null)
             {
+                Point position = new Point(0, 0);
+
+                if (Options.Border)
+                {
+                    using (Pen pen = new Pen(Options.BorderColor, Options.BorderSize) { Alignment = PenAlignment.Inset })
+                    {
+                        g.DrawRectangleProper(pen, new Rectangle(position, FormSize));
+                    }
+
+                    position = position.Add(Options.BorderSize);
+                }
+
                 if (Minimized)
                 {
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                    g.DrawImage(Image, new Rectangle(0, 0, Options.MinimizeSize.Width, Options.MinimizeSize.Height),
-                        0, 0, Options.MinimizeSize.Width, Options.MinimizeSize.Height, GraphicsUnit.Pixel);
+                    g.DrawImage(Image, new Rectangle(position, Options.MinimizeSize), 0, 0, Options.MinimizeSize.Width, Options.MinimizeSize.Height, GraphicsUnit.Pixel);
                 }
                 else
                 {
                     if (ImageScale == 100)
                     {
                         g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                        g.DrawImage(Image, 0, 0, Image.Width, Image.Height);
+                        g.DrawImage(Image, new Rectangle(position, Image.Size));
                     }
                     else
                     {
@@ -293,7 +429,7 @@ namespace ShareX
                         using (ImageAttributes ia = new ImageAttributes())
                         {
                             ia.SetWrapMode(WrapMode.TileFlipXY);
-                            g.DrawImage(Image, new Rectangle(0, 0, ImageSize.Width, ImageSize.Height), 0, 0, Image.Width, Image.Height, GraphicsUnit.Pixel, ia);
+                            g.DrawImage(Image, new Rectangle(position, ImageSize), 0, 0, Image.Width, Image.Height, GraphicsUnit.Pixel, ia);
                         }
                     }
                 }
@@ -380,13 +516,46 @@ namespace ShareX
             }
         }
 
+        private void PinToScreenForm_MouseEnter(object sender, EventArgs e)
+        {
+            UpdateControls();
+        }
+
+        private void PinToScreenForm_MouseLeave(object sender, EventArgs e)
+        {
+            UpdateControls();
+        }
+
+        private void tsMain_MouseLeave(object sender, EventArgs e)
+        {
+            UpdateControls();
+        }
+
+        private void PinToScreenForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            int speed = e.Shift ? 10 : 1;
+
+            switch (e.KeyCode)
+            {
+                case Keys.Left:
+                    Location = new Point(Location.X - speed, Location.Y);
+                    break;
+                case Keys.Right:
+                    Location = new Point(Location.X + speed, Location.Y);
+                    break;
+                case Keys.Up:
+                    Location = new Point(Location.X, Location.Y - speed);
+                    break;
+                case Keys.Down:
+                    Location = new Point(Location.X, Location.Y + speed);
+                    break;
+            }
+        }
+
         private void PinToScreenForm_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyData)
             {
-                case Keys.Escape:
-                    Close();
-                    break;
                 case Keys.Control | Keys.C:
                     ClipboardHelpers.CopyImage(Image);
                     break;

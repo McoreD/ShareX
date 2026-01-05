@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -68,15 +68,6 @@ namespace ShareX.UploadersLib
         public PhotobucketAccountInfo PhotobucketAccountInfo { get; set; } = null;
 
         #endregion Photobucket
-
-        #region Google Photos
-
-        public OAuth2Info GooglePhotosOAuth2Info { get; set; } = null;
-        public OAuthUserInfo GooglePhotosUserInfo { get; set; } = null;
-        public string GooglePhotosAlbumID { get; set; } = "";
-        public bool GooglePhotosIsPublic { get; set; } = false;
-
-        #endregion Google Photos
 
         #region Chevereto
 
@@ -160,9 +151,6 @@ namespace ShareX.UploadersLib
         public bool DropboxAutoCreateShareableLink { get; set; } = true;
         public bool DropboxUseDirectLink { get; set; } = false;
 
-        // TEMP: For backward compatibility
-        public DropboxURLType DropboxURLType = DropboxURLType.Default;
-
         #endregion Dropbox
 
         #region FTP
@@ -179,18 +167,9 @@ namespace ShareX.UploadersLib
         public OAuth2Info OneDriveV2OAuth2Info { get; set; } = null;
         public OneDriveFileInfo OneDriveV2SelectedFolder { get; set; } = OneDrive.RootFolder;
         public bool OneDriveAutoCreateShareableLink { get; set; } = true;
+        public bool OneDriveUseDirectLink { get; set; } = false;
 
         #endregion OneDrive
-
-        #region Gfycat
-
-        public OAuth2Info GfycatOAuth2Info { get; set; } = null;
-        public AccountType GfycatAccountType { get; set; } = AccountType.Anonymous;
-        public bool GfycatIsPublic { get; set; } = false;
-        public bool GfycatKeepAudio { get; set; } = true;
-        public string GfycatTitle { get; set; } = "ShareX";
-
-        #endregion Gfycat
 
         #region Google Drive
 
@@ -263,14 +242,6 @@ namespace ShareX.UploadersLib
 
         #endregion Email
 
-        #region Jira
-
-        public string JiraHost { get; set; } = "http://";
-        public string JiraIssuePrefix { get; set; } = "PROJECT-";
-        public OAuthInfo JiraOAuthInfo { get; set; } = null;
-
-        #endregion Jira
-
         #region Mega
 
         public MegaAuthInfos MegaAuthInfos { get; set; } = null;
@@ -332,20 +303,6 @@ namespace ShareX.UploadersLib
 
         #endregion
 
-        #region Teknik
-
-        public OAuth2Info TeknikOAuth2Info { get; set; } = null;
-        public string TeknikUploadAPIUrl { get; set; } = Teknik.DefaultUploadAPIURL;
-        public string TeknikPasteAPIUrl { get; set; } = Teknik.DefaultPasteAPIURL;
-        public string TeknikUrlShortenerAPIUrl { get; set; } = Teknik.DefaultUrlShortenerAPIURL;
-        public string TeknikAuthUrl { get; set; } = Teknik.DefaultAuthURL;
-        public TeknikExpirationUnit TeknikExpirationUnit { get; set; } = TeknikExpirationUnit.Never;
-        public int TeknikExpirationLength { get; set; } = 1;
-        public bool TeknikEncryption { get; set; } = false;
-        public bool TeknikGenerateDeletionKey { get; set; } = false;
-
-        #endregion Teknik
-
         #region Pomf
 
         public PomfUploader PomfUploader { get; set; } = new PomfUploader();
@@ -371,7 +328,6 @@ namespace ShareX.UploadersLib
         public string SeafileEncryptedLibraryPassword { get; set; } = "";
         public bool SeafileCreateShareableURL { get; set; } = true;
         public bool SeafileCreateShareableURLRaw { get; set; } = false;
-        public bool SeafileIgnoreInvalidCert { get; set; } = false;
         public int SeafileShareDaysToExpire { get; set; } = 0;
         [JsonEncrypt]
         public string SeafileSharePassword { get; set; } = "";
@@ -398,6 +354,7 @@ namespace ShareX.UploadersLib
         public string AzureStorageEnvironment { get; set; } = "blob.core.windows.net";
         public string AzureStorageCustomDomain { get; set; } = "";
         public string AzureStorageUploadPath { get; set; } = "";
+        public string AzureStorageCacheControl { get; set; } = "";
 
         #endregion Azure Storage
 
@@ -465,14 +422,6 @@ namespace ShareX.UploadersLib
 
         #endregion yourls.org
 
-        #region adf.ly
-
-        public string AdFlyAPIUID { get; set; } = "";
-        [JsonEncrypt]
-        public string AdFlyAPIKEY { get; set; } = "";
-
-        #endregion adf.ly
-
         #region polr
 
         public string PolrAPIHostname { get; set; } = "";
@@ -508,15 +457,6 @@ namespace ShareX.UploadersLib
         #endregion URL shorteners
 
         #region Other uploaders
-
-        #region Twitter
-
-        public List<OAuthInfo> TwitterOAuthInfoList { get; set; } = new List<OAuthInfo>();
-        public int TwitterSelectedAccount { get; set; } = 0;
-        public bool TwitterSkipMessageBox { get; set; } = false;
-        public string TwitterDefaultMessage { get; set; } = "";
-
-        #endregion Twitter
 
         #region Custom uploaders
 

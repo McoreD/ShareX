@@ -108,7 +108,6 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             resources.ApplyResources(this.btnCancel, "btnCancel");
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -153,8 +152,7 @@
             resources.ApplyResources(this.lvPresets, "lvPresets");
             this.lvPresets.MultiSelect = false;
             this.lvPresets.Name = "lvPresets";
-            this.lvPresets.SmallImageList = this.ilPresets;
-            this.lvPresets.TileSize = new System.Drawing.Size(110, 28);
+            this.lvPresets.TileSize = new System.Drawing.Size(70, 70);
             this.lvPresets.UseCompatibleStateImageBehavior = false;
             this.lvPresets.View = System.Windows.Forms.View.Tile;
             this.lvPresets.SelectedIndexChanged += new System.EventHandler(this.lvPresets_SelectedIndexChanged);
@@ -173,6 +171,7 @@
             // cbtnCurrentColor
             // 
             this.cbtnCurrentColor.Color = System.Drawing.Color.White;
+            this.cbtnCurrentColor.ColorPickerOptions = null;
             resources.ApplyResources(this.cbtnCurrentColor, "cbtnCurrentColor");
             this.cbtnCurrentColor.Name = "cbtnCurrentColor";
             this.cbtnCurrentColor.UseVisualStyleBackColor = true;
@@ -204,7 +203,6 @@
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.CancelButton = this.btnCancel;
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.lvPresets);
             this.Controls.Add(this.lblPresets);
@@ -224,6 +222,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "GradientPickerForm";
+            this.Shown += new System.EventHandler(this.GradientPickerForm_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.nudLocation)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
             this.ResumeLayout(false);

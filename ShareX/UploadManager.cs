@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -30,6 +30,8 @@ using ShareX.UploadersLib;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
@@ -121,24 +123,21 @@ namespace ShareX
 
         public static void UploadFolder(TaskSettings taskSettings = null)
         {
-            using (FolderSelectDialog folderDialog = new FolderSelectDialog())
+            string initialDirectory;
+            if (!string.IsNullOrEmpty(Program.Settings.FileUploadDefaultDirectory) && Directory.Exists(Program.Settings.FileUploadDefaultDirectory))
             {
-                folderDialog.Title = "ShareX - " + Resources.UploadManager_UploadFolder_Folder_upload;
+                initialDirectory = Program.Settings.FileUploadDefaultDirectory;
+            }
+            else
+            {
+                initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            }
+            string selectedPath = FileHelpers.BrowseFolder("ShareX - " + Resources.UploadManager_UploadFolder_Folder_upload, initialDirectory);
 
-                if (!string.IsNullOrEmpty(Program.Settings.FileUploadDefaultDirectory) && Directory.Exists(Program.Settings.FileUploadDefaultDirectory))
-                {
-                    folderDialog.InitialDirectory = Program.Settings.FileUploadDefaultDirectory;
-                }
-                else
-                {
-                    folderDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                }
-
-                if (folderDialog.ShowDialog() && !string.IsNullOrEmpty(folderDialog.FileName))
-                {
-                    Program.Settings.FileUploadDefaultDirectory = folderDialog.FileName;
-                    UploadFile(folderDialog.FileName, taskSettings);
-                }
+            if (!string.IsNullOrEmpty(selectedPath))
+            {
+                Program.Settings.FileUploadDefaultDirectory = selectedPath;
+                UploadFile(selectedPath, taskSettings);
             }
         }
 
@@ -205,23 +204,49 @@ namespace ShareX
         {
             if (taskSettings == null) taskSettings = TaskSettings.GetDefaultTaskSettings();
 
-            if (ClipboardHelpers.ContainsImage())
+            try
             {
-                Bitmap bmp = ClipboardHelpers.GetImage();
+                if (Clipboard.ContainsImage())
+                {
+                    Bitmap image;
 
-                ProcessImageUpload(bmp, taskSettings);
+                    if (HelpersOptions.UseAlternativeClipboardGetImage)
+                    {
+                        image = ClipboardHelpers.GetImageAlternative2();
+                    }
+                    else
+                    {
+                        image = (Bitmap)Clipboard.GetImage();
+                    }
+
+                    ProcessImageUpload(image, taskSettings);
+                }
+                else if (Clipboard.ContainsText())
+                {
+                    string text = Clipboard.GetText();
+
+                    ProcessTextUpload(text, taskSettings);
+                }
+                else if (Clipboard.ContainsFileDropList())
+                {
+                    string[] files = Clipboard.GetFileDropList().Cast<string>().ToArray();
+
+                    ProcessFilesUpload(files, taskSettings);
+                }
             }
-            else if (ClipboardHelpers.ContainsText())
+            catch (ExternalException e)
             {
-                string text = ClipboardHelpers.GetText();
+                DebugHelper.WriteException(e);
 
-                ProcessTextUpload(text, taskSettings);
+                if (MessageBox.Show("\"" + e.Message + "\"\r\n\r\n" + Resources.WouldYouLikeToRetryClipboardUpload, "ShareX - " + Resources.ClipboardUpload,
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                {
+                    ClipboardUpload(taskSettings);
+                }
             }
-            else if (ClipboardHelpers.ContainsFileDropList())
+            catch (Exception e)
             {
-                string[] files = ClipboardHelpers.GetFileDropList();
-
-                ProcessFilesUpload(files, taskSettings);
+                DebugHelper.WriteException(e);
             }
         }
 
@@ -305,7 +330,7 @@ namespace ShareX
                 inputText = text;
             }
 
-            string url = InputBox.GetInputText("ShareX - " + Resources.UploadManager_UploadURL_URL_to_download_from_and_upload, inputText);
+            string url = InputBox.Show(Resources.UploadManager_UploadURL_URL_to_download_from_and_upload, inputText);
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -326,8 +351,7 @@ namespace ShareX
                 inputText = text;
             }
 
-            string url = InputBox.GetInputText("ShareX - " + Resources.UploadManager_ShowShortenURLDialog_ShortenURL, inputText,
-                Resources.UploadManager_ShowShortenURLDialog_Shorten);
+            string url = InputBox.Show(Resources.UploadManager_ShowShortenURLDialog_ShortenURL, inputText, Resources.UploadManager_ShowShortenURLDialog_Shorten);
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -533,12 +557,11 @@ namespace ShareX
 
         public static void IndexFolder(TaskSettings taskSettings = null)
         {
-            using (FolderSelectDialog dlg = new FolderSelectDialog())
+            string selectedPath = FileHelpers.BrowseFolder();
+
+            if (!string.IsNullOrEmpty(selectedPath))
             {
-                if (dlg.ShowDialog())
-                {
-                    IndexFolder(dlg.FileName, taskSettings);
-                }
+                IndexFolder(selectedPath, taskSettings);
             }
         }
 

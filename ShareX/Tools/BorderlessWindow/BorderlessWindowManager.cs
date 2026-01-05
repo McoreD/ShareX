@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,20 +26,21 @@
 using ShareX.HelpersLib;
 using ShareX.Properties;
 using System;
-using System.Diagnostics;
+using System.Collections.Concurrent;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace ShareX
 {
-    public class BorderlessWindowManager
+    public static class BorderlessWindowManager
     {
-        public static bool MakeWindowBorderless(string windowTitle, bool useWorkingArea = false)
+        private static readonly ConcurrentDictionary<IntPtr, BorderlessWindowInfo> borderlessWindowList = new ConcurrentDictionary<IntPtr, BorderlessWindowInfo>();
+
+        public static bool ToggleBorderlessWindow(string windowTitle, bool useWorkingArea = false)
         {
             if (!string.IsNullOrEmpty(windowTitle))
             {
-                IntPtr hWnd = SearchWindow(windowTitle);
+                IntPtr hWnd = NativeMethods.SearchWindow(windowTitle);
 
                 if (hWnd == IntPtr.Zero)
                 {
@@ -47,7 +48,7 @@ namespace ShareX
                 }
                 else
                 {
-                    MakeWindowBorderless(hWnd, useWorkingArea);
+                    ToggleBorderlessWindow(hWnd, useWorkingArea);
 
                     return true;
                 }
@@ -56,7 +57,19 @@ namespace ShareX
             return false;
         }
 
-        public static void MakeWindowBorderless(IntPtr hWnd, bool useWorkingArea = false)
+        public static void ToggleBorderlessWindow(IntPtr hWnd, bool useWorkingArea = false)
+        {
+            if (borderlessWindowList.TryGetValue(hWnd, out BorderlessWindowInfo borderlessWindowInfo))
+            {
+                RestoreBorderlessWindow(hWnd, borderlessWindowInfo);
+            }
+            else
+            {
+                MakeWindowBorderless(hWnd, useWorkingArea);
+            }
+        }
+
+        private static void RestoreBorderlessWindow(IntPtr hWnd, BorderlessWindowInfo borderlessWindowInfo)
         {
             WindowInfo windowInfo = new WindowInfo(hWnd);
 
@@ -64,6 +77,32 @@ namespace ShareX
             {
                 windowInfo.Restore();
             }
+
+            windowInfo.Style = borderlessWindowInfo.Style;
+            windowInfo.ExStyle = borderlessWindowInfo.ExStyle;
+
+            // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos
+            SetWindowPosFlags setWindowPosFlag =
+                SetWindowPosFlags.SWP_FRAMECHANGED // Applies new frame styles set using the SetWindowLong function.
+                | SetWindowPosFlags.SWP_NOOWNERZORDER // Does not change the owner window's position in the Z order.
+                | SetWindowPosFlags.SWP_NOZORDER // Retains the current Z order (ignores the hWndInsertAfter parameter).
+            ;
+
+            windowInfo.SetWindowPos(borderlessWindowInfo.Rectangle, setWindowPosFlag);
+
+            borderlessWindowList.TryRemove(hWnd, out _);
+        }
+
+        private static void MakeWindowBorderless(IntPtr hWnd, bool useWorkingArea = false)
+        {
+            WindowInfo windowInfo = new WindowInfo(hWnd);
+
+            if (windowInfo.IsMinimized)
+            {
+                windowInfo.Restore();
+            }
+
+            BorderlessWindowInfo borderlessWindowInfo = new BorderlessWindowInfo(windowInfo);
 
             WindowStyles windowStyle = windowInfo.Style;
             // https://docs.microsoft.com/en-us/windows/win32/winmsg/window-styles
@@ -85,7 +124,7 @@ namespace ShareX
                 );
             windowInfo.ExStyle = windowExStyle;
 
-            Screen screen = Screen.FromHandle(hWnd);
+            Screen screen = Screen.FromHandle(windowInfo.Handle);
             Rectangle rect;
 
             if (useWorkingArea)
@@ -113,24 +152,8 @@ namespace ShareX
             }
 
             windowInfo.SetWindowPos(rect, setWindowPosFlag);
-        }
 
-        private static IntPtr SearchWindow(string windowTitle)
-        {
-            IntPtr hWnd = NativeMethods.FindWindow(null, windowTitle);
-
-            if (hWnd == IntPtr.Zero)
-            {
-                foreach (Process process in Process.GetProcesses())
-                {
-                    if (process.MainWindowTitle.Contains(windowTitle, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-            }
-
-            return hWnd;
+            borderlessWindowList.TryAdd(hWnd, borderlessWindowInfo);
         }
     }
 }

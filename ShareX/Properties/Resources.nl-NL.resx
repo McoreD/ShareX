@@ -120,9 +120,6 @@
   <data name="AutoCaptureForm_UpdateStatus_Timeleft___0_s___1____Total___2_" xml:space="preserve">
     <value>Resterende tijd: {0}s ({1}%) Totaal: {2}</value>
   </data>
-  <data name="TaskHelpers_TweetMessage_Unable_to_find_valid_Twitter_account_" xml:space="preserve">
-    <value>Kan geen geldig Twitter account vinden.</value>
-  </data>
   <data name="UploadTask_ThreadDoWork_URL_is_empty_" xml:space="preserve">
     <value>URL is leeg.</value>
   </data>
@@ -199,9 +196,6 @@ Wil je ShareX opnieuw opstarten?</value>
   </data>
   <data name="Program_Run_Unable_to_create_folder_" xml:space="preserve">
     <value>Kan de map niet aanmaken:</value>
-  </data>
-  <data name="MainForm_UpdateMainFormTip_Currently_configured_hotkeys_" xml:space="preserve">
-    <value>Huidige geconfigureerde sneltoetsen:</value>
   </data>
   <data name="RecentManager_UpdateRecentMenu_Left_click_to_copy_URL_to_clipboard__Right_click_to_open_URL_" xml:space="preserve">
     <value>Links klikken om de link naar het klembord te kopiëren. Rechtsklikken om de link te openen.</value>
@@ -291,9 +285,6 @@ Wil je ShareX opnieuw opstarten?</value>
   <data name="UploadManager_IsUploadConfirmed_Upload_files" xml:space="preserve">
     <value>Upload bestanden</value>
   </data>
-  <data name="HotkeyManager_ShowFailedHotkeys_These_applications_could_be_conflicting_" xml:space="preserve">
-    <value>Deze programma's kunnen conflicten veroorzaken:</value>
-  </data>
   <data name="TaskManager_task_UploadCompleted_Error" xml:space="preserve">
     <value>Fout</value>
   </data>
@@ -314,9 +305,6 @@ Wil je ShareX opnieuw opstarten?</value>
   </data>
   <data name="AboutForm_AboutForm_Project_page" xml:space="preserve">
     <value>Projectpagina</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Tweet_successfully_sent_" xml:space="preserve">
-    <value>Tweet succesvol verzonden.</value>
   </data>
   <data name="Program_WritePersonalPathConfig_Cant_access_to_file" xml:space="preserve">
     <value>Kan het bestand "{0}" niet benaderen.

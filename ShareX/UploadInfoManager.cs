@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -86,7 +86,10 @@ namespace ShareX
 
                 if (!string.IsNullOrEmpty(urls))
                 {
-                    ClipboardHelpers.CopyText(urls);
+                    if (ClipboardHelpers.CopyText(urls))
+                    {
+                        TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                    }
                 }
             }
         }
@@ -175,12 +178,24 @@ namespace ShareX
 
         public void CopyFile()
         {
-            if (IsItemSelected && SelectedItem.IsFileExist) ClipboardHelpers.CopyFile(SelectedItem.Info.FilePath);
+            if (IsItemSelected && SelectedItem.IsFileExist)
+            {
+                if (ClipboardHelpers.CopyFile(SelectedItem.Info.FilePath))
+                {
+                    TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                }
+            }
         }
 
         public void CopyImage()
         {
-            if (IsItemSelected && SelectedItem.IsImageFile) ClipboardHelpers.CopyImageFromFile(SelectedItem.Info.FilePath);
+            if (IsItemSelected && SelectedItem.IsImageFile)
+            {
+                if (ClipboardHelpers.CopyImageFromFile(SelectedItem.Info.FilePath))
+                {
+                    TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                }
+            }
         }
 
         public void CopyImageDimensions()
@@ -188,26 +203,48 @@ namespace ShareX
             if (IsItemSelected && SelectedItem.IsImageFile)
             {
                 Size size = ImageHelpers.GetImageFileDimensions(SelectedItem.Info.FilePath);
+
                 if (!size.IsEmpty)
                 {
-                    ClipboardHelpers.CopyText($"{size.Width} x {size.Height}");
+                    if (ClipboardHelpers.CopyText($"{size.Width} x {size.Height}"))
+                    {
+                        TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                    }
                 }
             }
         }
 
         public void CopyText()
         {
-            if (IsItemSelected && SelectedItem.IsTextFile) ClipboardHelpers.CopyTextFromFile(SelectedItem.Info.FilePath);
+            if (IsItemSelected && SelectedItem.IsTextFile)
+            {
+                if (ClipboardHelpers.CopyTextFromFile(SelectedItem.Info.FilePath))
+                {
+                    TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                }
+            }
         }
 
         public void CopyThumbnailFile()
         {
-            if (IsItemSelected && SelectedItem.IsThumbnailFileExist) ClipboardHelpers.CopyFile(SelectedItem.Info.ThumbnailFilePath);
+            if (IsItemSelected && SelectedItem.IsThumbnailFileExist)
+            {
+                if (ClipboardHelpers.CopyFile(SelectedItem.Info.ThumbnailFilePath))
+                {
+                    TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                }
+            }
         }
 
         public void CopyThumbnailImage()
         {
-            if (IsItemSelected && SelectedItem.IsThumbnailFileExist) ClipboardHelpers.CopyImageFromFile(SelectedItem.Info.ThumbnailFilePath);
+            if (IsItemSelected && SelectedItem.IsThumbnailFileExist)
+            {
+                if (ClipboardHelpers.CopyImageFromFile(SelectedItem.Info.ThumbnailFilePath))
+                {
+                    TaskHelpers.PlayNotificationSoundAsync(NotificationSound.ActionCompleted);
+                }
+            }
         }
 
         public void CopyHTMLLink()
@@ -342,6 +379,11 @@ namespace ShareX
             if (IsItemSelected && SelectedItem.IsImageFile) TaskHelpers.AnnotateImageFromFile(SelectedItem.Info.FilePath);
         }
 
+        public void BeautifyImage()
+        {
+            if (IsItemSelected && SelectedItem.IsImageFile) TaskHelpers.OpenImageBeautifier(SelectedItem.Info.FilePath);
+        }
+
         public void AddImageEffects()
         {
             if (IsItemSelected && SelectedItem.IsImageFile) TaskHelpers.OpenImageEffects(SelectedItem.Info.FilePath);
@@ -373,9 +415,9 @@ namespace ShareX
             if (IsItemSelected && SelectedItem.IsURLExist) UploadManager.ShareURL(SelectedItem.Info.Result.ToString(), urlSharingService);
         }
 
-        public void SearchImageUsingGoogle()
+        public void SearchImageUsingGoogleLens()
         {
-            if (IsItemSelected && SelectedItem.IsURLExist) TaskHelpers.SearchImageUsingGoogle(SelectedItem.Info.Result.URL);
+            if (IsItemSelected && SelectedItem.IsURLExist) TaskHelpers.SearchImageUsingGoogleLens(SelectedItem.Info.Result.URL);
         }
 
         public void SearchImageUsingBing()

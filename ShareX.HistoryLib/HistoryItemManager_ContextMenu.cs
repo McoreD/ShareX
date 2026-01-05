@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -42,6 +42,7 @@ namespace ShareX.HistoryLib
         private ToolStripSeparator tssOpen1;
         private ToolStripMenuItem tsmiOpenFile;
         private ToolStripMenuItem tsmiOpenFolder;
+
         private ToolStripMenuItem tsmiCopy;
         private ToolStripMenuItem tsmiCopyURL;
         private ToolStripMenuItem tsmiCopyShortenedURL;
@@ -68,14 +69,24 @@ namespace ShareX.HistoryLib
         private ToolStripMenuItem tsmiCopyFileName;
         private ToolStripMenuItem tsmiCopyFileNameWithExtension;
         private ToolStripMenuItem tsmiCopyFolder;
+
+        private ToolStripSeparator tssMain1;
+        private ToolStripMenuItem tsmiFavorite;
+        private ToolStripMenuItem tsmiTag;
+        private ToolStripMenuItem tsmiEdit;
+        private ToolStripMenuItem tsmiRenameFile;
+        private ToolStripMenuItem tsmiDelete;
+        private ToolStripMenuItem tsmiDeleteFile;
+        private ToolStripSeparator tssMain2;
         private ToolStripMenuItem tsmiShowImagePreview;
-        private ToolStripMenuItem tsmiShowMoreInfo;
         private ToolStripMenuItem tsmiUploadFile;
         private ToolStripMenuItem tsmiEditImage;
+        private ToolStripMenuItem tsmiPinToScreen;
 
         private void InitializeComponent()
         {
             cmsHistory = new ContextMenuStrip();
+
             tsmiOpen = new ToolStripMenuItem();
             tsmiOpenURL = new ToolStripMenuItem();
             tsmiOpenShortenedURL = new ToolStripMenuItem();
@@ -84,6 +95,7 @@ namespace ShareX.HistoryLib
             tssOpen1 = new ToolStripSeparator();
             tsmiOpenFile = new ToolStripMenuItem();
             tsmiOpenFolder = new ToolStripMenuItem();
+
             tsmiCopy = new ToolStripMenuItem();
             tsmiCopyURL = new ToolStripMenuItem();
             tsmiCopyShortenedURL = new ToolStripMenuItem();
@@ -110,10 +122,20 @@ namespace ShareX.HistoryLib
             tsmiCopyFileName = new ToolStripMenuItem();
             tsmiCopyFileNameWithExtension = new ToolStripMenuItem();
             tsmiCopyFolder = new ToolStripMenuItem();
+
+            tssMain1 = new ToolStripSeparator();
+            tsmiFavorite = new ToolStripMenuItem();
+            tsmiTag = new ToolStripMenuItem();
+            tsmiEdit = new ToolStripMenuItem();
+            tsmiRenameFile = new ToolStripMenuItem();
+            tsmiDelete = new ToolStripMenuItem();
+            tsmiDeleteFile = new ToolStripMenuItem();
+            tssMain2 = new ToolStripSeparator();
             tsmiShowImagePreview = new ToolStripMenuItem();
-            tsmiShowMoreInfo = new ToolStripMenuItem();
             tsmiUploadFile = new ToolStripMenuItem();
             tsmiEditImage = new ToolStripMenuItem();
+            tsmiPinToScreen = new ToolStripMenuItem();
+
             cmsHistory.SuspendLayout();
 
             //
@@ -123,13 +145,20 @@ namespace ShareX.HistoryLib
             {
                 tsmiOpen,
                 tsmiCopy,
+                tssMain1,
+                tsmiFavorite,
+                tsmiTag,
+                tsmiEdit,
+                tsmiRenameFile,
+                tsmiDelete,
+                tsmiDeleteFile,
+                tssMain2,
                 tsmiShowImagePreview,
                 tsmiUploadFile,
                 tsmiEditImage,
-                tsmiShowMoreInfo
+                tsmiPinToScreen
             });
             cmsHistory.Name = "cmsHistory";
-            cmsHistory.ShowImageMargin = false;
             cmsHistory.Size = new Size(128, 92);
             cmsHistory.Enabled = false;
             //
@@ -148,6 +177,7 @@ namespace ShareX.HistoryLib
             tsmiOpen.Name = "tsmiOpen";
             tsmiOpen.Size = new Size(127, 22);
             tsmiOpen.Text = Resources.HistoryItemManager_InitializeComponent_Open;
+            tsmiOpen.Image = Resources.folder_open_document;
             //
             // tsmiOpenURL
             //
@@ -232,6 +262,7 @@ namespace ShareX.HistoryLib
             tsmiCopy.Name = "tsmiCopy";
             tsmiCopy.Size = new Size(127, 22);
             tsmiCopy.Text = Resources.HistoryItemManager_InitializeComponent_Copy;
+            tsmiCopy.Image = Resources.document_copy;
             //
             // tsmiCopyURL
             //
@@ -402,19 +433,63 @@ namespace ShareX.HistoryLib
             tsmiCopyFolder.Text = Resources.HistoryItemManager_InitializeComponent_Folder;
             tsmiCopyFolder.Click += tsmiCopyFolder_Click;
             //
+            // tsmiFavorite
+            //
+            tsmiFavorite.Name = "tsmiFavorite";
+            tsmiFavorite.Size = new Size(127, 22);
+            tsmiFavorite.Text = "Favorite"; // TODO: Translate
+            tsmiFavorite.Click += tsmiFavorite_Click;
+            tsmiFavorite.Image = Resources.star;
+            //
+            // tsmiTag
+            //
+            tsmiTag.Name = "tsmiTag";
+            tsmiTag.Size = new Size(127, 22);
+            tsmiTag.Text = "Edit tag..."; // TODO: Translate
+            tsmiTag.Click += tsmiTag_Click;
+            tsmiTag.Image = Resources.tag_hash;
+            //
+            // tsmiEdit
+            //
+            tsmiEdit.Name = "tsmiEdit";
+            tsmiEdit.Size = new Size(127, 22);
+            tsmiEdit.Text = "Edit item..."; // TODO: Translate
+            tsmiEdit.Click += tsmiEdit_Click;
+            tsmiEdit.Image = Resources.database__pencil;
+            //
+            // tsmiRenameFile
+            //
+            tsmiRenameFile.Name = "tsmiRenameFile";
+            tsmiRenameFile.Size = new Size(127, 22);
+            tsmiRenameFile.Text = "Rename file..."; // TODO: Translate
+            tsmiRenameFile.Click += tsmiRenameFile_Click;
+            tsmiRenameFile.Image = Resources.document_rename;
+            //
+            // tsmiDelete
+            //
+            tsmiDelete.Name = "tsmiDelete";
+            tsmiDelete.ShortcutKeyDisplayString = "Del";
+            tsmiDelete.Size = new Size(127, 22);
+            tsmiDelete.Text = "Delete item..."; // TODO: Translate
+            tsmiDelete.Click += tsmiDelete_Click;
+            tsmiDelete.Image = Resources.database__minus;
+            //
+            // tsmiDeleteFile
+            //
+            tsmiDeleteFile.Name = "tsmiDeleteFile";
+            tsmiDeleteFile.ShortcutKeyDisplayString = "Shift+Del";
+            tsmiDeleteFile.Size = new Size(127, 22);
+            tsmiDeleteFile.Text = "Delete file && item..."; // TODO: Translate
+            tsmiDeleteFile.Click += tsmiDeleteFile_Click;
+            tsmiDeleteFile.Image = Resources.bin;
+            //
             // tsmiShowImagePreview
             //
             tsmiShowImagePreview.Name = "tsmiShowImagePreview";
             tsmiShowImagePreview.Size = new Size(127, 22);
             tsmiShowImagePreview.Text = Resources.HistoryItemManager_InitializeComponent_Image_preview;
             tsmiShowImagePreview.Click += tsmiShowImagePreview_Click;
-            //
-            // tsmiShowMoreInfo
-            //
-            tsmiShowMoreInfo.Name = "tsmiShowMoreInfo";
-            tsmiShowMoreInfo.Size = new Size(127, 22);
-            tsmiShowMoreInfo.Text = Resources.HistoryItemManager_InitializeComponent_More_info;
-            tsmiShowMoreInfo.Click += tsmiShowMoreInfo_Click;
+            tsmiShowImagePreview.Image = Resources.image_sunset;
             //
             // tsmiUploadFile
             //
@@ -423,6 +498,7 @@ namespace ShareX.HistoryLib
             tsmiUploadFile.Size = new Size(127, 22);
             tsmiUploadFile.Text = Resources.HistoryItemManager_InitializeComponent_UploadFile;
             tsmiUploadFile.Click += tsmiUploadFile_Click;
+            tsmiUploadFile.Image = Resources.drive_upload;
             //
             // tsmiEditImage
             //
@@ -431,6 +507,16 @@ namespace ShareX.HistoryLib
             tsmiEditImage.Size = new Size(127, 22);
             tsmiEditImage.Text = Resources.HistoryItemManager_InitializeComponent_EditImage;
             tsmiEditImage.Click += tsmiEditImage_Click;
+            tsmiEditImage.Image = Resources.image__pencil;
+            //
+            // tsmiPinToScreen
+            //
+            tsmiPinToScreen.Name = "tsmiPinToScreen";
+            tsmiPinToScreen.ShortcutKeyDisplayString = "Ctrl+P";
+            tsmiPinToScreen.Size = new Size(127, 22);
+            tsmiPinToScreen.Text = Resources.PinToScreen;
+            tsmiPinToScreen.Click += tsmiPinToScreen_Click;
+            tsmiPinToScreen.Image = Resources.pin;
 
             cmsHistory.ResumeLayout(false);
         }
@@ -499,10 +585,11 @@ namespace ShareX.HistoryLib
                 tsmiCopyFolder.Text = Resources.HistoryItemManager_InitializeComponent_Folder + " (" + itemCount + ")";
 
                 // Other
+                tsmiEdit.Enabled = false;
                 tsmiShowImagePreview.Enabled = false;
                 tsmiUploadFile.Enabled = false;
                 tsmiEditImage.Enabled = false;
-                tsmiShowMoreInfo.Enabled = false;
+                tsmiPinToScreen.Enabled = false;
             }
             else
             {
@@ -563,10 +650,11 @@ namespace ShareX.HistoryLib
                 tsmiCopyFolder.Text = Resources.HistoryItemManager_InitializeComponent_Folder;
 
                 // Other
+                tsmiEdit.Enabled = true;
                 tsmiShowImagePreview.Enabled = IsImageFile;
                 tsmiUploadFile.Enabled = uploadFile != null && IsFileExist;
                 tsmiEditImage.Enabled = editImage != null && IsImageFile;
-                tsmiShowMoreInfo.Enabled = true;
+                tsmiPinToScreen.Enabled = pinToScreen != null && IsImageFile;
             }
 
             cmsHistory.ResumeLayout();
@@ -702,6 +790,36 @@ namespace ShareX.HistoryLib
             CopyFolder();
         }
 
+        private void tsmiFavorite_Click(object sender, EventArgs e)
+        {
+            ToggleFavorite();
+        }
+
+        private void tsmiTag_Click(object sender, EventArgs e)
+        {
+            EditTag();
+        }
+
+        private void tsmiEdit_Click(object sender, EventArgs e)
+        {
+            Edit();
+        }
+
+        private void tsmiRenameFile_Click(object sender, EventArgs e)
+        {
+            RenameFile();
+        }
+
+        private void tsmiDelete_Click(object sender, EventArgs e)
+        {
+            Delete();
+        }
+
+        private void tsmiDeleteFile_Click(object sender, EventArgs e)
+        {
+            DeleteFile();
+        }
+
         private void tsmiShowImagePreview_Click(object sender, EventArgs e)
         {
             ShowImagePreview();
@@ -717,9 +835,9 @@ namespace ShareX.HistoryLib
             EditImage();
         }
 
-        private void tsmiShowMoreInfo_Click(object sender, EventArgs e)
+        private void tsmiPinToScreen_Click(object sender, EventArgs e)
         {
-            ShowMoreInfo();
+            PinToScreen();
         }
     }
 }

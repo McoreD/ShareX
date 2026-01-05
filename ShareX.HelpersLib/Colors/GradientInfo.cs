@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -49,23 +49,35 @@ namespace ShareX.HelpersLib
         [JsonIgnore]
         public bool IsTransparent => IsValid && Colors.Any(x => x.Color.IsTransparent());
 
-        public GradientInfo()
+        public GradientInfo() : this(LinearGradientMode.Vertical)
         {
-            Type = LinearGradientMode.Vertical;
+        }
+
+        public GradientInfo(LinearGradientMode type)
+        {
+            Type = type;
             Colors = new List<GradientStop>();
         }
 
-        public GradientInfo(params GradientStop[] colors) : this()
+        public GradientInfo(LinearGradientMode type, params GradientStop[] colors) : this(type)
         {
             Colors = colors.ToList();
         }
 
-        public GradientInfo(params Color[] colors) : this()
+        public GradientInfo(LinearGradientMode type, params Color[] colors) : this(type)
         {
             for (int i = 0; i < colors.Length; i++)
             {
                 Colors.Add(new GradientStop(colors[i], (int)Math.Round(100f / (colors.Length - 1) * i)));
             }
+        }
+
+        public GradientInfo(params GradientStop[] colors) : this(LinearGradientMode.Vertical, colors)
+        {
+        }
+
+        public GradientInfo(params Color[] colors) : this(LinearGradientMode.Vertical, colors)
+        {
         }
 
         public void Clear()

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -79,8 +79,7 @@ namespace ShareX.UploadersLib
         {
             if (Connected)
             {
-                // TODO: Translate
-                btnConnect.Text = "Disconnect";
+                btnConnect.Text = Resources.Disconnect;
                 if (UserInfo != null && !string.IsNullOrEmpty(UserInfo.name))
                 {
                     lblStatusValue.Text = string.Format(Resources.LoggedInAs0, UserInfo.name);
@@ -93,8 +92,7 @@ namespace ShareX.UploadersLib
             }
             else
             {
-                // TODO: Translate
-                btnConnect.Text = "Connect...";
+                btnConnect.Text = Resources.Connect;
                 lblStatusValue.Text = Resources.OAuthControl_Status_NotLoggedIn;
                 lblStatusValue.ForeColor = Color.FromArgb(220, 0, 0);
             }

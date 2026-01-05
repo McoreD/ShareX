@@ -233,9 +233,6 @@ aqui</value>
   <data name="HotkeyManager_ShowFailedHotkeys_hotkeys" xml:space="preserve">
     <value>teclas de atalho</value>
   </data>
-  <data name="HotkeyManager_ShowFailedHotkeys_These_applications_could_be_conflicting_" xml:space="preserve">
-    <value>Estas aplicações podem causar conflitos:</value>
-  </data>
   <data name="HotkeyManager_ShowFailedHotkeys_Unable_to_register_hotkey" xml:space="preserve">
     <value>Não foi possivel registar {0}:
 
@@ -264,9 +261,6 @@ Por favor, selecione uma tecla de atalho diferente ou feche o programa que está
   <data name="MainForm_tsmiTestTextUpload_Click_Text_upload_test" xml:space="preserve">
     <value>Teste de envio de texto</value>
   </data>
-  <data name="MainForm_UpdateMainFormTip_Currently_configured_hotkeys_" xml:space="preserve">
-    <value>Teclas de atalho configuradas actualmente:</value>
-  </data>
   <data name="MainForm_UpdateToggleHotkeyButton_Disable_hotkeys" xml:space="preserve">
     <value>Desactivar teclas de atalho</value>
   </data>
@@ -278,15 +272,6 @@ Por favor, selecione uma tecla de atalho diferente ou feche o programa que está
   </data>
   <data name="MainForm_UploadDebugLogWarning" xml:space="preserve">
     <value>O relatório de depuração pode contêr informação privada. Têm a certeza que deseja prosseguir?</value>
-  </data>
-  <data name="OCRForm_AutoComplete" xml:space="preserve">
-    <value>O resultado do OCR foi copiado para a área de transferências.</value>
-  </data>
-  <data name="OCRForm_AutoCompleteFail" xml:space="preserve">
-    <value>Um erro ocorreu durante o processamento do ORC ou nenhum texto foi obtido.</value>
-  </data>
-  <data name="OCRForm_AutoProcessing" xml:space="preserve">
-    <value>OCR está a procesar.</value>
   </data>
   <data name="Program_Run_Unable_to_create_folder_" xml:space="preserve">
     <value>Não foi possível criar pasta:</value>
@@ -338,12 +323,6 @@ Deseja reiniciar agora?</value>
   </data>
   <data name="TaskHelpers_ToggleHotkeys_Hotkeys_enabled_" xml:space="preserve">
     <value>Teclas de atalho desativadas.</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Tweet_successfully_sent_" xml:space="preserve">
-    <value>Tweet enviado com sucesso.</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Unable_to_find_valid_Twitter_account_" xml:space="preserve">
-    <value>Não foi possível encontrar uma conta válida do Twitter.</value>
   </data>
   <data name="TaskManager_CreateListViewItem_History" xml:space="preserve">
     <value>Histórico</value>

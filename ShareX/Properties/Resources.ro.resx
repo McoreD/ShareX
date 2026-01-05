@@ -301,9 +301,6 @@ Doriți să reporniți ShareX?</value>
   <data name="Confirmation" xml:space="preserve">
     <value>Confirmare</value>
   </data>
-  <data name="Description" xml:space="preserve">
-    <value>Descriere</value>
-  </data>
   <data name="DropForm_DrawDropImage_Drop_here" xml:space="preserve">
     <value>Trageți
 aici</value>
@@ -323,9 +320,6 @@ aici</value>
   <data name="FileExistForm_txtNewName_TextChanged_Use_new_name__" xml:space="preserve">
     <value>Utilizați nume nou: </value>
   </data>
-  <data name="Hotkey" xml:space="preserve">
-    <value>Tasta rapidă</value>
-  </data>
   <data name="HotkeyManager_ShowFailedHotkeys_hotkey" xml:space="preserve">
     <value>tastă rapidă</value>
   </data>
@@ -334,9 +328,6 @@ aici</value>
   </data>
   <data name="HotkeyManager_ShowFailedHotkeys_hotkeys" xml:space="preserve">
     <value>taste rapide</value>
-  </data>
-  <data name="HotkeyManager_ShowFailedHotkeys_These_applications_could_be_conflicting_" xml:space="preserve">
-    <value>Este posibil să existe un conflict între aplicații:</value>
   </data>
   <data name="HotkeyManager_ShowFailedHotkeys_Unable_to_register_hotkey" xml:space="preserve">
     <value>Nu se poate înregistra {0}:
@@ -399,9 +390,6 @@ Vă rugăm să selectați o altă tastatură rapidă sau să ieșiți din aplica
   <data name="MainForm_tsmiTestTextUpload_Click_Text_upload_test" xml:space="preserve">
     <value>Test de încărcare text</value>
   </data>
-  <data name="MainForm_UpdateMainFormTip_Currently_configured_hotkeys_" xml:space="preserve">
-    <value>Taste rapide configurate în prezent:</value>
-  </data>
   <data name="MainForm_UpdateToggleHotkeyButton_Disable_hotkeys" xml:space="preserve">
     <value>Dezactivați tastele rapide</value>
   </data>
@@ -413,15 +401,6 @@ Vă rugăm să selectați o altă tastatură rapidă sau să ieșiți din aplica
   </data>
   <data name="MainForm_UploadDebugLogWarning" xml:space="preserve">
     <value>Jurnalul de depanării poate conține informații cu caracter personal. Sunteți sigur că doriți să continuați?</value>
-  </data>
-  <data name="OCRForm_AutoComplete" xml:space="preserve">
-    <value>Rezultatul OCR a fost copiat în clipboard.</value>
-  </data>
-  <data name="OCRForm_AutoCompleteFail" xml:space="preserve">
-    <value>A apărut o eroare în timpul procesării OCR sau nu a fost returnat niciun text.</value>
-  </data>
-  <data name="OCRForm_AutoProcessing" xml:space="preserve">
-    <value>OCR procesează.</value>
   </data>
   <data name="Program_Run_Unable_to_create_folder_" xml:space="preserve">
     <value>Nu s-a putut crea folderul:</value>
@@ -479,12 +458,6 @@ Doriți să reporniți ShareX?</value>
   </data>
   <data name="TaskHelpers_ToggleHotkeys_Hotkeys_enabled_" xml:space="preserve">
     <value>Taste rapide activate.</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Tweet_successfully_sent_" xml:space="preserve">
-    <value>Tweet trimis cu succes.</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Unable_to_find_valid_Twitter_account_" xml:space="preserve">
-    <value>Nu s-a putut găsi un cont de Twitter valid.</value>
   </data>
   <data name="TaskManager_CreateListViewItem_History" xml:space="preserve">
     <value>Istoric</value>

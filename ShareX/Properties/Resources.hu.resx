@@ -194,9 +194,6 @@ Kérlek, válassz egy másik gyorsbillentyűt vagy zárd be a problémát okozó
   <data name="Program_Run_Unable_to_create_folder_" xml:space="preserve">
     <value>Hiba a mappa létrehozásakor:</value>
   </data>
-  <data name="MainForm_UpdateMainFormTip_Currently_configured_hotkeys_" xml:space="preserve">
-    <value>Jelenleg konfigurált gyorsbillentyűk:</value>
-  </data>
   <data name="TaskManager_CreateListViewItem_In_queue" xml:space="preserve">
     <value>Várakozik</value>
   </data>
@@ -283,9 +280,6 @@ ide</value>
   </data>
   <data name="AboutForm_AboutForm_Project_page" xml:space="preserve">
     <value>Projekt weboldal</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Tweet_successfully_sent_" xml:space="preserve">
-    <value>Tweet sikeresen elküldve.</value>
   </data>
   <data name="Program_WritePersonalPathConfig_Cant_access_to_file" xml:space="preserve">
     <value>Nem sikerült a(z) "{0}" fájl elérése.

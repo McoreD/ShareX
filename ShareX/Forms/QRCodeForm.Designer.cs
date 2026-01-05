@@ -28,184 +28,158 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QRCodeForm));
-            this.cmsQR = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tsmiCopy = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSaveAs = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiUpload = new System.Windows.Forms.ToolStripMenuItem();
-            this.tss1 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiDecode = new System.Windows.Forms.ToolStripMenuItem();
-            this.txtQRCode = new System.Windows.Forms.TextBox();
-            this.pbQRCode = new System.Windows.Forms.PictureBox();
-            this.tcMain = new System.Windows.Forms.TabControl();
-            this.tpEncode = new System.Windows.Forms.TabPage();
-            this.tpDecode = new System.Windows.Forms.TabPage();
-            this.btnDecodeFromFile = new System.Windows.Forms.Button();
-            this.lblDecodeResult = new System.Windows.Forms.Label();
-            this.btnDecodeFromScreen = new System.Windows.Forms.Button();
-            this.rtbDecodeResult = new System.Windows.Forms.RichTextBox();
-            this.pDecodeResult = new System.Windows.Forms.Panel();
-            this.cmsQR.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbQRCode)).BeginInit();
-            this.tcMain.SuspendLayout();
-            this.tpEncode.SuspendLayout();
-            this.tpDecode.SuspendLayout();
-            this.pDecodeResult.SuspendLayout();
+            this.txtText = new System.Windows.Forms.TextBox();
+            this.lblQRCodeSizeHint = new System.Windows.Forms.Label();
+            this.lblQRCodeSize = new System.Windows.Forms.Label();
+            this.nudQRCodeSize = new System.Windows.Forms.NumericUpDown();
+            this.pbQRCode = new ShareX.HelpersLib.MyPictureBox();
+            this.lblQRCode = new System.Windows.Forms.Label();
+            this.lblText = new System.Windows.Forms.Label();
+            this.btnCopyImage = new System.Windows.Forms.Button();
+            this.btnSaveImage = new System.Windows.Forms.Button();
+            this.btnUploadImage = new System.Windows.Forms.Button();
+            this.btnScanScreen = new System.Windows.Forms.Button();
+            this.btnScanRegion = new System.Windows.Forms.Button();
+            this.btnScanImageFile = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.nudQRCodeSize)).BeginInit();
             this.SuspendLayout();
             // 
-            // cmsQR
+            // txtText
             // 
-            this.cmsQR.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmiCopy,
-            this.tsmiSaveAs,
-            this.tsmiUpload,
-            this.tss1,
-            this.tsmiDecode});
-            this.cmsQR.Name = "cmsQR";
-            this.cmsQR.ShowImageMargin = false;
-            resources.ApplyResources(this.cmsQR, "cmsQR");
+            resources.ApplyResources(this.txtText, "txtText");
+            this.txtText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtText.Name = "txtText";
+            this.txtText.TextChanged += new System.EventHandler(this.txtText_TextChanged);
             // 
-            // tsmiCopy
+            // lblQRCodeSizeHint
             // 
-            this.tsmiCopy.Name = "tsmiCopy";
-            resources.ApplyResources(this.tsmiCopy, "tsmiCopy");
-            this.tsmiCopy.Click += new System.EventHandler(this.tsmiCopy_Click);
+            resources.ApplyResources(this.lblQRCodeSizeHint, "lblQRCodeSizeHint");
+            this.lblQRCodeSizeHint.Name = "lblQRCodeSizeHint";
             // 
-            // tsmiSaveAs
+            // lblQRCodeSize
             // 
-            this.tsmiSaveAs.Name = "tsmiSaveAs";
-            resources.ApplyResources(this.tsmiSaveAs, "tsmiSaveAs");
-            this.tsmiSaveAs.Click += new System.EventHandler(this.tsmiSaveAs_Click);
+            resources.ApplyResources(this.lblQRCodeSize, "lblQRCodeSize");
+            this.lblQRCodeSize.Name = "lblQRCodeSize";
             // 
-            // tsmiUpload
+            // nudQRCodeSize
             // 
-            this.tsmiUpload.Name = "tsmiUpload";
-            resources.ApplyResources(this.tsmiUpload, "tsmiUpload");
-            this.tsmiUpload.Click += new System.EventHandler(this.tsmiUpload_Click);
-            // 
-            // tss1
-            // 
-            this.tss1.Name = "tss1";
-            resources.ApplyResources(this.tss1, "tss1");
-            // 
-            // tsmiDecode
-            // 
-            this.tsmiDecode.Name = "tsmiDecode";
-            resources.ApplyResources(this.tsmiDecode, "tsmiDecode");
-            this.tsmiDecode.Click += new System.EventHandler(this.tsmiDecode_Click);
-            // 
-            // txtQRCode
-            // 
-            resources.ApplyResources(this.txtQRCode, "txtQRCode");
-            this.txtQRCode.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtQRCode.Name = "txtQRCode";
-            this.txtQRCode.TextChanged += new System.EventHandler(this.txtQRCode_TextChanged);
+            this.nudQRCodeSize.Increment = new decimal(new int[] {
+            64,
+            0,
+            0,
+            0});
+            resources.ApplyResources(this.nudQRCodeSize, "nudQRCodeSize");
+            this.nudQRCodeSize.Maximum = new decimal(new int[] {
+            2048,
+            0,
+            0,
+            0});
+            this.nudQRCodeSize.Name = "nudQRCodeSize";
+            this.nudQRCodeSize.ValueChanged += new System.EventHandler(this.nudQRCodeSize_ValueChanged);
             // 
             // pbQRCode
             // 
             resources.ApplyResources(this.pbQRCode, "pbQRCode");
-            this.pbQRCode.ContextMenuStrip = this.cmsQR;
+            this.pbQRCode.BackColor = System.Drawing.SystemColors.Window;
+            this.pbQRCode.FullscreenOnClick = true;
             this.pbQRCode.Name = "pbQRCode";
-            this.pbQRCode.TabStop = false;
+            this.pbQRCode.PictureBoxBackColor = System.Drawing.SystemColors.Window;
             // 
-            // tcMain
+            // lblQRCode
             // 
-            this.tcMain.Controls.Add(this.tpEncode);
-            this.tcMain.Controls.Add(this.tpDecode);
-            resources.ApplyResources(this.tcMain, "tcMain");
-            this.tcMain.Name = "tcMain";
-            this.tcMain.SelectedIndex = 0;
+            resources.ApplyResources(this.lblQRCode, "lblQRCode");
+            this.lblQRCode.Name = "lblQRCode";
             // 
-            // tpEncode
+            // lblText
             // 
-            this.tpEncode.BackColor = System.Drawing.SystemColors.Window;
-            this.tpEncode.Controls.Add(this.txtQRCode);
-            this.tpEncode.Controls.Add(this.pbQRCode);
-            resources.ApplyResources(this.tpEncode, "tpEncode");
-            this.tpEncode.Name = "tpEncode";
+            resources.ApplyResources(this.lblText, "lblText");
+            this.lblText.Name = "lblText";
             // 
-            // tpDecode
+            // btnCopyImage
             // 
-            this.tpDecode.BackColor = System.Drawing.SystemColors.Window;
-            this.tpDecode.Controls.Add(this.pDecodeResult);
-            this.tpDecode.Controls.Add(this.btnDecodeFromFile);
-            this.tpDecode.Controls.Add(this.lblDecodeResult);
-            this.tpDecode.Controls.Add(this.btnDecodeFromScreen);
-            resources.ApplyResources(this.tpDecode, "tpDecode");
-            this.tpDecode.Name = "tpDecode";
+            resources.ApplyResources(this.btnCopyImage, "btnCopyImage");
+            this.btnCopyImage.Name = "btnCopyImage";
+            this.btnCopyImage.UseVisualStyleBackColor = true;
+            this.btnCopyImage.Click += new System.EventHandler(this.btnCopyImage_Click);
             // 
-            // btnDecodeFromFile
+            // btnSaveImage
             // 
-            resources.ApplyResources(this.btnDecodeFromFile, "btnDecodeFromFile");
-            this.btnDecodeFromFile.Name = "btnDecodeFromFile";
-            this.btnDecodeFromFile.UseVisualStyleBackColor = true;
-            this.btnDecodeFromFile.Click += new System.EventHandler(this.btnDecodeFromFile_Click);
+            resources.ApplyResources(this.btnSaveImage, "btnSaveImage");
+            this.btnSaveImage.Name = "btnSaveImage";
+            this.btnSaveImage.UseVisualStyleBackColor = true;
+            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
             // 
-            // lblDecodeResult
+            // btnUploadImage
             // 
-            resources.ApplyResources(this.lblDecodeResult, "lblDecodeResult");
-            this.lblDecodeResult.Name = "lblDecodeResult";
+            resources.ApplyResources(this.btnUploadImage, "btnUploadImage");
+            this.btnUploadImage.Name = "btnUploadImage";
+            this.btnUploadImage.UseVisualStyleBackColor = true;
+            this.btnUploadImage.Click += new System.EventHandler(this.btnUploadImage_Click);
             // 
-            // btnDecodeFromScreen
+            // btnScanScreen
             // 
-            resources.ApplyResources(this.btnDecodeFromScreen, "btnDecodeFromScreen");
-            this.btnDecodeFromScreen.Name = "btnDecodeFromScreen";
-            this.btnDecodeFromScreen.UseVisualStyleBackColor = true;
-            this.btnDecodeFromScreen.Click += new System.EventHandler(this.btnDecodeFromScreen_Click);
+            resources.ApplyResources(this.btnScanScreen, "btnScanScreen");
+            this.btnScanScreen.Name = "btnScanScreen";
+            this.btnScanScreen.UseVisualStyleBackColor = true;
+            this.btnScanScreen.Click += new System.EventHandler(this.btnScanScreen_Click);
             // 
-            // rtbDecodeResult
+            // btnScanRegion
             // 
-            this.rtbDecodeResult.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            resources.ApplyResources(this.rtbDecodeResult, "rtbDecodeResult");
-            this.rtbDecodeResult.Name = "rtbDecodeResult";
-            this.rtbDecodeResult.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.rtbDecodeResult_LinkClicked);
+            resources.ApplyResources(this.btnScanRegion, "btnScanRegion");
+            this.btnScanRegion.Name = "btnScanRegion";
+            this.btnScanRegion.UseVisualStyleBackColor = true;
+            this.btnScanRegion.Click += new System.EventHandler(this.btnScanRegion_Click);
             // 
-            // pDecodeResult
+            // btnScanImageFile
             // 
-            resources.ApplyResources(this.pDecodeResult, "pDecodeResult");
-            this.pDecodeResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pDecodeResult.Controls.Add(this.rtbDecodeResult);
-            this.pDecodeResult.Name = "pDecodeResult";
+            resources.ApplyResources(this.btnScanImageFile, "btnScanImageFile");
+            this.btnScanImageFile.Name = "btnScanImageFile";
+            this.btnScanImageFile.UseVisualStyleBackColor = true;
+            this.btnScanImageFile.Click += new System.EventHandler(this.btnScanImageFile_Click);
             // 
             // QRCodeForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.Controls.Add(this.tcMain);
+            this.Controls.Add(this.btnScanImageFile);
+            this.Controls.Add(this.btnScanRegion);
+            this.Controls.Add(this.btnScanScreen);
+            this.Controls.Add(this.btnUploadImage);
+            this.Controls.Add(this.btnSaveImage);
+            this.Controls.Add(this.btnCopyImage);
+            this.Controls.Add(this.lblText);
+            this.Controls.Add(this.lblQRCode);
+            this.Controls.Add(this.pbQRCode);
+            this.Controls.Add(this.lblQRCodeSizeHint);
+            this.Controls.Add(this.lblQRCodeSize);
+            this.Controls.Add(this.nudQRCodeSize);
+            this.Controls.Add(this.txtText);
             this.Name = "QRCodeForm";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Shown += new System.EventHandler(this.QRCodeForm_Shown);
             this.Resize += new System.EventHandler(this.QRCodeForm_Resize);
-            this.cmsQR.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbQRCode)).EndInit();
-            this.tcMain.ResumeLayout(false);
-            this.tpEncode.ResumeLayout(false);
-            this.tpEncode.PerformLayout();
-            this.tpDecode.ResumeLayout(false);
-            this.tpDecode.PerformLayout();
-            this.pDecodeResult.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.nudQRCodeSize)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TextBox txtQRCode;
-        private System.Windows.Forms.ContextMenuStrip cmsQR;
-        private System.Windows.Forms.ToolStripMenuItem tsmiCopy;
-        private System.Windows.Forms.ToolStripMenuItem tsmiSaveAs;
-        private System.Windows.Forms.PictureBox pbQRCode;
-        private System.Windows.Forms.TabControl tcMain;
-        private System.Windows.Forms.TabPage tpEncode;
-        private System.Windows.Forms.TabPage tpDecode;
-        private System.Windows.Forms.Button btnDecodeFromScreen;
-        private System.Windows.Forms.Label lblDecodeResult;
-        private System.Windows.Forms.Button btnDecodeFromFile;
-        private System.Windows.Forms.ToolStripMenuItem tsmiDecode;
-        private System.Windows.Forms.ToolStripMenuItem tsmiUpload;
-        private System.Windows.Forms.ToolStripSeparator tss1;
-        private System.Windows.Forms.RichTextBox rtbDecodeResult;
-        private System.Windows.Forms.Panel pDecodeResult;
+        private System.Windows.Forms.TextBox txtText;
+        private System.Windows.Forms.NumericUpDown nudQRCodeSize;
+        private HelpersLib.MyPictureBox pbQRCode;
+        private System.Windows.Forms.Label lblQRCodeSize;
+        private System.Windows.Forms.Label lblQRCodeSizeHint;
+        private System.Windows.Forms.Label lblQRCode;
+        private System.Windows.Forms.Label lblText;
+        private System.Windows.Forms.Button btnCopyImage;
+        private System.Windows.Forms.Button btnSaveImage;
+        private System.Windows.Forms.Button btnUploadImage;
+        private System.Windows.Forms.Button btnScanScreen;
+        private System.Windows.Forms.Button btnScanRegion;
+        private System.Windows.Forms.Button btnScanImageFile;
     }
 }

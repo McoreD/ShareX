@@ -142,7 +142,7 @@
     <value>Dziennik zmian</value>
   </data>
   <data name="AboutForm_AboutForm_Language_de" xml:space="preserve">
-    <value>Niemiekci</value>
+    <value>Niemiecki</value>
   </data>
   <data name="AboutForm_AboutForm_Language_es" xml:space="preserve">
     <value>Hiszpański</value>
@@ -254,7 +254,7 @@ Czy chcesz ponownie uruchomić ShareX?</value>
     <value>Uruchamianie zostało wyłączone w menedżerze zadań</value>
   </data>
   <data name="ApplicationSettingsForm_cbStartWithWindows_EnabledByPolicy_Text" xml:space="preserve">
-    <value>Uruchomienie zostało wyłączone przez Twoją organizację</value>
+    <value>Uruchomienie zostało włączone przez Twoją organizację</value>
   </data>
   <data name="HotkeySettingsForm_Reset_all_hotkeys_to_defaults_Confirmation" xml:space="preserve">
     <value>Zresetować wszystkie skróty klawiszowe do ustawień domyślnych?</value>
@@ -410,9 +410,6 @@ Jesteś pewien, że chcesz kontynuować?</value>
     <value>Upuść
 tutaj</value>
   </data>
-  <data name="Description" xml:space="preserve">
-    <value>Opis</value>
-  </data>
   <data name="Confirmation" xml:space="preserve">
     <value>Potwierdzenie</value>
   </data>
@@ -449,17 +446,11 @@ tutaj</value>
   <data name="SwitchToThumbnailView" xml:space="preserve">
     <value>Przełącz na widok miniatur</value>
   </data>
-  <data name="Hotkey" xml:space="preserve">
-    <value>Skrót klawiszowy</value>
-  </data>
   <data name="HotkeyManager_ShowFailedHotkeys_hotkey" xml:space="preserve">
     <value>skrót klawiszowy</value>
   </data>
   <data name="HotkeyManager_ShowFailedHotkeys_hotkeys" xml:space="preserve">
     <value>skróty klawiszowe</value>
-  </data>
-  <data name="MainForm_UpdateMainFormTip_Currently_configured_hotkeys_" xml:space="preserve">
-    <value>Aktualnie skonfigurowane skróty:</value>
   </data>
   <data name="TaskHelpers_ToggleHotkeys_Hotkeys_disabled_" xml:space="preserve">
     <value>Skróty klawiszowe wyłączone.</value>
@@ -527,9 +518,6 @@ Czy chcesz ponownie uruchomić ShareX?</value>
   <data name="FFmpeg_FFmpeg_video_and_audio_source_both_can_t_be__None__" xml:space="preserve">
     <value>Źródło wideo i audio FFmpeg nie może być jednocześnie "Brak".</value>
   </data>
-  <data name="OCRForm_AutoProcessing" xml:space="preserve">
-    <value>OCR jest przetwarzany.</value>
-  </data>
   <data name="MainForm_UploadDebugLogWarning" xml:space="preserve">
     <value>Dziennik debugowania może zawierać poufne informacje. Czy na pewno chcesz kontynuować?</value>
   </data>
@@ -542,12 +530,6 @@ Czy chcesz ponownie uruchomić ShareX?</value>
   <data name="ShareXIsMinimizedToTheSystemTray" xml:space="preserve">
     <value>ShareX jest zminimalizowany do zasobnika systemowego.</value>
   </data>
-  <data name="HotkeyManager_ShowFailedHotkeys_These_applications_could_be_conflicting_" xml:space="preserve">
-    <value>Może wystąpić konflikt aplikacji:</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Tweet_successfully_sent_" xml:space="preserve">
-    <value>Tweet pomyślnie wysłany.</value>
-  </data>
   <data name="ImageData_Write_Error_Message" xml:space="preserve">
     <value>Nie można zapisać obrazu do ścieżki:</value>
   </data>
@@ -556,12 +538,6 @@ Czy chcesz ponownie uruchomić ShareX?</value>
   </data>
   <data name="MainForm_tsmiDeleteSelectedFile_Click_File_delete_confirmation" xml:space="preserve">
     <value>Potwierdzenie usunięcia pliku</value>
-  </data>
-  <data name="OCRForm_AutoComplete" xml:space="preserve">
-    <value>Dane wyjściowe OCR zostały skopiowane do schowka.</value>
-  </data>
-  <data name="OCRForm_AutoCompleteFail" xml:space="preserve">
-    <value>Podczas przetwarzania OCR wystąpił błąd lub nie zwrócono żadnego tekstu.</value>
   </data>
   <data name="Program_Run_Unable_to_create_folder_" xml:space="preserve">
     <value>Nie można utworzyć folderu:</value>
@@ -584,9 +560,6 @@ Proszę uruchomić ShareX jako administrator, aby zmienić ścieżkę folderu os
   </data>
   <data name="ScreenColorPicker" xml:space="preserve">
     <value>Selektor kolorów ekranu</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Unable_to_find_valid_Twitter_account_" xml:space="preserve">
-    <value>Nie można znaleźć prawidłowego konta na Twitterze.</value>
   </data>
   <data name="TaskManager_task_UploadCompleted_ShareX___Task_completed" xml:space="preserve">
     <value>Zadanie ukończone</value>
@@ -640,5 +613,31 @@ Możesz je później wyłączyć w menu "Zadania po przechwyceniu".</value>
   </data>
   <data name="ClipboardDoesNotContainAnImage" xml:space="preserve">
     <value>Schowek nie zawiera obrazu.</value>
+  </data>
+  <data name="FFmpegIsMissing" xml:space="preserve">
+    <value>Brakuje FFmpeg</value>
+  </data>
+  <data name="FFmpegDoesNotExistAtTheFollowingPath" xml:space="preserve">
+    <value>FFmpeg nie istnieje w następującej ścieżce:</value>
+  </data>
+  <data name="FFmpegOnlySupports64BitOperatingSystems" xml:space="preserve">
+    <value>FFmpeg, który jest dostarczany z ShareX, obsługuje tylko 64-bitowe systemy operacyjne.</value>
+  </data>
+  <data name="ShareXIsUpToDate" xml:space="preserve">
+    <value>ShareX jest aktualny!</value>
+  </data>
+  <data name="WouldYouLikeToRetryClipboardUpload" xml:space="preserve">
+    <value>Czy chcesz ponowić próbę przesłania schowka?</value>
+  </data>
+  <data name="ShareXCannotBeClosedWhileScreenRecordingIsActive" xml:space="preserve">
+    <value>ShareX nie może zostać zamknięty, gdy aktywne jest nagrywanie ekranu.
+
+Czy chcesz przerwać aktywne nagrywanie ekranu?</value>
+  </data>
+  <data name="ClipboardUpload" xml:space="preserve">
+    <value>Przesyłanie schowka</value>
+  </data>
+  <data name="AboutForm_AboutForm_Language_he-IL" xml:space="preserve">
+    <value>Hebrajski</value>
   </data>
 </root>

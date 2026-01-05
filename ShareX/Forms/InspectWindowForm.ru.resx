@@ -129,7 +129,13 @@
   <data name="btnRefresh.Text" xml:space="preserve">
     <value>Обновить</value>
   </data>
-  <data name="btnPinToTop.Text" xml:space="preserve">
-    <value>Закрепить поверх окон</value>
+  <data name="cbTopMost.Text" xml:space="preserve">
+    <value>Поверх окон</value>
+  </data>
+  <data name="lblOpacity.Text" xml:space="preserve">
+    <value>Прозрачность:</value>
+  </data>
+  <data name="mbWindowList.Text" xml:space="preserve">
+    <value>Список окон</value>
   </data>
 </root>

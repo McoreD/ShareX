@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -65,7 +65,7 @@ namespace ShareX.UploadersLib
                 new CodeMenuItem("{filename}", "File name"),
                 new CodeMenuItem("{random:input1|input2}", "Random selection from list"),
                 new CodeMenuItem("{select:input1|input2}", "Lets user to select one input from list"),
-                new CodeMenuItem("{prompt:title|default_value}", "Lets user to input text"),
+                new CodeMenuItem("{inputbox:title|default_value}", "Lets user to input text"),
                 new CodeMenuItem("{base64:input}", "Base64 encode input")
             };
             */
@@ -81,7 +81,8 @@ namespace ShareX.UploadersLib
                 new CodeMenuItem("{filename}", "File name used when uploading"),
                 new CodeMenuItem("{random:input1|input2}", "Random selection from list"),
                 new CodeMenuItem("{select:input1|input2}", "Lets user to select one input from list"),
-                new CodeMenuItem("{prompt:title|default_value}", "Lets user to input text"),
+                new CodeMenuItem("{inputbox:title|default_value}", "Lets user to input text"),
+                new CodeMenuItem("{outputbox:title|text}", "Lets user to output text"),
                 new CodeMenuItem("{base64:input}", "Base64 encode input")
             };
 
@@ -101,7 +102,7 @@ namespace ShareX.UploadersLib
             cbRequestMethod.Items.AddRange(Enum.GetNames(typeof(HttpMethod)));
             cbBody.Items.AddRange(Helpers.GetEnumDescriptions<CustomUploaderBody>());
 
-            ShareXResources.ApplyTheme(this);
+            ShareXResources.ApplyTheme(this, true);
 
             CustomUploaderLoadTab();
         }
@@ -293,14 +294,13 @@ namespace ShareX.UploadersLib
         {
             if (Config.CustomUploadersList != null && Config.CustomUploadersList.Count > 0)
             {
-                using (FolderSelectDialog fsd = new FolderSelectDialog())
+                string selectedPath = FileHelpers.BrowseFolder();
+
+                if (!string.IsNullOrEmpty(selectedPath))
                 {
-                    if (fsd.ShowDialog())
+                    foreach (CustomUploaderItem cui in Config.CustomUploadersList)
                     {
-                        foreach (CustomUploaderItem cui in Config.CustomUploadersList)
-                        {
-                            CustomUploaderSerialize(cui, fsd.FileName);
-                        }
+                        CustomUploaderSerialize(cui, selectedPath);
                     }
                 }
             }
@@ -308,32 +308,37 @@ namespace ShareX.UploadersLib
 
         private void CustomUploaderUpdateFolder()
         {
-            using (FolderSelectDialog fsd = new FolderSelectDialog())
+            string selectedPath = FileHelpers.BrowseFolder();
+
+            if (!string.IsNullOrEmpty(selectedPath))
             {
-                if (fsd.ShowDialog())
+                string folderPath = selectedPath;
+                string[] files = Directory.GetFiles(folderPath, "*.sxcu", SearchOption.TopDirectoryOnly);
+
+                int updated = 0;
+
+                if (files != null)
                 {
-                    string folderPath = fsd.FileName;
-                    string[] files = Directory.GetFiles(folderPath, "*.sxcu", SearchOption.TopDirectoryOnly);
-
-                    int updated = 0;
-
-                    if (files != null)
+                    foreach (string filePath in files)
                     {
-                        foreach (string filePath in files)
-                        {
-                            CustomUploaderItem cui = JsonHelpers.DeserializeFromFile<CustomUploaderItem>(filePath);
+                        CustomUploaderItem cui = JsonHelpers.DeserializeFromFile<CustomUploaderItem>(filePath);
 
-                            if (cui != null)
+                        if (cui != null)
+                        {
+                            try
                             {
                                 cui.CheckBackwardCompatibility();
                                 CustomUploaderSerialize(cui, folderPath);
                                 updated++;
                             }
+                            catch
+                            {
+                            }
                         }
                     }
-
-                    MessageBox.Show($"{updated} custom uploader files updated.", "ShareX", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+
+                MessageBox.Show($"{updated} custom uploader files updated.", "ShareX", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -783,8 +788,15 @@ namespace ShareX.UploadersLib
 
                     if (cui != null)
                     {
-                        cui.CheckBackwardCompatibility();
-                        CustomUploaderAdd(cui);
+                        try
+                        {
+                            cui.CheckBackwardCompatibility();
+                            CustomUploaderAdd(cui);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ShowError(false);
+                        }
                     }
                 }
 
@@ -871,9 +883,17 @@ namespace ShareX.UploadersLib
 
         private void eiCustomUploaders_ImportRequested(object obj)
         {
-            CustomUploaderItem uploader = obj as CustomUploaderItem;
-            uploader.CheckBackwardCompatibility();
-            CustomUploaderAdd(uploader);
+            CustomUploaderItem cui = obj as CustomUploaderItem;
+
+            try
+            {
+                cui.CheckBackwardCompatibility();
+                CustomUploaderAdd(cui);
+            }
+            catch (Exception e)
+            {
+                e.ShowError(false);
+            }
         }
 
         private void eiCustomUploaders_ImportCompleted()

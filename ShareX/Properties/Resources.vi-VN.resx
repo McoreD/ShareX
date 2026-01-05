@@ -120,9 +120,6 @@
   <data name="AutoCaptureForm_UpdateStatus_Timeleft___0_s___1____Total___2_" xml:space="preserve">
     <value>Thời gian còn lại: {0}giây ({1}%) Tổng cộng: {2}</value>
   </data>
-  <data name="TaskHelpers_TweetMessage_Unable_to_find_valid_Twitter_account_" xml:space="preserve">
-    <value>Không thể tìm thấy tài khoàn Twitter hợp lệ.</value>
-  </data>
   <data name="UploadTask_ThreadDoWork_URL_is_empty_" xml:space="preserve">
     <value>URL đang trống.</value>
   </data>
@@ -199,9 +196,6 @@ Bạn có muốn khởi động lại ShareX không?</value>
   </data>
   <data name="Program_Run_Unable_to_create_folder_" xml:space="preserve">
     <value>Không thể tạo thư mục mới:</value>
-  </data>
-  <data name="MainForm_UpdateMainFormTip_Currently_configured_hotkeys_" xml:space="preserve">
-    <value>Các phím tắt đang được thiết lập:</value>
   </data>
   <data name="RecentManager_UpdateRecentMenu_Left_click_to_copy_URL_to_clipboard__Right_click_to_open_URL_" xml:space="preserve">
     <value>Chuột trái để sao chép URL vào vùng nhớ tạm. Chuột phải để mở URL.</value>
@@ -312,9 +306,6 @@ Bạn có muốn khởi động lại ShareX không?</value>
   </data>
   <data name="AboutForm_AboutForm_Project_page" xml:space="preserve">
     <value>Trang dự án</value>
-  </data>
-  <data name="TaskHelpers_TweetMessage_Tweet_successfully_sent_" xml:space="preserve">
-    <value>Đã gửi Tweet thành công.</value>
   </data>
   <data name="Program_WritePersonalPathConfig_Cant_access_to_file" xml:space="preserve">
     <value>Không thể truy cập tới tệp "{0}"
@@ -457,9 +448,6 @@ Nhấn "Không" để hủy tiến trình tải lên hiện tại và tắt ch�
   <data name="ApplicationSettingsForm_cbStartWithWindows_DisabledByUser_Text" xml:space="preserve">
     <value>Tự khởi động đã bị vô hiệu trong Task Manager</value>
   </data>
-  <data name="HotkeyManager_ShowFailedHotkeys_These_applications_could_be_conflicting_" xml:space="preserve">
-    <value>Có thể đã có mâu thuẫn với một ứng dụng:</value>
-  </data>
   <data name="ActionsToolbar_Tip" xml:space="preserve">
     <value>Nhấn chuột trái để kéo
 Nhấn chuột phải để mở menu
@@ -474,9 +462,6 @@ Nhấn chuột giữa để đóng</value>
   <data name="ActionsToolbar_StayTopMost" xml:space="preserve">
     <value>Giữ ở trên cùng</value>
   </data>
-  <data name="OCRForm_AutoCompleteFail" xml:space="preserve">
-    <value>Lỗi xảy ra trong quá trình xử lí nhận diện văn bản (OCR), hoặc không có văn bản được nhận diện.</value>
-  </data>
   <data name="AboutForm_AboutForm_Language_uk" xml:space="preserve">
     <value>Tiếng Ukraina</value>
   </data>
@@ -485,12 +470,6 @@ Nhấn chuột giữa để đóng</value>
   </data>
   <data name="AboutForm_AboutForm_Language_id_ID" xml:space="preserve">
     <value>Tiếng Indonesia</value>
-  </data>
-  <data name="OCRForm_AutoComplete" xml:space="preserve">
-    <value>Kết quả nhận diện văn bản (OCR) đã được sao chép vào vùng nhớ tạm</value>
-  </data>
-  <data name="OCRForm_AutoProcessing" xml:space="preserve">
-    <value>Đang nhận diện văn bản (OCR)</value>
   </data>
   <data name="SwitchToThumbnailView" xml:space="preserve">
     <value>Chuyển qua xem trước ảnh</value>
@@ -557,9 +536,6 @@ Bạn có muốn khởi động lại ShareX?</value>
   <data name="Confirmation" xml:space="preserve">
     <value>Xác nhận</value>
   </data>
-  <data name="Description" xml:space="preserve">
-    <value>Mô tả</value>
-  </data>
   <data name="Error" xml:space="preserve">
     <value>Lỗi</value>
   </data>
@@ -580,9 +556,6 @@ Bạn có muốn khởi động lại ShareX?</value>
   </data>
   <data name="FFmpegOnlySupports64BitOperatingSystems" xml:space="preserve">
     <value>FFmpeg đi kèm với ShareX chỉ hỗ trợ hệ điều hành 64-bit.</value>
-  </data>
-  <data name="Hotkey" xml:space="preserve">
-    <value>Phím tắt</value>
   </data>
   <data name="ImageData_Write_Error_Message" xml:space="preserve">
     <value>Không thể ghi hình ảnh vào đường dẫn:</value>
