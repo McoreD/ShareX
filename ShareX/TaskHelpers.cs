@@ -23,6 +23,7 @@
 
 #endregion License Information (GPL v3)
 
+using ShareX.EditorInterop;
 using ShareX.HelpersLib;
 using ShareX.HistoryLib;
 using ShareX.ImageEffectsLib;
@@ -1206,6 +1207,13 @@ namespace ShareX
 
             worker.DoWork += () =>
             {
+                if (ShareXEditorHost.TryAnnotateWithShareXEditor(bmp, filePath, out Bitmap editedImage) && editedImage != null)
+                {
+                    bmp?.Dispose();
+                    bmp = editedImage;
+                    return;
+                }
+
                 bmp = AnnotateImage(bmp, filePath, taskSettings);
             };
 

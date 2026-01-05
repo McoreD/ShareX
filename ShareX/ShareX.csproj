@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <PlatformTarget>x64</PlatformTarget>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -18,6 +18,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="SkiaSharp" Version="3.119.1" />
+    <PackageReference Include="SkiaSharp.Views.WindowsForms" Version="3.119.1" />
     <PackageReference Include="ZXing.Net" Version="0.16.11" />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.14" />
   </ItemGroup>
@@ -29,6 +31,7 @@
     <ProjectReference Include="..\ShareX.ScreenCaptureLib\ShareX.ScreenCaptureLib.csproj" />
     <ProjectReference Include="..\ShareX.HelpersLib\ShareX.HelpersLib.csproj" />
     <ProjectReference Include="..\ShareX.UploadersLib\ShareX.UploadersLib.csproj" />
+    <ProjectReference Include="..\..\..\ShareX Team\ShareX.Editor\src\ShareX.Editor\ShareX.Editor.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host-manifest-chrome.json">
