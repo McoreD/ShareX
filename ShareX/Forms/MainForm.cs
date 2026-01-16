@@ -46,6 +46,7 @@ namespace ShareX
         private int trayClickCount = 0;
         private UploadInfoManager uim;
         private ToolStripDropDownItem tsmiImageFileUploaders, tsmiTrayImageFileUploaders, tsmiTextFileUploaders, tsmiTrayTextFileUploaders;
+        private ToolStripMenuItem tsmiOpenInEditorWindow;
         private ImageFilesCache actionsMenuIconCache = new ImageFilesCache();
 
         public MainForm()
@@ -232,6 +233,11 @@ namespace ShareX
             tsbDonate.Image = Resources.globe;
 #endif
 
+            tsmiOpenInEditorWindow = new ToolStripMenuItem("Open in Editor (Avalonia)");
+            tsmiOpenInEditorWindow.Click += TsmiOpenInEditorWindow_Click;
+            tsmiOpenInEditorWindow.Image = Resources.image_pencil; // Reusing existing icon or similar
+            cmsTaskInfo.Items.Insert(cmsTaskInfo.Items.IndexOf(tsmiEditSelectedFile) + 1, tsmiOpenInEditorWindow);
+
             HandleCreated += MainForm_HandleCreated;
         }
 
@@ -341,6 +347,9 @@ namespace ShareX
             {
                 lvUploads.Items[lvUploads.Items.Count - 1].EnsureVisible();
             }
+
+            // Initialize Avalonia for the editor window
+            EditorInterop.AvaloniaAppHost.Initialize();
 
             if (Program.SteamFirstTimeConfig)
             {
@@ -643,7 +652,7 @@ namespace ShareX
 
             tsmiStopUpload.Visible = tsmiOpen.Visible = tsmiCopy.Visible = tsmiShowErrors.Visible = tsmiShowResponse.Visible =
                 tsmiAnalyzeImage.Visible = tsmiGoogleLens.Visible = tsmiBingVisualSearch.Visible = tsmiShowQRCode.Visible = tsmiOCRImage.Visible =
-                tsmiCombineImages.Visible = tsmiUploadSelectedFile.Visible = tsmiDownloadSelectedURL.Visible = tsmiEditSelectedFile.Visible =
+                tsmiCombineImages.Visible = tsmiUploadSelectedFile.Visible = tsmiDownloadSelectedURL.Visible = tsmiEditSelectedFile.Visible = tsmiOpenInEditorWindow.Visible =
                 tsmiBeautifyImage.Visible = tsmiAddImageEffects.Visible = tsmiPinSelectedFile.Visible = tsmiRunAction.Visible =
                 tsmiDeleteSelectedItem.Visible = tsmiDeleteSelectedFile.Visible = tsmiShortenSelectedURL.Visible = tsmiShareSelectedURL.Visible = false;
 
@@ -752,6 +761,7 @@ namespace ShareX
                     tsmiUploadSelectedFile.Visible = !SystemOptions.DisableUpload && uim.SelectedItem.IsFileExist;
                     tsmiDownloadSelectedURL.Visible = uim.SelectedItem.IsFileURL;
                     tsmiEditSelectedFile.Visible = uim.SelectedItem.IsImageFile;
+                    tsmiOpenInEditorWindow.Visible = uim.SelectedItem.IsImageFile;
                     tsmiBeautifyImage.Visible = uim.SelectedItem.IsImageFile;
                     tsmiAddImageEffects.Visible = uim.SelectedItem.IsImageFile;
                     tsmiPinSelectedFile.Visible = uim.SelectedItem.IsImageFile;
@@ -2356,6 +2366,22 @@ namespace ShareX
         private void tsmiEditSelectedFile_Click(object sender, EventArgs e)
         {
             uim.EditImage();
+        }
+
+        private void TsmiOpenInEditorWindow_Click(object sender, EventArgs e)
+        {
+            if (uim.SelectedItem != null && uim.SelectedItem.IsImageFile)
+            {
+                try 
+                {
+                    EditorInterop.AvaloniaAppHost.OpenEditor(uim.SelectedItem.Info.FilePath);
+                }
+                catch (Exception ex)
+                {
+                    DebugHelper.WriteException(ex);
+                    MessageBox.Show("Failed to launch EditorWindow: " + ex.Message);
+                }
+            }
         }
 
         private void tsmiBeautifyImage_Click(object sender, EventArgs e)

@@ -17,6 +17,7 @@
     <CETCompat>false</CETCompat>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SkiaSharp" Version="3.119.1" />
     <PackageReference Include="SkiaSharp.Views.WindowsForms" Version="3.119.1" />
