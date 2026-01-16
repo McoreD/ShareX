@@ -1207,10 +1207,24 @@ namespace ShareX
 
             worker.DoWork += () =>
             {
-                if (ShareXEditorHost.TryAnnotateWithShareXEditor(bmp, filePath, out Bitmap editedImage) && editedImage != null)
+                byte[] inputBytes = null;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    bmp.Save(ms, ImageFormat.Png);
+                    inputBytes = ms.ToArray();
+                }
+
+                var task = AvaloniaAppHost.RequestEditAsync(inputBytes);
+                task.Wait();
+
+                if (task.Result != null)
                 {
                     bmp?.Dispose();
-                    bmp = editedImage;
+                    using (MemoryStream ms = new MemoryStream(task.Result))
+                    using (Bitmap temp = new Bitmap(ms))
+                    {
+                        bmp = new Bitmap(temp);
+                    }
                     return;
                 }
 

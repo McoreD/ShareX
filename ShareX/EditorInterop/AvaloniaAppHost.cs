@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -104,6 +106,58 @@ namespace ShareX.EditorInterop
                     DebugHelper.WriteException(ex, "AvaloniaAppHost.OpenEditor failed.");
                 }
             });
+        }
+
+        /// <summary>
+        /// Requests an edit operation, returning the result as a byte array (PNG encoded).
+        /// This is used for bridging synchronous/modal workflow tasks from WinForms.
+        /// </summary>
+        public static Task<byte[]?> RequestEditAsync(byte[] imageBytes)
+        {
+            if (!_isInitialized || _lifetime == null)
+            {
+                return Task.FromResult<byte[]?>(null);
+            }
+
+            var tcs = new TaskCompletionSource<byte[]?>();
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                try
+                {
+                    var window = new EditorWindow();
+                    
+                    // Load image from bytes
+                    using (var ms = new MemoryStream(imageBytes))
+                    {
+                        window.LoadImage(ms);
+                    }
+
+                    // Handle window closing to capture result
+                    // For now, we assume if the window is closed, we take the result.
+                    // Ideally we'd have an "OK" vs "Cancel" dialog result pattern.
+                    window.Closed += (s, e) =>
+                    {
+                        try
+                        {
+                            var result = window.GetResultBytes();
+                            tcs.TrySetResult(result);
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.TrySetException(ex);
+                        }
+                    };
+
+                    window.Show();
+                }
+                catch (Exception ex)
+                {
+                    tcs.TrySetException(ex);
+                }
+            });
+
+            return tcs.Task;
         }
 
         /// <summary>
