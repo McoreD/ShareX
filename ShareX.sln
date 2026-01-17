@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.32112.339
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11408.102 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareX", "ShareX\ShareX.csproj", "{C5AE4585-E9EC-4FA3-B75A-E1210635ACB6}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.build.props = Directory.build.props
 		Directory.build.targets = Directory.build.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareX.Editor", "..\..\ShareX Team\ShareX.Editor\src\ShareX.Editor\ShareX.Editor.csproj", "{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -416,6 +418,36 @@ Global
 		{B1F2C3D4-E5F6-7890-ABCD-EF1234567890}.Steam|x64.Build.0 = Release|Any CPU
 		{B1F2C3D4-E5F6-7890-ABCD-EF1234567890}.Steam|x86.ActiveCfg = Release|Any CPU
 		{B1F2C3D4-E5F6-7890-ABCD-EF1234567890}.Steam|x86.Build.0 = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Debug|x64.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Debug|x86.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStore|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStore|Any CPU.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStore|x64.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStore|x64.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStore|x86.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStore|x86.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStoreDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStoreDebug|Any CPU.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStoreDebug|x64.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStoreDebug|x64.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStoreDebug|x86.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.MicrosoftStoreDebug|x86.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Release|x64.ActiveCfg = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Release|x64.Build.0 = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Release|x86.ActiveCfg = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Release|x86.Build.0 = Release|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Steam|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Steam|Any CPU.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Steam|x64.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Steam|x64.Build.0 = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Steam|x86.ActiveCfg = Debug|Any CPU
+		{7DAB41BC-6888-CF0E-DC8A-D71A0C2D3AEF}.Steam|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
