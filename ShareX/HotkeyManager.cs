@@ -1,8 +1,8 @@
-﻿#region License Information (GPL v3)
+#region License Information (GPL v3)
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,10 +24,13 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.Properties;
+using ShareX.Localization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
+using MessageBox = ShareX.AvaloniaUI.MessageBox;
+using MessageBoxButtons = ShareX.AvaloniaUI.MessageBoxButtons;
+using MessageBoxIcon = ShareX.AvaloniaUI.MessageBoxIcon;
 
 namespace ShareX
 {
@@ -42,18 +45,18 @@ namespace ShareX
         public HotkeyTriggerEventHandler HotkeyTrigger;
         public HotkeysToggledEventHandler HotkeysToggledTrigger;
 
-        private HotkeyForm hotkeyForm;
+        private IHotkeyHost hotkeyHost;
 
-        public HotkeyManager(HotkeyForm form)
+        public HotkeyManager(IHotkeyHost host)
         {
-            hotkeyForm = form;
-            hotkeyForm.HotkeyPress += HotkeyForm_HotkeyPress;
-            hotkeyForm.FormClosed += HotkeyForm_FormClosed;
+            hotkeyHost = host;
+            hotkeyHost.HotkeyPress += OnHotkeyPressed;
+            hotkeyHost.Closed += OnHostClosed;
         }
 
-        private void HotkeyForm_HotkeyPress(ushort id, Keys key, Modifiers modifier)
+        private void OnHotkeyPressed(ushort id, InputKey key, Modifiers modifier)
         {
-            if (!IgnoreHotkeys && (!Program.Settings.DisableHotkeysOnFullscreen || !CaptureHelpers.IsActiveWindowFullscreen()))
+            if (!IgnoreHotkeys && (!ApplicationState.Settings.DisableHotkeysOnFullscreen || !CaptureHelpers.IsActiveWindowFullscreen()))
             {
                 HotkeySettings hotkeySetting = Hotkeys.Find(x => x.HotkeyInfo.ID == id);
 
@@ -64,9 +67,9 @@ namespace ShareX
             }
         }
 
-        private void HotkeyForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void OnHostClosed(object sender, EventArgs e)
         {
-            if (hotkeyForm != null && !hotkeyForm.IsDisposed)
+            if (hotkeyHost != null && !hotkeyHost.IsDisposed)
             {
                 UnregisterAllHotkeys(false);
             }
@@ -96,13 +99,13 @@ namespace ShareX
 
         public void RegisterHotkey(HotkeySettings hotkeySetting)
         {
-            if (!Program.Settings.DisableHotkeys || hotkeySetting.TaskSettings.Job == HotkeyType.DisableHotkeys)
+            if (!ApplicationState.Settings.DisableHotkeys || hotkeySetting.TaskSettings.Job == HotkeyType.DisableHotkeys)
             {
                 UnregisterHotkey(hotkeySetting, false);
 
                 if (hotkeySetting.HotkeyInfo.Status != HotkeyStatus.Registered && hotkeySetting.HotkeyInfo.IsValidHotkey)
                 {
-                    hotkeyForm.RegisterHotkey(hotkeySetting.HotkeyInfo);
+                    hotkeyHost.RegisterHotkey(hotkeySetting.HotkeyInfo);
 
                     if (hotkeySetting.HotkeyInfo.Status == HotkeyStatus.Registered)
                     {
@@ -145,7 +148,7 @@ namespace ShareX
         {
             if (hotkeySetting.HotkeyInfo.Status == HotkeyStatus.Registered)
             {
-                hotkeyForm.UnregisterHotkey(hotkeySetting.HotkeyInfo);
+                hotkeyHost.UnregisterHotkey(hotkeySetting.HotkeyInfo);
 
                 if (hotkeySetting.HotkeyInfo.Status == HotkeyStatus.NotConfigured)
                 {
@@ -198,10 +201,10 @@ namespace ShareX
             if (failedHotkeysList.Count > 0)
             {
                 string failedHotkeys = string.Join("\r\n", failedHotkeysList.Select(x => $"[{x.HotkeyInfo}] {x.TaskSettings}"));
-                string hotkeyText = failedHotkeysList.Count > 1 ? Resources.HotkeyManager_ShowFailedHotkeys_hotkeys : Resources.HotkeyManager_ShowFailedHotkeys_hotkey;
-                string text = string.Format(Resources.HotkeyManager_ShowFailedHotkeys_Unable_to_register_hotkey, hotkeyText, failedHotkeys);
+                string hotkeyText = failedHotkeysList.Count > 1 ? Strings.HotkeyManager_ShowFailedHotkeys_hotkeys : Strings.HotkeyManager_ShowFailedHotkeys_hotkey;
+                string text = string.Format(Strings.HotkeyManager_ShowFailedHotkeys_Unable_to_register_hotkey, hotkeyText, failedHotkeys);
 
-                MessageBox.Show(text, "ShareX - " + Resources.HotkeyManager_ShowFailedHotkeys_Hotkey_registration_failed, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(text, "ShareX - " + Strings.HotkeyManager_ShowFailedHotkeys_Hotkey_registration_failed, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -211,7 +214,7 @@ namespace ShareX
             Hotkeys.AddRange(GetDefaultHotkeyList());
             RegisterAllHotkeys();
 
-            if (Program.Settings.DisableHotkeys)
+            if (ApplicationState.Settings.DisableHotkeys)
             {
                 TaskHelpers.ToggleHotkeys();
             }
@@ -221,11 +224,11 @@ namespace ShareX
         {
             return new List<HotkeySettings>
             {
-                new HotkeySettings(HotkeyType.RectangleRegion, Keys.Control | Keys.PrintScreen),
-                new HotkeySettings(HotkeyType.PrintScreen, Keys.PrintScreen),
-                new HotkeySettings(HotkeyType.ActiveWindow, Keys.Alt | Keys.PrintScreen),
-                new HotkeySettings(HotkeyType.ScreenRecorder, Keys.Shift | Keys.PrintScreen),
-                new HotkeySettings(HotkeyType.ScreenRecorderGIF, Keys.Control | Keys.Shift | Keys.PrintScreen)
+                new HotkeySettings(HotkeyType.RectangleRegion, InputKey.Control | InputKey.PrintScreen),
+                new HotkeySettings(HotkeyType.PrintScreen, InputKey.PrintScreen),
+                new HotkeySettings(HotkeyType.ActiveWindow, InputKey.Alt | InputKey.PrintScreen),
+                new HotkeySettings(HotkeyType.ScreenRecorder, InputKey.Shift | InputKey.PrintScreen),
+                new HotkeySettings(HotkeyType.ScreenRecorderGIF, InputKey.Control | InputKey.Shift | InputKey.PrintScreen)
             };
         }
     }

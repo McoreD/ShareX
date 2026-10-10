@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,24 +25,18 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class MediaFireFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.MediaFire;
-
-        public override Icon ServiceIcon => Resources.MediaFire;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -57,8 +51,6 @@ namespace ShareX.UploadersLib.FileUploaders
                 UseLongLink = config.MediaFireUseLongLink
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpMediaFire;
     }
 
     public sealed class MediaFire : FileUploader
@@ -80,22 +72,22 @@ namespace ShareX.UploadersLib.FileUploaders
             this.pasw = pasw;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             AllowReportProgress = false;
-            GetSessionToken();
+            await GetSessionTokenAsync(cancellationToken).ConfigureAwait(false);
             AllowReportProgress = true;
-            string key = SimpleUpload(stream, fileName);
+            string key = await SimpleUploadAsync(stream, fileName, cancellationToken).ConfigureAwait(false);
             AllowReportProgress = false;
             string url;
-            while ((url = PollUpload(key, fileName)) == null)
+            while ((url = await PollUploadAsync(key, fileName, cancellationToken).ConfigureAwait(false)) == null)
             {
-                Thread.Sleep(pollInterval);
+                await Task.Delay(pollInterval, cancellationToken).ConfigureAwait(false);
             }
             return new UploadResult() { IsSuccess = true, URL = url };
         }
 
-        private void GetSessionToken()
+        private async Task GetSessionTokenAsync(CancellationToken cancellationToken)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("email", user);
@@ -104,17 +96,18 @@ namespace ShareX.UploadersLib.FileUploaders
             args.Add("token_version", "2");
             args.Add("response_format", "json");
             args.Add("signature", GetInitSignature());
-            string respStr = SendRequestMultiPart(apiUrl + "user/get_session_token.php", args);
+            string respStr = await SendRequestMultiPartAsync(apiUrl + "user/get_session_token.php", args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
             GetSessionTokenResponse resp = DeserializeResponse<GetSessionTokenResponse>(respStr);
             EnsureSuccess(resp);
             if (resp.session_token == null || resp.time == null || resp.secret_key == null)
-                throw new IOException("Invalid response");
+                throw new IOException(Localization.Strings.MediaFire_Invalid_response);
             sessionToken = resp.session_token;
             signatureTime = resp.time;
             signatureKey = (int)resp.secret_key;
         }
 
-        private string SimpleUpload(Stream stream, string fileName)
+        private async Task<string> SimpleUploadAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("session_token", sessionToken);
@@ -122,15 +115,16 @@ namespace ShareX.UploadersLib.FileUploaders
             args.Add("response_format", "json");
             args.Add("signature", GetSignature("upload/simple.php", args));
             string url = URLHelpers.CreateQueryString(apiUrl + "upload/simple.php", args);
-            UploadResult res = SendRequestFile(url, stream, fileName, "Filedata");
+            UploadResult res = await SendRequestFileAsync(url, stream, fileName, "Filedata",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
             if (!res.IsSuccess) throw new IOException(res.ErrorsToString());
             SimpleUploadResponse resp = DeserializeResponse<SimpleUploadResponse>(res.Response);
             EnsureSuccess(resp);
-            if (resp.doupload.result != 0 || resp.doupload.key == null) throw new IOException("Invalid response");
+            if (resp.doupload.result != 0 || resp.doupload.key == null) throw new IOException(Localization.Strings.MediaFire_Invalid_response);
             return resp.doupload.key;
         }
 
-        private string PollUpload(string uploadKey, string fileName)
+        private async Task<string> PollUploadAsync(string uploadKey, string fileName, CancellationToken cancellationToken)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("session_token", sessionToken);
@@ -138,17 +132,19 @@ namespace ShareX.UploadersLib.FileUploaders
             args.Add("filename", fileName);
             args.Add("response_format", "json");
             args.Add("signature", GetSignature("upload/poll_upload.php", args));
-            string respStr = SendRequestMultiPart(apiUrl + "upload/poll_upload.php", args);
+            string respStr = await SendRequestMultiPartAsync(apiUrl + "upload/poll_upload.php", args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
             PollUploadResponse resp = DeserializeResponse<PollUploadResponse>(respStr);
             EnsureSuccess(resp);
-            if (resp.doupload.result == null || resp.doupload.status == null) throw new IOException("Invalid response");
+            if (resp.doupload.result == null || resp.doupload.status == null) throw new IOException(Localization.Strings.MediaFire_Invalid_response);
             if (resp.doupload.result != 0 || resp.doupload.fileerror != null)
             {
-                throw new IOException(string.Format("Couldn't upload the file: {0}", resp.doupload.description ?? "Unknown error"));
+                throw new IOException(string.Format(Localization.Strings.MediaFire_Could_not_upload_file,
+                    resp.doupload.description ?? Localization.Strings.Common_Unknown_error));
             }
             if (resp.doupload.status == 99)
             {
-                if (resp.doupload.quickkey == null) throw new IOException("Invalid response");
+                if (resp.doupload.quickkey == null) throw new IOException(Localization.Strings.MediaFire_Invalid_response);
 
                 string url = URLHelpers.CombineURL("http://www.mediafire.com/view", resp.doupload.quickkey);
                 if (UseLongLink) url = URLHelpers.CombineURL(url, URLHelpers.URLEncode(resp.doupload.filename));
@@ -160,7 +156,8 @@ namespace ShareX.UploadersLib.FileUploaders
         private void EnsureSuccess(MFResponse resp)
         {
             if (resp.result != "Success")
-                throw new IOException(string.Format("Couldn't upload the file: {0}", resp.message ?? "Unknown error"));
+                throw new IOException(string.Format(Localization.Strings.MediaFire_Could_not_upload_file,
+                    resp.message ?? Localization.Strings.Common_Unknown_error));
             if (resp.new_key == "yes") NextSignatureKey();
         }
 

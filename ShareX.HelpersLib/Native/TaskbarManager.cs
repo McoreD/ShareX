@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -27,7 +27,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace ShareX.HelpersLib
 {
@@ -104,6 +103,40 @@ namespace ShareX.HelpersLib
 
         private static IntPtr mainWindowHandle;
 
+        private static void InvokeTaskbar(Action<ITaskbarList4> action)
+        {
+            lock (syncLock)
+            {
+                try
+                {
+                    action(TaskbarList);
+                }
+                catch (InvalidComObjectException)
+                {
+                    // Upload progress can be reported by different COM apartments.
+                    // Recreate a cached RCW whose creating apartment was torn down.
+                    taskbarList = null;
+
+                    try
+                    {
+                        action(TaskbarList);
+                    }
+                    catch (InvalidComObjectException)
+                    {
+                        taskbarList = null;
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        Enabled = false;
+                    }
+                }
+                catch (FileNotFoundException)
+                {
+                    Enabled = false;
+                }
+            }
+        }
+
         private static IntPtr MainWindowHandle
         {
             get
@@ -142,14 +175,10 @@ namespace ShareX.HelpersLib
             {
                 currentValue = currentValue.Clamp(0, maximumValue);
 
-                try
-                {
-                    TaskbarList.SetProgressValue(hwnd, Convert.ToUInt32(currentValue), Convert.ToUInt32(maximumValue));
-                }
-                catch (FileNotFoundException)
-                {
-                    Enabled = false;
-                }
+                InvokeTaskbar(taskbar => taskbar.SetProgressValue(
+                    hwnd,
+                    Convert.ToUInt32(currentValue),
+                    Convert.ToUInt32(maximumValue)));
             }
         }
 
@@ -158,23 +187,11 @@ namespace ShareX.HelpersLib
             SetProgressValue(MainWindowHandle, currentValue, maximumValue);
         }
 
-        public static void SetProgressValue(Form form, int currentValue, int maximumValue = 100)
-        {
-            form.InvokeSafe(() => SetProgressValue(form.Handle, currentValue, maximumValue));
-        }
-
         private static void SetProgressState(IntPtr hwnd, TaskbarProgressBarStatus state)
         {
             if (Enabled && IsPlatformSupported && hwnd != IntPtr.Zero)
             {
-                try
-                {
-                    TaskbarList.SetProgressState(hwnd, state);
-                }
-                catch (FileNotFoundException)
-                {
-                    Enabled = false;
-                }
+                InvokeTaskbar(taskbar => taskbar.SetProgressState(hwnd, state));
             }
         }
 
@@ -183,9 +200,5 @@ namespace ShareX.HelpersLib
             SetProgressState(MainWindowHandle, state);
         }
 
-        public static void SetProgressState(Form form, TaskbarProgressBarStatus state)
-        {
-            form.InvokeSafe(() => SetProgressState(form.Handle, state));
-        }
     }
 }

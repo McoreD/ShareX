@@ -1,0 +1,518 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:theming="using:ShareX.AvaloniaUI.Theming"
+        xmlns:res="using:ShareX.Localization"
+        xmlns:local="using:ShareX"
+        x:Class="ShareX.MainWindow"
+        x:CompileBindings="False"
+        Title="ShareX"
+        Width="900"
+        Height="720"
+        MinWidth="760"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="38"
+        WindowDecorations="BorderOnly"
+        WindowStartupLocation="CenterScreen"
+        DragDrop.AllowDrop="True"
+        DragDrop.DragEnter="OnDragEnter"
+        DragDrop.DragLeave="OnDragLeave"
+        DragDrop.DragOver="OnDragOver"
+        DragDrop.Drop="OnDrop">
+
+    <Window.Styles>
+        <Style Selector="Button.nav-button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        <Style Selector="Button.nav-button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Control.Background.Hover}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Border.thumbnail-card">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Control.Background}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShareX.Brush.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style Selector="Border.thumbnail-card:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Control.Background.Hover}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShareX.Brush.Accent.Start}"/>
+        </Style>
+        <Style Selector="Border.thumbnail-card.selected">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Control.Background.Hover}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShareX.Brush.Accent.Start}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Border.thumbnail-preview.clickable">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Border.combine-drop-zone">
+            <Setter Property="Background" Value="#CC2B2B2B"/>
+        </Style>
+        <Style Selector="Border.combine-drop-zone.drag-over">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Accent.Start}"/>
+        </Style>
+        <Style Selector="Border.hotkey-panel">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Background.Panel}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShareX.Brush.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+        <Style Selector="Button.caption-button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource ShareX.Brush.Text}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.caption-button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Control.Background.Hover}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Button.caption-button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Control.Background}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="TextBlock.theme-toggle-icon">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.32" Easing="CubicEaseOut"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.32" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+            <Style Selector="^.moon">
+                <Setter Property="RenderTransform" Value="translateY(20px) rotate(-45deg)"/>
+            </Style>
+            <Style Selector="^.sun">
+                <Setter Property="RenderTransform" Value="translateY(-20px) rotate(45deg)"/>
+            </Style>
+            <Style Selector="^.active">
+                <Setter Property="Opacity" Value="1"/>
+                <Setter Property="RenderTransform" Value="translateY(0px) rotate(0deg)"/>
+            </Style>
+        </Style>
+        <Style Selector="Button.caption-close">
+            <Setter Property="CornerRadius" Value="0,7,0,0"/>
+        </Style>
+        <Style Selector="Button.caption-close.maximized">
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+        <Style Selector="Button.caption-close:pointerover">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="Button.caption-close:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#C42B1C"/>
+        </Style>
+        <Style Selector="Button.caption-close:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#A51D12"/>
+        </Style>
+    </Window.Styles>
+
+    <Border x:Name="WindowFrame"
+            Background="{DynamicResource ShareX.Brush.Background.Main}"
+            BorderBrush="{DynamicResource ShareX.Brush.Border}"
+            BorderThickness="1">
+        <Grid RowDefinitions="Auto,*">
+            <Border x:Name="TitleBar"
+                    Grid.Row="0"
+                    Height="38"
+                    Background="{DynamicResource ShareX.Brush.Background.Toolbar}"
+                    BorderBrush="{DynamicResource ShareX.Brush.Separator}"
+                    BorderThickness="0,0,0,1"
+                    chrome:WindowDecorationProperties.ElementRole="TitleBar">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="14,0,12,0"
+                                Orientation="Horizontal"
+                                Spacing="9"
+                                VerticalAlignment="Center"
+                                IsHitTestVisible="False">
+                        <Image Width="20"
+                               Height="20"
+                               Source="{Binding TitleBarIcon}"
+                               Stretch="Uniform"/>
+                        <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{DynamicResource ShareX.Brush.Text}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Classes="caption-button"
+                                AutomationProperties.Name="{Binding ThemeToggleText}"
+                                ToolTip.Tip="{Binding ThemeToggleText}"
+                                Click="OnThemeToggleClick"
+                                chrome:WindowDecorationProperties.ElementRole="User">
+                            <Grid Width="20" Height="20" ClipToBounds="True" IsHitTestVisible="False">
+                                <TextBlock Classes="icon theme-toggle-icon moon"
+                                           Classes.active="{Binding IsDarkTheme}"
+                                           Text="{x:Static theming:LucideIcons.moon}"/>
+                                <TextBlock Classes="icon theme-toggle-icon sun"
+                                           Classes.active="{Binding !IsDarkTheme}"
+                                           Text="{x:Static theming:LucideIcons.sun}"/>
+                            </Grid>
+                        </Button>
+                        <Button Classes="caption-button"
+                                AutomationProperties.Name="{x:Static res:Strings.MainWindow_AlwaysOnTop}"
+                                Click="OnTopmostClick"
+                                chrome:WindowDecorationProperties.ElementRole="User">
+                            <Grid>
+                                <TextBlock Classes="icon"
+                                           Text="{x:Static theming:LucideIcons.pin}"
+                                           FontSize="13"
+                                           IsVisible="{Binding !Topmost, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                <TextBlock Classes="icon"
+                                           Text="{x:Static theming:LucideIcons.pin_off}"
+                                           FontSize="13"
+                                           IsVisible="{Binding Topmost, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </Grid>
+                        </Button>
+                        <Button Classes="caption-button"
+                                AutomationProperties.Name="{x:Static res:Strings.MainWindow_Minimize}"
+                                Click="OnMinimizeClick"
+                                chrome:WindowDecorationProperties.ElementRole="MinimizeButton">
+                            <TextBlock Classes="icon"
+                                       Text="{x:Static theming:LucideIcons.minus}"
+                                       FontSize="14"/>
+                        </Button>
+                        <Button Classes="caption-button"
+                                AutomationProperties.Name="{x:Static res:Strings.MainWindow_MaximizeOrRestore}"
+                                Click="OnMaximizeRestoreClick"
+                                chrome:WindowDecorationProperties.ElementRole="MaximizeButton">
+                            <Grid>
+                                <TextBlock Classes="icon"
+                                           Text="{x:Static theming:LucideIcons.square}"
+                                           FontSize="12"
+                                           IsVisible="{Binding !IsWindowMaximized}"/>
+                                <TextBlock Classes="icon"
+                                           Text="{x:Static theming:LucideIcons.copy}"
+                                           FontSize="12"
+                                           IsVisible="{Binding IsWindowMaximized}"/>
+                            </Grid>
+                        </Button>
+                        <Button Classes="caption-button caption-close"
+                                Classes.maximized="{Binding IsWindowMaximized}"
+                                AutomationProperties.Name="{x:Static res:Strings.ActionsToolbarWindow_Close}"
+                                Click="OnCloseClick"
+                                chrome:WindowDecorationProperties.ElementRole="CloseButton">
+                            <TextBlock Classes="icon"
+                                       Text="{x:Static theming:LucideIcons.x}"
+                                       FontSize="14"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+        <Border Grid.Column="0"
+                MinWidth="210"
+                Background="{DynamicResource ShareX.Brush.Background.Toolbar}"
+                BorderBrush="{DynamicResource ShareX.Brush.Border}"
+                BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          HorizontalContentAlignment="Stretch">
+                <StackPanel x:Name="NavigationPanel"
+                            Margin="6,6,6,0"
+                            Spacing="0"
+                            HorizontalAlignment="Stretch"/>
+            </ScrollViewer>
+        </Border>
+
+        <Grid Grid.Column="1"
+              PointerPressed="OnMainContentPointerPressed"
+              PointerReleased="OnMainContentPointerReleased">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding ThumbnailItems}" Margin="6">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="local:ThumbnailItemViewModel">
+                                <Border Classes="thumbnail-card"
+                                        Classes.selected="{Binding IsSelected}"
+                                        PointerPressed="OnThumbnailPointerPressed"
+                                        PointerMoved="OnThumbnailPointerMoved"
+                                        PointerReleased="OnThumbnailPointerReleased"
+                                        PointerCaptureLost="OnThumbnailPointerCaptureLost"
+                                        DoubleTapped="OnThumbnailDoubleTapped">
+                                    <StackPanel Width="{Binding Width}" Spacing="3">
+                                        <Border Width="{Binding Width}"
+                                                IsVisible="{Binding ShowTitleAbove}"
+                                                Background="Transparent"
+                                                Cursor="Hand"
+                                                PointerPressed="OnThumbnailTitlePointerPressed"
+                                                PointerReleased="OnThumbnailTitlePointerReleased">
+                                            <ToolTip.Tip>
+                                                <TextBlock Text="{Binding Details}"
+                                                           FontWeight="Normal"
+                                                           TextWrapping="WrapWithOverflow"/>
+                                            </ToolTip.Tip>
+                                            <TextBlock Text="{Binding Title}"
+                                                       Foreground="{DynamicResource ShareX.Brush.Text}"
+                                                       FontWeight="Normal"
+                                                       TextAlignment="Center"
+                                                       HorizontalAlignment="Stretch"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxLines="1"/>
+                                        </Border>
+                                        <Border Classes="thumbnail-preview"
+                                                Classes.clickable="{Binding IsClickable}"
+                                                Width="{Binding Width}"
+                                                Height="{Binding Height}"
+                                                Background="{DynamicResource ShareX.Brush.Background.Panel}"
+                                                CornerRadius="4"
+                                                ClipToBounds="True">
+                                            <Grid>
+                                                <Image Source="{Binding Thumbnail}"
+                                                       IsVisible="{Binding HasThumbnail}"
+                                                       Stretch="Uniform"/>
+                                                <Border IsVisible="{Binding ShowPlayIcon}"
+                                                        Width="50"
+                                                        Height="50"
+                                                        Background="#B8181818"
+                                                        CornerRadius="25"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        IsHitTestVisible="False">
+                                                    <TextBlock Classes="icon"
+                                                               Text="{x:Static theming:LucideIcons.play}"
+                                                               Foreground="#A9A9A9"
+                                                               FontSize="18"
+                                                               Width="18"
+                                                               TextAlignment="Center"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Classes="icon"
+                                                           Text="{Binding PlaceholderIcon}"
+                                                           IsVisible="{Binding HasNoThumbnail}"
+                                                           FontSize="42"
+                                                           Opacity="0.45"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                                <Border IsVisible="{Binding IsFailed}"
+                                                        Background="#C8B91C1C"
+                                                        CornerRadius="4"
+                                                        Padding="6,3"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        Margin="5">
+                                                    <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.triangle_alert}" Foreground="White"/>
+                                                </Border>
+                                                <ProgressBar IsVisible="{Binding IsProgressVisible}"
+                                                             Value="{Binding Progress}"
+                                                             Minimum="0"
+                                                             Maximum="100"
+                                                             Height="5"
+                                                             VerticalAlignment="Bottom"/>
+                                                <Border IsVisible="{Binding IsCombineTarget}"
+                                                        Background="#E61B1B1B"
+                                                        CornerRadius="4"
+                                                        Padding="6">
+                                                    <Grid RowDefinitions="Auto,*" RowSpacing="6">
+                                                        <TextBlock Text="{x:Static res:Strings.MainWindow_CombineImages}"
+                                                                   Foreground="White"
+                                                                   FontWeight="SemiBold"
+                                                                   TextAlignment="Center"/>
+                                                        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="6">
+                                                            <Border Classes="combine-drop-zone"
+                                                                    Tag="Horizontal"
+                                                                    BorderBrush="{DynamicResource ShareX.Brush.Accent.Start}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="4"
+                                                                    DragDrop.AllowDrop="True"
+                                                                    DragDrop.DragEnter="OnCombineImagesDragEnter"
+                                                                    DragDrop.DragLeave="OnCombineImagesDragLeave"
+                                                                    DragDrop.DragOver="OnCombineImagesDragOver"
+                                                                    DragDrop.Drop="OnCombineImagesDrop">
+                                                                <StackPanel HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            Spacing="3">
+                                                                    <TextBlock Classes="icon"
+                                                                               Text="{x:Static theming:LucideIcons.columns_2}"
+                                                                               Foreground="White"
+                                                                               FontSize="20"
+                                                                               HorizontalAlignment="Center"/>
+                                                                    <TextBlock Text="{x:Static res:Strings.MainWindow_Horizontal}"
+                                                                               Foreground="White"
+                                                                               FontSize="11"
+                                                                               TextAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+                                                            <Border Grid.Column="1"
+                                                                    Classes="combine-drop-zone"
+                                                                    Tag="Vertical"
+                                                                    BorderBrush="{DynamicResource ShareX.Brush.Accent.Start}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="4"
+                                                                    DragDrop.AllowDrop="True"
+                                                                    DragDrop.DragEnter="OnCombineImagesDragEnter"
+                                                                    DragDrop.DragLeave="OnCombineImagesDragLeave"
+                                                                    DragDrop.DragOver="OnCombineImagesDragOver"
+                                                                    DragDrop.Drop="OnCombineImagesDrop">
+                                                                <StackPanel HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            Spacing="3">
+                                                                    <TextBlock Classes="icon"
+                                                                               Text="{x:Static theming:LucideIcons.rows_2}"
+                                                                               Foreground="White"
+                                                                               FontSize="20"
+                                                                               HorizontalAlignment="Center"/>
+                                                                    <TextBlock Text="{x:Static res:Strings.MainWindow_Vertical}"
+                                                                               Foreground="White"
+                                                                               FontSize="11"
+                                                                               TextAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                        <Border Width="{Binding Width}"
+                                                IsVisible="{Binding ShowTitleBelow}"
+                                                Background="Transparent"
+                                                Cursor="Hand"
+                                                PointerPressed="OnThumbnailTitlePointerPressed"
+                                                PointerReleased="OnThumbnailTitlePointerReleased">
+                                            <ToolTip.Tip>
+                                                <TextBlock Text="{Binding Details}"
+                                                           FontWeight="Normal"
+                                                           TextWrapping="WrapWithOverflow"/>
+                                            </ToolTip.Tip>
+                                            <TextBlock Text="{Binding Title}"
+                                                       Foreground="{DynamicResource ShareX.Brush.Text}"
+                                                       FontWeight="Normal"
+                                                       TextAlignment="Center"
+                                                       HorizontalAlignment="Stretch"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxLines="1"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Grid IsVisible="{Binding IsEmpty}" Margin="28">
+                    <Border Classes="hotkey-panel"
+                            Width="530"
+                            MaxHeight="430"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="9">
+                                <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.keyboard}" FontSize="22" Foreground="{DynamicResource ShareX.Brush.Accent.Start}"/>
+                                <TextBlock Text="{x:Static res:Strings.MainWindow_ShareXHotkeys}" FontSize="19" FontWeight="SemiBold" Foreground="{DynamicResource ShareX.Brush.Text}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Row="1"
+                                       Text="{x:Static res:Strings.MainWindow_HotkeyHint}"
+                                       TextAlignment="Center"
+                                       FontWeight="Normal"
+                                       TextWrapping="Wrap"
+                                       Margin="8,0,8,8"/>
+                            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding HotkeyTips}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="local:HotkeyTipViewModel">
+                                            <Border BorderBrush="{DynamicResource ShareX.Brush.Border}" BorderThickness="0,1,0,0" Padding="6,8">
+                                                <Grid ColumnDefinitions="24,155,*" ColumnSpacing="10">
+                                                    <TextBlock Classes="icon"
+                                                               Text="{x:Static theming:LucideIcons.circle_check}"
+                                                               IsVisible="{Binding IsRegistered}"
+                                                               Foreground="{DynamicResource ShareX.Brush.Accent.Start}"
+                                                               FontSize="17"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Classes="icon"
+                                                               Text="{x:Static theming:LucideIcons.circle_x}"
+                                                               IsVisible="{Binding !IsRegistered}"
+                                                               Foreground="#C65F5F"
+                                                               FontSize="17"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding Hotkey}"
+                                                               FontFamily="{DynamicResource ShareX.FontFamily.Monospace}"
+                                                               FontWeight="Normal"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Description}"
+                                                               FontWeight="Normal"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+        </Grid>
+
+        <Border x:Name="DropOverlay"
+                Grid.ColumnSpan="2"
+                IsVisible="False"
+                IsHitTestVisible="False"
+                Background="{DynamicResource ShareX.Brush.Overlay.Modal}">
+            <Border Width="440"
+                    Padding="32"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource ShareX.Brush.Background.Panel}"
+                    BorderBrush="{DynamicResource ShareX.Brush.Accent.Start}"
+                    BorderThickness="2"
+                    CornerRadius="12">
+                <StackPanel Spacing="12" HorizontalAlignment="Center">
+                    <TextBlock Classes="icon"
+                               Text="{x:Static theming:LucideIcons.upload}"
+                               FontSize="48"
+                               Foreground="{DynamicResource ShareX.Brush.Accent.Start}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="DropOverlayTitle"
+                               Text="{x:Static res:Strings.MainWindow_ReleaseToUploadFiles}"
+                               FontSize="22"
+                               Foreground="{DynamicResource ShareX.Brush.Text}"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="DropOverlayDescription"
+                               Text="{x:Static res:Strings.MainWindow_FilesDroppedUploadDescription}"
+                               FontWeight="Normal"
+                               Foreground="{DynamicResource ShareX.Brush.Text.Secondary}"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

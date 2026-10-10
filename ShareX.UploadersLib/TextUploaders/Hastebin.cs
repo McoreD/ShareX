@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,18 +25,13 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.TextUploaders
 {
     public class HastebinTextUploaderService : TextUploaderService
     {
         public override TextDestination EnumValue { get; } = TextDestination.Hastebin;
-
-        public override Image ServiceImage => Resources.Hastebin;
 
         public override bool CheckConfig(UploadersConfig config) => true;
 
@@ -49,8 +44,6 @@ namespace ShareX.UploadersLib.TextUploaders
                 UseFileExtension = config.HastebinUseFileExtension
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpHastebin;
     }
 
     public sealed class Hastebin : TextUploader
@@ -59,7 +52,7 @@ namespace ShareX.UploadersLib.TextUploaders
         public string SyntaxHighlighting { get; set; }
         public bool UseFileExtension { get; set; }
 
-        public override UploadResult UploadText(string text, string fileName)
+        protected override async Task<UploadResult> UploadTextCoreAsync(string text, string fileName, CancellationToken cancellationToken)
         {
             UploadResult ur = new UploadResult();
 
@@ -76,7 +69,8 @@ namespace ShareX.UploadersLib.TextUploaders
                     domain = "https://hastebin.com";
                 }
 
-                ur.Response = SendRequest(HttpMethod.POST, URLHelpers.CombineURL(domain, "documents"), text);
+                ur.Response = await SendRequestAsync(HttpMethod.POST, URLHelpers.CombineURL(domain, "documents"), text,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(ur.Response))
                 {

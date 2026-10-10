@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,19 +26,14 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.ImageUploaders
 {
     public class ImageShackImageUploaderService : ImageUploaderService
     {
         public override ImageDestination EnumValue { get; } = ImageDestination.ImageShack;
-
-        public override Icon ServiceIcon => Resources.ImageShack;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -49,8 +44,6 @@ namespace ShareX.UploadersLib.ImageUploaders
         {
             return new ImageShackUploader(APIKeys.ImageShackKey, config.ImageShackSettings);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpImageShack;
     }
 
     public sealed class ImageShackUploader : ImageUploader
@@ -69,7 +62,7 @@ namespace ShareX.UploadersLib.ImageUploaders
             Config = config;
         }
 
-        public bool GetAccessToken()
+        public async Task<bool> GetAccessTokenAsync(CancellationToken cancellationToken = default)
         {
             if (!string.IsNullOrEmpty(Config.Username) && !string.IsNullOrEmpty(Config.Password))
             {
@@ -77,7 +70,8 @@ namespace ShareX.UploadersLib.ImageUploaders
                 args.Add("user", Config.Username);
                 args.Add("password", Config.Password);
 
-                string response = SendRequestMultiPart(URLAccessToken, args);
+                string response = await SendRequestMultiPartAsync(URLAccessToken, args,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -94,14 +88,15 @@ namespace ShareX.UploadersLib.ImageUploaders
             return false;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             arguments.Add("api_key", APIKey);
             arguments.Add("auth_token", Config.Auth_token);
             arguments.Add("public", Config.IsPublic ? "y" : "n");
 
-            UploadResult result = SendRequestFile(URLUpload, stream, fileName, "file", arguments);
+            UploadResult result = await SendRequestFileAsync(URLUpload, stream, fileName, "file", arguments,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(result.Response))
             {

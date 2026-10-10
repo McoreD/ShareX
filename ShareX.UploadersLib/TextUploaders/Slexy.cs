@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -61,7 +61,7 @@ namespace ShareX.UploadersLib.TextUploaders
             this.settings = settings;
         }
 
-        public override UploadResult UploadText(string text, string fileName)
+        protected override async Task<UploadResult> UploadTextCoreAsync(string text, string fileName, CancellationToken cancellationToken)
         {
             UploadResult ur = new UploadResult();
 
@@ -80,7 +80,7 @@ namespace ShareX.UploadersLib.TextUploaders
                 arguments.Add("tabbing", "true");
                 arguments.Add("tabtype", "real");
 
-                SendRequestMultiPart(APIURL, arguments);
+                await SendRequestMultiPartAsync(APIURL, arguments, cancellationToken: cancellationToken).ConfigureAwait(false);
                 ur.URL = LastResponseInfo.ResponseURL;
             }
 

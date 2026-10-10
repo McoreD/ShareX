@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,19 +25,14 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.TextUploaders
 {
     public class OneTimeSecretTextUploaderService : TextUploaderService
     {
         public override TextDestination EnumValue { get; } = TextDestination.OneTimeSecret;
-
-        public override Icon ServiceIcon => Resources.OneTimeSecret;
 
         public override bool CheckConfig(UploadersConfig config) => true;
 
@@ -49,8 +44,6 @@ namespace ShareX.UploadersLib.TextUploaders
                 API_USERNAME = config.OneTimeSecretAPIUsername
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpOneTimeSecret;
     }
 
     public sealed class OneTimeSecret : TextUploader
@@ -60,7 +53,7 @@ namespace ShareX.UploadersLib.TextUploaders
         public string API_KEY { get; set; }
         public string API_USERNAME { get; set; }
 
-        public override UploadResult UploadText(string text, string fileName)
+        protected override async Task<UploadResult> UploadTextCoreAsync(string text, string fileName, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult();
 
@@ -76,7 +69,8 @@ namespace ShareX.UploadersLib.TextUploaders
                     headers = RequestHelpers.CreateAuthenticationHeader(API_USERNAME, API_KEY);
                 }
 
-                result.Response = SendRequestMultiPart(API_ENDPOINT, args, headers);
+                result.Response = await SendRequestMultiPartAsync(API_ENDPOINT, args, headers,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(result.Response))
                 {

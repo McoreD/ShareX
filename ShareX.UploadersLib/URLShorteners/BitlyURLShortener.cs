@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,21 +25,16 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.Web;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.URLShorteners
 {
     public class BitlyURLShortenerService : URLShortenerService
     {
         public override UrlShortenerType EnumValue { get; } = UrlShortenerType.BITLY;
-
-        public override Icon ServiceIcon => Resources.Bitly;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -58,8 +53,6 @@ namespace ShareX.UploadersLib.URLShorteners
                 Domain = config.BitlyDomain
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpBitly;
     }
 
     public sealed class BitlyURLShortener : URLShortener, IOAuth2Basic
@@ -76,16 +69,16 @@ namespace ShareX.UploadersLib.URLShorteners
             AuthInfo = oauth;
         }
 
-        public string GetAuthorizationURL()
+        public Task<string> GetAuthorizationURLAsync(CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("client_id", AuthInfo.Client_ID);
             args.Add("redirect_uri", Links.Callback);
 
-            return URLHelpers.CreateQueryString("https://bitly.com/oauth/authorize", args);
+            return Task.FromResult(URLHelpers.CreateQueryString("https://bitly.com/oauth/authorize", args));
         }
 
-        public bool GetAccessToken(string code)
+        public async Task<bool> GetAccessTokenAsync(string code, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("client_id", AuthInfo.Client_ID);
@@ -93,7 +86,8 @@ namespace ShareX.UploadersLib.URLShorteners
             args.Add("code", code);
             args.Add("redirect_uri", Links.Callback);
 
-            string response = SendRequestURLEncoded(HttpMethod.POST, URLAccessToken, args);
+            string response = await SendRequestURLEncodedAsync(HttpMethod.POST, URLAccessToken, args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -116,7 +110,7 @@ namespace ShareX.UploadersLib.URLShorteners
             return headers;
         }
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
 
@@ -129,7 +123,8 @@ namespace ShareX.UploadersLib.URLShorteners
 
                 NameValueCollection headers = GetAuthHeaders();
 
-                result.Response = SendRequest(HttpMethod.POST, URLShorten, json, RequestHelpers.ContentTypeJSON, null, headers);
+                result.Response = await SendRequestAsync(HttpMethod.POST, URLShorten, json, RequestHelpers.ContentTypeJSON, null, headers,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 BitlyShortenResponse responseData = JsonConvert.DeserializeObject<BitlyShortenResponse>(result.Response);
 

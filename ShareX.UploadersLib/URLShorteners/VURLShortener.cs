@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -43,14 +43,14 @@ namespace ShareX.UploadersLib.URLShorteners
     {
         private const string API_ENDPOINT = "http://vurl.com/api.php";
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
 
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("url", url);
 
-            string response = SendRequest(HttpMethod.GET, API_ENDPOINT, args);
+            string response = await SendRequestAsync(HttpMethod.GET, API_ENDPOINT, args, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response) && response != "Invalid URL")
             {

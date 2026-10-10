@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -77,13 +77,13 @@ namespace ShareX
 
         private TaskSettings FindCLITask(List<CLICommand> commands)
         {
-            if (Program.HotkeysConfig != null)
+            if (ApplicationState.HotkeysConfigOrNull is { } hotkeysConfig)
             {
                 CLICommand command = commands.FirstOrDefault(x => x.CheckCommand("task") && !string.IsNullOrEmpty(x.Parameter));
 
                 if (command != null)
                 {
-                    foreach (HotkeySettings hotkeySetting in Program.HotkeysConfig.Hotkeys)
+                    foreach (HotkeySettings hotkeySetting in hotkeysConfig.Hotkeys)
                     {
                         if (command.Parameter == hotkeySetting.TaskSettings.ToString())
                         {
@@ -173,9 +173,9 @@ namespace ShareX
 
         private async Task<bool> CheckCLIWorkflow(CLICommand command)
         {
-            if (Program.HotkeysConfig != null && command.CheckCommand("workflow") && !string.IsNullOrEmpty(command.Parameter))
+            if (ApplicationState.HotkeysConfigOrNull is { } hotkeysConfig && command.CheckCommand("workflow") && !string.IsNullOrEmpty(command.Parameter))
             {
-                foreach (HotkeySettings hotkeySetting in Program.HotkeysConfig.Hotkeys)
+                foreach (HotkeySettings hotkeySetting in hotkeysConfig.Hotkeys)
                 {
                     if (hotkeySetting.TaskSettings.Job != HotkeyType.None)
                     {

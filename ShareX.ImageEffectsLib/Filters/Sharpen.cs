@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,19 +24,19 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using System.Drawing;
+using SkiaSharp;
 
 namespace ShareX.ImageEffectsLib
 {
     internal class Sharpen : ImageEffect
     {
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
-            //return ImageHelpers.Sharpen(bmp, Strength);
+            //return SkiaImageHelpers.Sharpen(bmp, Strength);
 
             using (bmp)
             {
-                return ConvolutionMatrixManager.Sharpen().Apply(bmp);
+                return SkiaConvolutionMatrixManager.Sharpen().Apply(bmp);
             }
         }
     }

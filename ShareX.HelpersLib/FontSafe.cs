@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -23,8 +23,6 @@
 
 #endregion License Information (GPL v3)
 
-using System.Drawing;
-
 namespace ShareX.HelpersLib
 {
     public class FontSafe
@@ -35,24 +33,11 @@ namespace ShareX.HelpersLib
         {
         }
 
-        public FontSafe(Font font)
-        {
-            SetFont(font);
-        }
+        public FontSafe(ImageFont font) => SetImageFont(font);
 
-        public void SetFont(Font font)
-        {
-            Font = new FontConverter().ConvertToInvariantString(font);
-        }
+        public ImageFont GetImageFont() => string.IsNullOrEmpty(Font) ? null :
+            new ImageFontConverter().ConvertFromInvariantString(Font) as ImageFont;
 
-        public Font GetFont()
-        {
-            if (!string.IsNullOrEmpty(Font))
-            {
-                return new FontConverter().ConvertFromInvariantString(Font) as Font;
-            }
-
-            return null;
-        }
+        public void SetImageFont(ImageFont font) => Font = font?.ToString();
     }
 }

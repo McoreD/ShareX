@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,9 +25,7 @@
 
 using Renci.SshNet;
 using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,8 +47,9 @@ namespace ShareX.UploadersLib.FileUploaders
             Account = account;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             UploadResult result = new UploadResult();
 
             string subFolderPath = Account.GetSubFolderPath();
@@ -77,7 +76,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 IsUploading = false;
             }
 
-            return result;
+            return Task.FromResult(result);
         }
 
         public override void StopUpload()
@@ -99,38 +98,7 @@ namespace ShareX.UploadersLib.FileUploaders
 
         public bool Connect()
         {
-            if (client == null)
-            {
-                if (!string.IsNullOrEmpty(Account.Keypath))
-                {
-                    if (!File.Exists(Account.Keypath))
-                    {
-                        throw new FileNotFoundException(Resources.UploadersConfigForm_ConnectSFTPAccount_Key_file_not_found, Account.Keypath);
-                    }
-
-                    PrivateKeyFile keyFile;
-
-                    if (string.IsNullOrEmpty(Account.Passphrase))
-                    {
-                        keyFile = new PrivateKeyFile(Account.Keypath);
-                    }
-                    else
-                    {
-                        keyFile = new PrivateKeyFile(Account.Keypath, Account.Passphrase);
-                    }
-
-                    client = new SftpClient(Account.Host, Account.Port, Account.Username, keyFile);
-                }
-                else if (!string.IsNullOrEmpty(Account.Password))
-                {
-                    client = new SftpClient(Account.Host, Account.Port, Account.Username, Account.Password);
-                }
-
-                if (client != null)
-                {
-                    client.BufferSize = (uint)BufferSize;
-                }
-            }
+            EnsureClient();
 
             if (client != null && !client.IsConnected)
             {
@@ -138,6 +106,136 @@ namespace ShareX.UploadersLib.FileUploaders
             }
 
             return IsConnected;
+        }
+
+        public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
+        {
+            EnsureClient();
+
+            if (client != null && !client.IsConnected)
+            {
+                await client.ConnectAsync(cancellationToken);
+            }
+
+            return IsConnected;
+        }
+
+        public async Task<IReadOnlyList<SFTPFileInfo>> ListDirectoryAsync(string path,
+            CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+
+            List<SFTPFileInfo> files = new List<SFTPFileInfo>();
+            await foreach (var file in client.ListDirectoryAsync(path, cancellationToken))
+            {
+                files.Add(new SFTPFileInfo(file.Name, file.IsDirectory, file.IsRegularFile,
+                    file.IsSymbolicLink, file.Length, file.LastWriteTimeUtc));
+            }
+
+            return files;
+        }
+
+        public async Task<bool> DirectoryHasItemsAsync(string path,
+            CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+
+            await foreach (var file in client.ListDirectoryAsync(path, cancellationToken))
+            {
+                if (file.Name != "." && file.Name != "..")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public async Task DownloadFileAsync(string remotePath, Stream destination,
+            CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+            await client.DownloadFileAsync(remotePath, destination, cancellationToken);
+        }
+
+        public async Task UploadFileAsync(Stream source, string remotePath,
+            CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+            await client.UploadFileAsync(source, remotePath, canOverride: true, uploadProgress: null,
+                cancellationToken);
+        }
+
+        public async Task CreateDirectoryAsync(string remotePath,
+            CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+            await client.CreateDirectoryAsync(remotePath, cancellationToken);
+        }
+
+        public async Task RenameAsync(string sourcePath, string destinationPath,
+            CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+            await client.RenameFileAsync(sourcePath, destinationPath, cancellationToken);
+        }
+
+        public async Task DeleteFileAsync(string remotePath, CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+            await client.DeleteFileAsync(remotePath, cancellationToken);
+        }
+
+        public async Task DeleteDirectoryAsync(string remotePath, CancellationToken cancellationToken = default)
+        {
+            await EnsureConnectedAsync(cancellationToken);
+            await client.DeleteDirectoryAsync(remotePath, cancellationToken);
+        }
+
+        private void EnsureClient()
+        {
+            if (client != null)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(Account.Keypath))
+            {
+                if (!File.Exists(Account.Keypath))
+                {
+                    throw new FileNotFoundException(Localization.Strings.SFTP_Key_file_not_found, Account.Keypath);
+                }
+
+                PrivateKeyFile keyFile;
+
+                if (string.IsNullOrEmpty(Account.Passphrase))
+                {
+                    keyFile = new PrivateKeyFile(Account.Keypath);
+                }
+                else
+                {
+                    keyFile = new PrivateKeyFile(Account.Keypath, Account.Passphrase);
+                }
+
+                client = new SftpClient(Account.Host, Account.Port, Account.Username, keyFile);
+            }
+            else if (!string.IsNullOrEmpty(Account.Password))
+            {
+                client = new SftpClient(Account.Host, Account.Port, Account.Username, Account.Password);
+            }
+
+            if (client != null)
+            {
+                client.BufferSize = (uint)BufferSize;
+            }
+        }
+
+        private async Task EnsureConnectedAsync(CancellationToken cancellationToken)
+        {
+            if (!await ConnectAsync(cancellationToken))
+            {
+                throw new InvalidOperationException("SFTP account does not contain valid authentication credentials.");
+            }
         }
 
         public void Disconnect()
@@ -218,10 +316,40 @@ namespace ShareX.UploadersLib.FileUploaders
             {
                 try
                 {
-                    using (SftpFileStream sftpStream = client.Create(remotePath))
+                    long fileSize = stream.CanSeek ? stream.Length : -1;
+                    ProgressManager progress = fileSize > 0 ? new ProgressManager(fileSize) : null;
+                    ulong lastUploadedBytes = 0;
+                    object progressLock = new object();
+
+                    // We have to use a lock here because UploadFile fires progress callbacks concurrently from multiple threads.
+                    client.UploadFile(stream, remotePath, canOverride: true, uploadedBytes =>
                     {
-                        return TransferData(stream, sftpStream);
-                    }
+                        if (StopUploadRequested)
+                        {
+                            Disconnect();
+                            return;
+                        }
+
+                        if (AllowReportProgress && progress != null)
+                        {
+                            lock (progressLock)
+                            {
+                                long delta = (long)(uploadedBytes - lastUploadedBytes);
+
+                                if (delta > 0)
+                                {
+                                    lastUploadedBytes = uploadedBytes;
+
+                                    if (progress.UpdateProgress(delta))
+                                    {
+                                        OnProgressChanged(progress);
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return !StopUploadRequested;
                 }
                 catch (SftpPathNotFoundException) when (autoCreateDirectory)
                 {

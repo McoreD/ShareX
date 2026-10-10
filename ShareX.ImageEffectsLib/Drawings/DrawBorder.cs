@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,10 +24,9 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
+using SkiaSharp;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
-using System.Drawing.Drawing2D;
 
 namespace ShareX.ImageEffectsLib
 {
@@ -52,16 +51,15 @@ namespace ShareX.ImageEffectsLib
             }
         }
 
-        [DefaultValue(DashStyle.Solid), TypeConverter(typeof(EnumProperNameConverter))]
-        public DashStyle DashStyle { get; set; }
+        [DefaultValue(ImageDashStyle.Solid)]
+        public ImageDashStyle DashStyle { get; set; }
 
-        [DefaultValue(typeof(Color), "Black"), Editor(typeof(MyColorEditor), typeof(UITypeEditor)), TypeConverter(typeof(MyColorConverter))]
+        [DefaultValue(typeof(Color), "Black")]
         public Color Color { get; set; }
 
         [DefaultValue(false)]
         public bool UseGradient { get; set; }
 
-        [Editor(typeof(GradientEditor), typeof(UITypeEditor))]
         public GradientInfo Gradient { get; set; }
 
         public DrawBorder()
@@ -79,14 +77,14 @@ namespace ShareX.ImageEffectsLib
             Gradient.Colors.Add(new GradientStop(Color.FromArgb(23, 89, 174), 100f));
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
             if (UseGradient && Gradient != null && Gradient.IsValid)
             {
-                return ImageHelpers.DrawBorder(bmp, Gradient, Size, Type, DashStyle);
+                return SkiaImageHelpers.DrawBorder(bmp, Gradient, Size, Type, DashStyle);
             }
 
-            return ImageHelpers.DrawBorder(bmp, Color, Size, Type, DashStyle);
+            return SkiaImageHelpers.DrawBorder(bmp, Color, Size, Type, DashStyle);
         }
 
         protected override string GetSummary()

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,23 +24,21 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using System;
+using SkiaSharp;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
-using System.Windows.Forms;
 
 namespace ShareX.ImageEffectsLib
 {
     internal class Canvas : ImageEffect
     {
-        [DefaultValue(typeof(Padding), "0, 0, 0, 0")]
-        public Padding Margin { get; set; }
+        [DefaultValue(typeof(ImageMargins), "0, 0, 0, 0")]
+        public ImageMargins Margin { get; set; }
 
-        [DefaultValue(CanvasMarginMode.AbsoluteSize), Description("How the margin around the canvas will be calculated."), TypeConverter(typeof(EnumDescriptionConverter))]
+        [DefaultValue(CanvasMarginMode.AbsoluteSize), Description("How the margin around the canvas will be calculated.")]
         public CanvasMarginMode MarginMode { get; set; }
 
-        [DefaultValue(typeof(Color), "Transparent"), Editor(typeof(MyColorEditor), typeof(UITypeEditor)), TypeConverter(typeof(MyColorConverter))]
+        [DefaultValue(typeof(Color), "Transparent")]
         public Color Color { get; set; }
 
         public Canvas()
@@ -54,13 +52,13 @@ namespace ShareX.ImageEffectsLib
             PercentageOfCanvas
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
-            Padding canvasMargin;
+            ImageMargins canvasMargin;
 
             if (MarginMode == CanvasMarginMode.PercentageOfCanvas)
             {
-                canvasMargin = new Padding();
+                canvasMargin = new ImageMargins();
                 canvasMargin.Left = (int)Math.Round(Margin.Left / 100f * bmp.Width);
                 canvasMargin.Right = (int)Math.Round(Margin.Right / 100f * bmp.Width);
                 canvasMargin.Top = (int)Math.Round(Margin.Top / 100f * bmp.Height);
@@ -71,7 +69,7 @@ namespace ShareX.ImageEffectsLib
                 canvasMargin = Margin;
             }
 
-            Bitmap bmpResult = ImageHelpers.AddCanvas(bmp, canvasMargin, Color);
+            SKBitmap bmpResult = SkiaImageHelpers.AddCanvas(bmp, canvasMargin, Color);
 
             if (bmpResult == null)
             {

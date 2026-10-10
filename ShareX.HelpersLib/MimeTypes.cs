@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -85,8 +85,7 @@ namespace ShareX.HelpersLib
                 (mimeType.Equals(Mappings["png"], StringComparison.OrdinalIgnoreCase) ||
                 mimeType.Equals(Mappings["jpeg"], StringComparison.OrdinalIgnoreCase) ||
                 mimeType.Equals(Mappings["gif"], StringComparison.OrdinalIgnoreCase) ||
-                mimeType.Equals(Mappings["bmp"], StringComparison.OrdinalIgnoreCase) ||
-                mimeType.Equals(Mappings["tiff"], StringComparison.OrdinalIgnoreCase));
+                mimeType.Equals(Mappings["bmp"], StringComparison.OrdinalIgnoreCase));
         }
 
         // http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types

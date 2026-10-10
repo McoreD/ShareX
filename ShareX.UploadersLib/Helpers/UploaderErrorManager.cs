@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -23,7 +23,6 @@
 
 #endregion License Information (GPL v3)
 
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,11 +31,22 @@ namespace ShareX.UploadersLib
 {
     public class UploaderErrorManager
     {
+        private readonly object syncRoot = new object();
+
         public List<UploaderErrorInfo> Errors { get; private set; }
 
-        public int Count => Errors.Count;
+        public int Count
+        {
+            get
+            {
+                lock (syncRoot)
+                {
+                    return Errors.Count;
+                }
+            }
+        }
 
-        public string DefaultTitle { get; set; } = Resources.Error;
+        public string DefaultTitle { get; set; } = Localization.Strings.Common_Error;
 
         public UploaderErrorManager()
         {
@@ -50,12 +60,25 @@ namespace ShareX.UploadersLib
 
         private void Add(string title, string text)
         {
-            Errors.Add(new UploaderErrorInfo(title, text));
+            lock (syncRoot)
+            {
+                Errors.Add(new UploaderErrorInfo(title, text));
+            }
         }
 
         public void Add(UploaderErrorManager manager)
         {
-            Errors.AddRange(manager.Errors);
+            UploaderErrorInfo[] errors;
+
+            lock (manager.syncRoot)
+            {
+                errors = manager.Errors.ToArray();
+            }
+
+            lock (syncRoot)
+            {
+                Errors.AddRange(errors);
+            }
         }
 
         public void AddFirst(string text)
@@ -65,12 +88,18 @@ namespace ShareX.UploadersLib
 
         private void AddFirst(string title, string text)
         {
-            Errors.Insert(0, new UploaderErrorInfo(title, text));
+            lock (syncRoot)
+            {
+                Errors.Insert(0, new UploaderErrorInfo(title, text));
+            }
         }
 
         public override string ToString()
         {
-            return string.Join(Environment.NewLine + Environment.NewLine, Errors.Select(x => x.Text));
+            lock (syncRoot)
+            {
+                return string.Join(Environment.NewLine + Environment.NewLine, Errors.Select(x => x.Text));
+            }
         }
     }
 }

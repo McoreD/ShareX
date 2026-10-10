@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -44,12 +44,12 @@ namespace ShareX
 
             WatchFolders = new List<WatchFolder>();
 
-            foreach (WatchFolderSettings defaultWatchFolderSetting in Program.DefaultTaskSettings.WatchFolderList)
+            foreach (WatchFolderSettings defaultWatchFolderSetting in ApplicationState.DefaultTaskSettings.WatchFolderList)
             {
-                AddWatchFolder(defaultWatchFolderSetting, Program.DefaultTaskSettings);
+                AddWatchFolder(defaultWatchFolderSetting, ApplicationState.DefaultTaskSettings);
             }
 
-            foreach (HotkeySettings hotkeySetting in Program.HotkeysConfig.Hotkeys)
+            foreach (HotkeySettings hotkeySetting in ApplicationState.HotkeysConfig.Hotkeys)
             {
                 foreach (WatchFolderSettings watchFolderSetting in hotkeySetting.TaskSettings.WatchFolderList)
                 {

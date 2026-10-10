@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,19 +24,14 @@
 #endregion License Information (GPL v3)
 
 using Newtonsoft.Json;
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Specialized;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.TextUploaders
 {
     public class Paste_eeTextUploaderService : TextUploaderService
     {
         public override TextDestination EnumValue { get; } = TextDestination.Paste_ee;
-
-        public override Image ServiceImage => Resources.document;
 
         public override bool CheckConfig(UploadersConfig config) => true;
 
@@ -58,8 +53,6 @@ namespace ShareX.UploadersLib.TextUploaders
                 EncryptPaste = config.Paste_eeEncryptPaste
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpPaste_ee;
     }
 
     public sealed class Paste_ee : TextUploader
@@ -72,11 +65,11 @@ namespace ShareX.UploadersLib.TextUploaders
             APIKey = apiKey;
         }
 
-        public override UploadResult UploadText(string text, string fileName)
+        protected override async Task<UploadResult> UploadTextCoreAsync(string text, string fileName, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(APIKey))
             {
-                throw new Exception("API key is missing.");
+                throw new Exception(Localization.Strings.Common_API_key_is_missing);
             }
 
             UploadResult ur = new UploadResult();
@@ -104,7 +97,8 @@ namespace ShareX.UploadersLib.TextUploaders
                 NameValueCollection headers = new NameValueCollection();
                 headers.Add("X-Auth-Token", APIKey);
 
-                ur.Response = SendRequest(HttpMethod.POST, "https://api.paste.ee/v1/pastes", json, RequestHelpers.ContentTypeJSON, null, headers);
+                ur.Response = await SendRequestAsync(HttpMethod.POST, "https://api.paste.ee/v1/pastes", json, RequestHelpers.ContentTypeJSON, null, headers,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(ur.Response))
                 {

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,19 +24,14 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.TextUploaders
 {
     public class PastebinTextUploaderService : TextUploaderService
     {
         public override TextDestination EnumValue { get; } = TextDestination.Pastebin;
-
-        public override Icon ServiceIcon => Resources.Pastebin;
 
         public override bool CheckConfig(UploadersConfig config) => true;
 
@@ -51,8 +46,6 @@ namespace ShareX.UploadersLib.TextUploaders
 
             return new Pastebin(APIKeys.PastebinKey, settings);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpPastebin;
     }
 
     public sealed class Pastebin : TextUploader
@@ -73,7 +66,7 @@ namespace ShareX.UploadersLib.TextUploaders
             Settings = settings;
         }
 
-        public bool Login()
+        public async Task<bool> LoginAsync(CancellationToken cancellationToken = default)
         {
             if (!string.IsNullOrEmpty(Settings.Username) && !string.IsNullOrEmpty(Settings.Password))
             {
@@ -83,7 +76,8 @@ namespace ShareX.UploadersLib.TextUploaders
                 loginArgs.Add("api_user_name", Settings.Username);
                 loginArgs.Add("api_user_password", Settings.Password);
 
-                string loginResponse = SendRequestMultiPart("https://pastebin.com/api/api_login.php", loginArgs);
+                string loginResponse = await SendRequestMultiPartAsync("https://pastebin.com/api/api_login.php", loginArgs,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(loginResponse) && !loginResponse.StartsWith("Bad API request"))
                 {
@@ -93,11 +87,11 @@ namespace ShareX.UploadersLib.TextUploaders
             }
 
             Settings.UserKey = null;
-            Errors.Add("Pastebin login failed.");
+            Errors.Add(Localization.Strings.Pastebin_Login_failed);
             return false;
         }
 
-        public override UploadResult UploadText(string text, string fileName)
+        protected override async Task<UploadResult> UploadTextCoreAsync(string text, string fileName, CancellationToken cancellationToken)
         {
             UploadResult ur = new UploadResult();
 
@@ -120,7 +114,8 @@ namespace ShareX.UploadersLib.TextUploaders
                     args.Add("api_user_key", Settings.UserKey); // this paramater is part of the login system
                 }
 
-                ur.Response = SendRequestMultiPart("https://pastebin.com/api/api_post.php", args);
+                ur.Response = await SendRequestMultiPartAsync("https://pastebin.com/api/api_post.php", args,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (URLHelpers.IsValidURL(ur.Response))
                 {

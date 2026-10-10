@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -38,7 +38,8 @@ namespace ShareX.UploadersLib.FileUploaders
         public static string Password;
         public static SendSpace.UploadInfo UploadInfo;
 
-        public static UploaderErrorManager PrepareUploadInfo(string apiKey, string username = null, string password = null)
+        public static async Task<UploaderErrorManager> PrepareUploadInfoAsync(string apiKey, string username = null, string password = null,
+            CancellationToken cancellationToken = default)
         {
             SendSpace sendSpace = new SendSpace(apiKey);
 
@@ -48,8 +49,8 @@ namespace ShareX.UploadersLib.FileUploaders
                 {
                     AccountType = AccountType.Anonymous;
 
-                    UploadInfo = sendSpace.AnonymousUploadGetInfo();
-                    if (UploadInfo == null) throw new Exception("UploadInfo is null.");
+                    UploadInfo = await sendSpace.AnonymousUploadGetInfoAsync(cancellationToken).ConfigureAwait(false);
+                    if (UploadInfo == null) throw new Exception(Localization.Strings.SendSpace_Upload_information_is_missing);
                 }
                 else
                 {
@@ -59,17 +60,18 @@ namespace ShareX.UploadersLib.FileUploaders
 
                     if (string.IsNullOrEmpty(Token))
                     {
-                        Token = sendSpace.AuthCreateToken();
-                        if (string.IsNullOrEmpty(Token)) throw new Exception("Token is null or empty.");
+                        Token = await sendSpace.AuthCreateTokenAsync(cancellationToken).ConfigureAwait(false);
+                        if (string.IsNullOrEmpty(Token)) throw new Exception(Localization.Strings.SendSpace_Token_is_missing);
                     }
                     if (string.IsNullOrEmpty(SessionKey) || (DateTime.Now - LastSessionKey).TotalMinutes > 30)
                     {
-                        SessionKey = sendSpace.AuthLogin(Token, username, password).SessionKey;
-                        if (string.IsNullOrEmpty(SessionKey)) throw new Exception("SessionKey is null or empty.");
+                        SendSpace.LoginInfo loginInfo = await sendSpace.AuthLoginAsync(Token, username, password, cancellationToken).ConfigureAwait(false);
+                        SessionKey = loginInfo?.SessionKey;
+                        if (string.IsNullOrEmpty(SessionKey)) throw new Exception(Localization.Strings.SendSpace_Session_key_is_missing);
                         LastSessionKey = DateTime.Now;
                     }
-                    UploadInfo = sendSpace.UploadGetInfo(SessionKey);
-                    if (UploadInfo == null) throw new Exception("UploadInfo is null.");
+                    UploadInfo = await sendSpace.UploadGetInfoAsync(SessionKey, cancellationToken).ConfigureAwait(false);
+                    if (UploadInfo == null) throw new Exception(Localization.Strings.SendSpace_Upload_information_is_missing);
                 }
             }
             catch (Exception e)

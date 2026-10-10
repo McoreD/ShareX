@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -30,7 +30,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace ShareX
 {
@@ -202,7 +201,7 @@ namespace ShareX
         {
             if (IsItemSelected && SelectedItem.IsImageFile)
             {
-                Size size = ImageHelpers.GetImageFileDimensions(SelectedItem.Info.FilePath);
+                Size size = SkiaImageHelpers.GetImageFileDimensions(SelectedItem.Info.FilePath);
 
                 if (!size.IsEmpty)
                 {
@@ -342,7 +341,10 @@ namespace ShareX
 
         public void ShowImagePreview()
         {
-            if (IsItemSelected && SelectedItem.IsImageFile) ImageViewer.ShowImage(SelectedItem.Info.FilePath);
+            if (IsItemSelected && SelectedItem.IsImageFile)
+            {
+                ImageViewerWindowIntegration.ShowImage(SelectedItem.Info.FilePath);
+            }
         }
 
         public void ShowErrors()
@@ -377,6 +379,23 @@ namespace ShareX
         public void EditImage()
         {
             if (IsItemSelected && SelectedItem.IsImageFile) TaskHelpers.AnnotateImageFromFile(SelectedItem.Info.FilePath);
+        }
+
+        public void TrimVideo()
+        {
+            if (IsItemSelected && SelectedItem.IsVideoFile)
+            {
+                TaskHelpers.OpenVideoTrimmer(SelectedItem.Info.TaskSettings, SelectedItem.Info.FilePath);
+            }
+        }
+
+        public void TrimAnimatedGif()
+        {
+            if (IsItemSelected && SelectedItem.IsFileExist &&
+                string.Equals(Path.GetExtension(SelectedItem.Info.FilePath), ".gif", System.StringComparison.OrdinalIgnoreCase))
+            {
+                TaskHelpers.OpenAnimatedGifTrimmer(SelectedItem.Info.FilePath, SelectedItem.Info.TaskSettings);
+            }
         }
 
         public void BeautifyImage()
@@ -415,19 +434,25 @@ namespace ShareX
             if (IsItemSelected && SelectedItem.IsURLExist) UploadManager.ShareURL(SelectedItem.Info.Result.ToString(), urlSharingService);
         }
 
-        public void SearchImageUsingGoogleLens()
+        public async void SearchImageUsingGoogleLens()
         {
-            if (IsItemSelected && SelectedItem.IsURLExist) TaskHelpers.SearchImageUsingGoogleLens(SelectedItem.Info.Result.URL);
+            if (IsItemSelected && SelectedItem.IsURLExist)
+            {
+                await TaskHelpers.SearchImageUsingGoogleLensAsync(SelectedItem.Info.Result.URL);
+            }
         }
 
-        public void SearchImageUsingBing()
+        public async void SearchImageUsingBing()
         {
-            if (IsItemSelected && SelectedItem.IsURLExist) TaskHelpers.SearchImageUsingBing(SelectedItem.Info.Result.URL);
+            if (IsItemSelected && SelectedItem.IsURLExist)
+            {
+                await TaskHelpers.SearchImageUsingBingAsync(SelectedItem.Info.Result.URL);
+            }
         }
 
         public void ShowQRCode()
         {
-            if (IsItemSelected && SelectedItem.IsURLExist) new QRCodeForm(SelectedItem.Info.Result.URL).Show();
+            if (IsItemSelected && SelectedItem.IsURLExist) TaskHelpers.OpenQRCode(SelectedItem.Info.Result.URL);
         }
 
         public void AnalyzeImage()
@@ -438,6 +463,19 @@ namespace ShareX
         public async Task OCRImage()
         {
             if (IsItemSelected && SelectedItem.IsImageFile) await TaskHelpers.OCRImage(SelectedItem.Info.FilePath);
+        }
+
+        public void ResizeImages()
+        {
+            if (IsItemSelected)
+            {
+                string[] imageFiles = SelectedItems.Where(x => x.IsImageFile).Select(x => x.Info.FilePath).ToArray();
+
+                if (imageFiles.Length > 0)
+                {
+                    TaskHelpers.OpenImageResizer(imageFiles);
+                }
+            }
         }
 
         public void CombineImages()
@@ -453,7 +491,7 @@ namespace ShareX
             }
         }
 
-        public void CombineImages(Orientation orientation)
+        public void CombineImages(ImageOrientation orientation)
         {
             if (IsItemSelected)
             {
@@ -470,7 +508,7 @@ namespace ShareX
         {
             if (IsItemSelected && SelectedItem.Info.Result != null)
             {
-                ResponseForm.ShowInstance(SelectedItem.Info.Result);
+                ResponseWindow.ShowInstance(SelectedItem.Info.Result);
             }
         }
 

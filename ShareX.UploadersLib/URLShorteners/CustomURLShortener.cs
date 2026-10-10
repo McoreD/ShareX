@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -70,31 +70,34 @@ namespace ShareX.UploadersLib.URLShorteners
             uploader = customUploaderItem;
         }
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
             CustomUploaderInput input = new CustomUploaderInput("", url);
 
             if (uploader.Body == CustomUploaderBody.None)
             {
-                result.Response = SendRequest(uploader.RequestMethod, uploader.GetRequestURL(input), null, uploader.GetHeaders(input));
+                result.Response = await SendRequestAsync(uploader.RequestMethod, uploader.GetRequestURL(input), null, uploader.GetHeaders(input),
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             else if (uploader.Body == CustomUploaderBody.MultipartFormData)
             {
-                result.Response = SendRequestMultiPart(uploader.GetRequestURL(input), uploader.GetArguments(input), uploader.GetHeaders(input), null, uploader.RequestMethod);
+                result.Response = await SendRequestMultiPartAsync(uploader.GetRequestURL(input), uploader.GetArguments(input), uploader.GetHeaders(input),
+                    null, uploader.RequestMethod, cancellationToken).ConfigureAwait(false);
             }
             else if (uploader.Body == CustomUploaderBody.FormURLEncoded)
             {
-                result.Response = SendRequestURLEncoded(uploader.RequestMethod, uploader.GetRequestURL(input), uploader.GetArguments(input), uploader.GetHeaders(input));
+                result.Response = await SendRequestURLEncodedAsync(uploader.RequestMethod, uploader.GetRequestURL(input), uploader.GetArguments(input),
+                    uploader.GetHeaders(input), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             else if (uploader.Body == CustomUploaderBody.JSON || uploader.Body == CustomUploaderBody.XML)
             {
-                result.Response = SendRequest(uploader.RequestMethod, uploader.GetRequestURL(input), uploader.GetData(input), uploader.GetContentType(),
-                    null, uploader.GetHeaders(input));
+                result.Response = await SendRequestAsync(uploader.RequestMethod, uploader.GetRequestURL(input), uploader.GetData(input), uploader.GetContentType(),
+                    null, uploader.GetHeaders(input), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                throw new Exception("Unsupported request format: " + uploader.Body);
+                throw new Exception(string.Format(Localization.Strings.CustomUploader_Unsupported_request_format, uploader.Body));
             }
 
             uploader.TryParseResponse(result, LastResponseInfo, Errors, input, true);

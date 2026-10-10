@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,12 +25,9 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace ShareX.UploadersLib.ImageUploaders
@@ -38,8 +35,6 @@ namespace ShareX.UploadersLib.ImageUploaders
     public class FlickrImageUploaderService : ImageUploaderService
     {
         public override ImageDestination EnumValue { get; } = ImageDestination.Flickr;
-
-        public override Icon ServiceIcon => Resources.Flickr;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -50,8 +45,6 @@ namespace ShareX.UploadersLib.ImageUploaders
         {
             return new FlickrUploader(config.FlickrOAuthInfo, config.FlickrSettings);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpFlickr;
     }
 
     public class FlickrUploader : ImageUploader, IOAuth
@@ -70,23 +63,26 @@ namespace ShareX.UploadersLib.ImageUploaders
             Settings = settings;
         }
 
-        public string GetAuthorizationURL()
+        public async Task<string> GetAuthorizationURLAsync(CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("oauth_callback", Links.Callback);
 
-            string url = GetAuthorizationURL("https://www.flickr.com/services/oauth/request_token", "https://www.flickr.com/services/oauth/authorize", AuthInfo, args);
+            string url = await GetAuthorizationURLAsync("https://www.flickr.com/services/oauth/request_token",
+                "https://www.flickr.com/services/oauth/authorize", AuthInfo, args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return url + "&perms=write";
         }
 
-        public bool GetAccessToken(string verificationCode = null)
+        public async Task<bool> GetAccessTokenAsync(string verificationCode = null, CancellationToken cancellationToken = default)
         {
             AuthInfo.AuthVerifier = verificationCode;
-            return GetAccessToken("https://www.flickr.com/services/oauth/access_token", AuthInfo);
+            return await GetAccessTokenAsync("https://www.flickr.com/services/oauth/access_token", AuthInfo,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
-        public FlickrPhotosGetSizesResponse PhotosGetSizes(string photoid)
+        public async Task<FlickrPhotosGetSizesResponse> PhotosGetSizesAsync(string photoid, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("nojsoncallback", "1");
@@ -96,12 +92,12 @@ namespace ShareX.UploadersLib.ImageUploaders
 
             string query = OAuthManager.GenerateQuery("https://api.flickr.com/services/rest", args, HttpMethod.POST, AuthInfo);
 
-            string response = SendRequest(HttpMethod.GET, query);
+            string response = await SendRequestAsync(HttpMethod.GET, query, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<FlickrPhotosGetSizesResponse>(response);
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             string url = "https://up.flickr.com/services/upload/";
 
@@ -119,7 +115,8 @@ namespace ShareX.UploadersLib.ImageUploaders
 
             OAuthManager.GenerateQuery(url, args, HttpMethod.POST, AuthInfo, out Dictionary<string, string> parameters);
 
-            UploadResult result = SendRequestFile(url, stream, fileName, "photo", parameters);
+            UploadResult result = await SendRequestFileAsync(url, stream, fileName, "photo", parameters,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
@@ -128,7 +125,7 @@ namespace ShareX.UploadersLib.ImageUploaders
                 if (xele != null)
                 {
                     string photoid = xele.Value;
-                    FlickrPhotosGetSizesResponse photos = PhotosGetSizes(photoid);
+                    FlickrPhotosGetSizesResponse photos = await PhotosGetSizesAsync(photoid, cancellationToken).ConfigureAwait(false);
                     if (photos != null && photos.sizes != null && photos.sizes.size != null && photos.sizes.size.Length > 0)
                     {
                         FlickrPhotosGetSizesSize photo = photos.sizes.size[photos.sizes.size.Length - 1];

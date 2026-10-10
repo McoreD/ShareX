@@ -1,8 +1,8 @@
-﻿#region License Information (GPL v3)
+#region License Information (GPL v3)
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,7 +28,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace ShareX.Steam
 {
@@ -100,12 +99,7 @@ namespace ShareX.Steam
             {
                 string arguments = "";
 
-                if (IsFirstTimeRunning)
-                {
-                    // Show first time config window.
-                    arguments = "-SteamConfig";
-                }
-                else if (IsStartupRun)
+                if (IsStartupRun)
                 {
                     // Don't show ShareX main window.
                     arguments = "-silent";
@@ -306,8 +300,7 @@ namespace ShareX.Steam
             {
                 while (IsShareXRunning())
                 {
-                    if (MessageBox.Show("ShareX is currently running.\r\n\r\nPlease close ShareX and press \"Retry\" button after it is closed.", "ShareX - Uninstaller",
-                        MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+                    if (!NativeMessageBox.Retry("ShareX is currently running.\r\n\r\nPlease close ShareX and press \"Retry\" button after it is closed.", "ShareX - Uninstaller"))
                     {
                         return;
                     }

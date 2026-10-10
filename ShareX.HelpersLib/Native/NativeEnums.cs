@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -27,6 +27,13 @@ using System;
 
 namespace ShareX.HelpersLib
 {
+    [Flags]
+    public enum NativeRasterOperation
+    {
+        SourceCopy = 0x00CC0020,
+        CaptureBlt = 0x40000000
+    }
+
     [Flags]
     public enum AnimateWindowFlags
     {

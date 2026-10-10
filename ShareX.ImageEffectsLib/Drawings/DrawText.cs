@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,24 +24,20 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
+using SkiaSharp;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace ShareX.ImageEffectsLib
 {
     [Description("Text watermark")]
     public class DrawText : ImageEffect
     {
-        [DefaultValue("Text watermark"), Editor(typeof(NameParserEditor), typeof(UITypeEditor))]
+        [DefaultValue("Text watermark")]
         public string Text { get; set; }
 
-        [DefaultValue(ContentAlignment.BottomRight), TypeConverter(typeof(EnumProperNameConverter))]
-        public ContentAlignment Placement { get; set; }
+        [DefaultValue(ImageContentAlignment.BottomRight)]
+        public ImageContentAlignment Placement { get; set; }
 
         [DefaultValue(typeof(Point), "5, 5")]
         public Point Offset { get; set; }
@@ -51,33 +47,32 @@ namespace ShareX.ImageEffectsLib
 
         private FontSafe textFontSafe = new FontSafe();
 
-        // Workaround for "System.AccessViolationException: Attempted to read or write protected memory. This is often an indication that other memory is corrupt."
-        [DefaultValue(typeof(Font), "Arial, 11.25pt")]
-        public Font TextFont
+        [DefaultValue(typeof(ImageFont), "Arial, 11.25pt")]
+        public ImageFont TextFont
         {
             get
             {
-                return textFontSafe.GetFont();
+                return textFontSafe.GetImageFont();
             }
             set
             {
                 using (value)
                 {
-                    textFontSafe.SetFont(value);
+                    textFontSafe.SetImageFont(value);
                 }
             }
         }
 
-        [DefaultValue(TextRenderingHint.SystemDefault), TypeConverter(typeof(EnumProperNameConverter))]
-        public TextRenderingHint TextRenderingMode { get; set; }
+        [DefaultValue(ImageTextRenderingMode.SystemDefault)]
+        public ImageTextRenderingMode TextRenderingMode { get; set; }
 
-        [DefaultValue(typeof(Color), "235, 235, 235"), Editor(typeof(MyColorEditor), typeof(UITypeEditor)), TypeConverter(typeof(MyColorConverter))]
+        [DefaultValue(typeof(Color), "235, 235, 235")]
         public Color TextColor { get; set; }
 
         [DefaultValue(true)]
         public bool DrawTextShadow { get; set; }
 
-        [DefaultValue(typeof(Color), "Black"), Editor(typeof(MyColorEditor), typeof(UITypeEditor)), TypeConverter(typeof(MyColorConverter))]
+        [DefaultValue(typeof(Color), "Black")]
         public Color TextShadowColor { get; set; }
 
         [DefaultValue(typeof(Point), "-1, -1")]
@@ -98,13 +93,13 @@ namespace ShareX.ImageEffectsLib
             }
         }
 
-        [DefaultValue(typeof(Padding), "5, 5, 5, 5")]
-        public Padding Padding { get; set; }
+        [DefaultValue(typeof(ImageMargins), "5, 5, 5, 5")]
+        public ImageMargins Padding { get; set; }
 
         [DefaultValue(true)]
         public bool DrawBorder { get; set; }
 
-        [DefaultValue(typeof(Color), "Black"), Editor(typeof(MyColorEditor), typeof(UITypeEditor)), TypeConverter(typeof(MyColorConverter))]
+        [DefaultValue(typeof(Color), "Black")]
         public Color BorderColor { get; set; }
 
         [DefaultValue(1)]
@@ -113,18 +108,18 @@ namespace ShareX.ImageEffectsLib
         [DefaultValue(true)]
         public bool DrawBackground { get; set; }
 
-        [DefaultValue(typeof(Color), "42, 47, 56"), Editor(typeof(MyColorEditor), typeof(UITypeEditor)), TypeConverter(typeof(MyColorConverter))]
+        [DefaultValue(typeof(Color), "42, 47, 56")]
         public Color BackgroundColor { get; set; }
 
         [DefaultValue(false)]
         public bool UseGradient { get; set; }
 
-        [Editor(typeof(GradientEditor), typeof(UITypeEditor))]
         public GradientInfo Gradient { get; set; }
 
         public DrawText()
         {
             this.ApplyDefaultPropertyValues();
+            Text = Localization.Strings.ImageEffectDefault_Text_watermark;
             AddDefaultGradient();
         }
 
@@ -137,107 +132,40 @@ namespace ShareX.ImageEffectsLib
             Gradient.Colors.Add(new GradientStop(Color.FromArgb(23, 89, 174), 100f));
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
-            if (string.IsNullOrEmpty(Text))
+            using ImageFont font = TextFont;
+            if (string.IsNullOrEmpty(Text) || font == null || font.Size < 1) return bmp;
+            NameParser parser = new(NameParserType.Text) { ImageWidth = bmp.Width, ImageHeight = bmp.Height };
+            string text = parser.Parse(Text);
+            Size textSize = SkiaDrawing.MeasureText(text, font);
+            Size size = new(Padding.Horizontal + textSize.Width, Padding.Vertical + textSize.Height);
+            Point position = Helpers.GetPosition(Placement, Offset, bmp.GetSize(), size);
+            Rectangle rectangle = new(position, size);
+            if (AutoHide && !new Rectangle(0, 0, bmp.Width, bmp.Height).Contains(rectangle)) return bmp;
+            using SKCanvas canvas = new(bmp);
+            using SKPath path = new();
+            path.AddRoundedRectangleProper(rectangle, CornerRadius);
+            if (DrawBackground)
             {
-                return bmp;
+                using SKPaint background = UseGradient && Gradient != null && Gradient.IsValid
+                    ? Gradient.GetSkiaPaint(rectangle) : SkiaDrawing.Fill(BackgroundColor);
+                canvas.DrawPath(path, background);
             }
-
-            using (Font textFont = TextFont)
+            if (DrawBorder)
             {
-                if (textFont == null || textFont.Size < 1)
-                {
-                    return bmp;
-                }
-
-                NameParser parser = new NameParser(NameParserType.Text);
-
-                if (bmp != null)
-                {
-                    parser.ImageWidth = bmp.Width;
-                    parser.ImageHeight = bmp.Height;
-                }
-
-                string parsedText = parser.Parse(Text);
-
-                Size textSize = Helpers.MeasureText(parsedText, textFont);
-                Size watermarkSize = new Size(Padding.Left + textSize.Width + Padding.Right, Padding.Top + textSize.Height + Padding.Bottom);
-                Point watermarkPosition = Helpers.GetPosition(Placement, Offset, bmp.Size, watermarkSize);
-                Rectangle watermarkRectangle = new Rectangle(watermarkPosition, watermarkSize);
-
-                if (AutoHide && !new Rectangle(0, 0, bmp.Width, bmp.Height).Contains(watermarkRectangle))
-                {
-                    return bmp;
-                }
-
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-
-                    using (GraphicsPath gp = new GraphicsPath())
-                    {
-                        gp.AddRoundedRectangleProper(watermarkRectangle, CornerRadius);
-
-                        if (DrawBackground)
-                        {
-                            Brush backgroundBrush = null;
-
-                            try
-                            {
-                                if (UseGradient && Gradient != null && Gradient.IsValid)
-                                {
-                                    backgroundBrush = Gradient.GetGradientBrush(watermarkRectangle);
-                                }
-                                else
-                                {
-                                    backgroundBrush = new SolidBrush(BackgroundColor);
-                                }
-
-                                g.FillPath(backgroundBrush, gp);
-                            }
-                            finally
-                            {
-                                if (backgroundBrush != null) backgroundBrush.Dispose();
-                            }
-                        }
-
-                        if (DrawBorder)
-                        {
-                            int borderSize = BorderSize.Max(1);
-
-                            if (borderSize.IsEvenNumber())
-                            {
-                                g.PixelOffsetMode = PixelOffsetMode.Half;
-                            }
-
-                            using (Pen borderPen = new Pen(BorderColor, borderSize))
-                            {
-                                g.DrawPath(borderPen, gp);
-                            }
-
-                            g.PixelOffsetMode = PixelOffsetMode.Default;
-                        }
-                    }
-
-                    g.TextRenderingHint = TextRenderingMode;
-
-                    if (DrawTextShadow)
-                    {
-                        using (Brush textShadowBrush = new SolidBrush(TextShadowColor))
-                        {
-                            g.DrawString(parsedText, textFont, textShadowBrush, watermarkRectangle.X + Padding.Left + TextShadowOffset.X,
-                                watermarkRectangle.Y + Padding.Top + TextShadowOffset.Y);
-                        }
-                    }
-
-                    using (Brush textBrush = new SolidBrush(TextColor))
-                    {
-                        g.DrawString(parsedText, textFont, textBrush, watermarkRectangle.X + Padding.Left, watermarkRectangle.Y + Padding.Top);
-                    }
-                }
+                using SKPaint border = SkiaDrawing.Stroke(BorderColor, Math.Max(1, BorderSize));
+                canvas.DrawPath(path, border);
             }
-
+            PointF textPosition = new(position.X + Padding.Left, position.Y + Padding.Top);
+            if (DrawTextShadow)
+            {
+                using SKPaint shadow = SkiaDrawing.Fill(TextShadowColor);
+                canvas.DrawText(text, new PointF(textPosition.X + TextShadowOffset.X, textPosition.Y + TextShadowOffset.Y), font, shadow, TextRenderingMode);
+            }
+            using SKPaint paint = SkiaDrawing.Fill(TextColor);
+            paint.IsAntialias = TextRenderingMode is not ImageTextRenderingMode.SingleBitPerPixel and not ImageTextRenderingMode.SingleBitPerPixelGridFit;
+            canvas.DrawText(text, textPosition, font, paint, TextRenderingMode);
             return bmp;
         }
 

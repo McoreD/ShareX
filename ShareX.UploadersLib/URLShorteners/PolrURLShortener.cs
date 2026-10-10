@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,18 +24,13 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.URLShorteners
 {
     public class PolrURLShortenerService : URLShortenerService
     {
         public override UrlShortenerType EnumValue { get; } = UrlShortenerType.Polr;
-
-        public override Icon ServiceIcon => Resources.Polr;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -52,8 +47,6 @@ namespace ShareX.UploadersLib.URLShorteners
                 UseAPIv1 = config.PolrUseAPIv1
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpPolr;
     }
 
     public sealed class PolrURLShortener : URLShortener
@@ -63,7 +56,7 @@ namespace ShareX.UploadersLib.URLShorteners
         public bool IsSecret { get; set; }
         public bool UseAPIv1 { get; set; }
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
 
@@ -95,7 +88,7 @@ namespace ShareX.UploadersLib.URLShorteners
                 args.Add("is_secret", "true");
             }
 
-            string response = SendRequest(HttpMethod.GET, Host, args);
+            string response = await SendRequestAsync(HttpMethod.GET, Host, args, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {

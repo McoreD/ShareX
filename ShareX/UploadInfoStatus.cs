@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -46,6 +46,7 @@ namespace ShareX
         public bool IsThumbnailFilePathValid { get; private set; }
         public bool IsThumbnailFileExist { get; private set; }
         public bool IsImageFile { get; private set; }
+        public bool IsVideoFile { get; private set; }
         public bool IsTextFile { get; private set; }
 
         public UploadInfoStatus(WorkerTask task)
@@ -72,6 +73,7 @@ namespace ShareX
             IsThumbnailFilePathValid = !string.IsNullOrEmpty(Info.ThumbnailFilePath) && Path.HasExtension(Info.ThumbnailFilePath);
             IsThumbnailFileExist = IsThumbnailFilePathValid && File.Exists(Info.ThumbnailFilePath);
             IsImageFile = IsFileExist && FileHelpers.IsImageFile(Info.FilePath);
+            IsVideoFile = IsFileExist && FileHelpers.IsVideoFile(Info.FilePath);
             IsTextFile = IsFileExist && FileHelpers.IsTextFile(Info.FilePath);
         }
     }

@@ -1,0 +1,185 @@
+#region License Information (GPL v3)
+
+/*
+    ShareX - A program that allows you to take screenshots and share any file type
+    Copyright (c) 2007-2026 ShareX Team
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    Optionally you can also view the license at <http://www.gnu.org/licenses/>.
+*/
+
+#endregion License Information (GPL v3)
+
+#nullable enable
+
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
+using ShareX.AvaloniaUI.Theming;
+using ShareX.HelpersLib;
+using ShareX.Localization;
+using System;
+using System.IO;
+using DrawingBitmap = SkiaSharp.SKBitmap;
+using ImageFormat = SkiaSharp.SKEncodedImageFormat;
+
+namespace ShareX;
+
+public partial class ClipboardUploadWindow : Window
+{
+    private readonly TaskSettings _taskSettings;
+    private object? _clipboardContent;
+    private Bitmap? _previewBitmap;
+    private bool _keepClipboardContent;
+
+    public bool DontShowAgain => DontShowAgainCheckBox.IsChecked == true;
+
+    public ClipboardUploadWindow() : this(TaskSettings.GetDefaultTaskSettings())
+    {
+    }
+
+    public ClipboardUploadWindow(TaskSettings taskSettings, bool showDontShowAgain = false)
+    {
+        _taskSettings = taskSettings;
+
+        InitializeComponent();
+        RequestedThemeVariant = ThemeManager.GetCurrentTheme();
+        Title = $"ShareX - {Strings.ClipboardUploadWindow_ClipboardUpload}";
+        HeaderTitle.Text = Strings.ClipboardUploadWindow_ClipboardUpload;
+        DontShowAgainCheckBox.IsVisible = showDontShowAgain;
+
+        UploadButton.IsEnabled = LoadClipboardContent();
+
+        Opened += (_, _) => Activate();
+        Closed += OnClosed;
+    }
+
+    private bool LoadClipboardContent()
+    {
+        ImagePreviewContainer.IsVisible = false;
+        TextPreview.IsVisible = false;
+        FilePreview.IsVisible = false;
+        EmptyPreview.IsVisible = false;
+
+        if (ClipboardHelpers.ContainsImage())
+        {
+            using DrawingBitmap? clipboardImage = ClipboardHelpers.GetImage();
+            if (clipboardImage != null)
+            {
+                DrawingBitmap image = (DrawingBitmap)clipboardImage.Copy();
+                _clipboardContent = image;
+                _previewBitmap = CreatePreviewBitmap(image);
+                ImagePreview.Source = _previewBitmap;
+                ImagePreviewContainer.IsVisible = true;
+                ClipboardSummary.Text = string.Format(
+                    Strings.ClipboardUploadWindow_ImageSummary,
+                    image.Width,
+                    image.Height);
+                return true;
+            }
+        }
+        else if (ClipboardHelpers.ContainsText())
+        {
+            string text = ClipboardHelpers.GetText();
+            if (!string.IsNullOrEmpty(text))
+            {
+                _clipboardContent = text;
+                TextPreview.Text = text;
+                TextPreview.IsVisible = true;
+                ClipboardSummary.Text = string.Format(
+                    Strings.ClipboardUploadWindow_TextSummary,
+                    text.Length);
+                return true;
+            }
+        }
+        else if (ClipboardHelpers.ContainsFileDropList())
+        {
+            string[]? files = ClipboardHelpers.GetFileDropList();
+            if (files is { Length: > 0 })
+            {
+                _clipboardContent = files;
+                FilePreview.ItemsSource = files;
+                FilePreview.IsVisible = true;
+                ClipboardSummary.Text = string.Format(
+                    Strings.ClipboardUploadWindow_FileSummary,
+                    files.Length);
+                return true;
+            }
+        }
+
+        ClipboardSummary.Text = Strings.ClipboardUploadWindow_Empty;
+        EmptyPreview.Text = ClipboardSummary.Text;
+        EmptyPreview.IsVisible = true;
+        return false;
+    }
+
+    private static Bitmap CreatePreviewBitmap(DrawingBitmap image)
+    {
+        using MemoryStream stream = new();
+        image.Save(stream, ImageFormat.Png);
+        stream.Position = 0;
+        return new Bitmap(stream);
+    }
+
+    private void UploadClipboardContent()
+    {
+        switch (_clipboardContent)
+        {
+            case DrawingBitmap image:
+                _keepClipboardContent = true;
+                UploadManager.ProcessImageUpload(image, _taskSettings);
+                break;
+            case string text:
+                UploadManager.ProcessTextUpload(text, _taskSettings);
+                break;
+            case string[] files:
+                UploadManager.ProcessFilesUpload(files, _taskSettings);
+                break;
+        }
+    }
+
+    private void OnUploadClick(object? sender, RoutedEventArgs e)
+    {
+        UploadClipboardContent();
+        Close();
+    }
+
+    private void OnCancelClick(object? sender, RoutedEventArgs e) => Close();
+
+    private void OnImagePreviewPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(ImagePreviewContainer).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonPressed &&
+            _clipboardContent is DrawingBitmap image)
+        {
+            ImageViewerWindowIntegration.ShowImage(image);
+            e.Handled = true;
+        }
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        _previewBitmap?.Dispose();
+        _previewBitmap = null;
+
+        if (!_keepClipboardContent && _clipboardContent is DrawingBitmap image)
+        {
+            image.Dispose();
+        }
+
+        _clipboardContent = null;
+    }
+}

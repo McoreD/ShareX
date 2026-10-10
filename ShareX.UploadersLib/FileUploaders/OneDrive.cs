@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,21 +25,16 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class OneDriveFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.OneDrive;
-
-        public override Icon ServiceIcon => Resources.OneDrive;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -55,8 +50,6 @@ namespace ShareX.UploadersLib.FileUploaders
                 UseDirectLink = config.OneDriveUseDirectLink
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpOneDrive;
     }
 
     public sealed class OneDrive : FileUploader, IOAuth2
@@ -73,7 +66,7 @@ namespace ShareX.UploadersLib.FileUploaders
         public static OneDriveFileInfo RootFolder = new OneDriveFileInfo
         {
             id = "", // empty defaults to root
-            name = Resources.OneDrive_RootFolder_Root_folder
+            name = Localization.Strings.OneDrive_Root_folder
         };
 
         public OneDrive(OAuth2Info authInfo)
@@ -81,7 +74,7 @@ namespace ShareX.UploadersLib.FileUploaders
             AuthInfo = authInfo;
         }
 
-        public string GetAuthorizationURL()
+        public Task<string> GetAuthorizationURLAsync(CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("client_id", AuthInfo.Client_ID);
@@ -94,10 +87,10 @@ namespace ShareX.UploadersLib.FileUploaders
                 args.Add("code_challenge_method", AuthInfo.Proof.ChallengeMethod);
             }
 
-            return URLHelpers.CreateQueryString(AuthorizationEndpoint, args);
+            return Task.FromResult(URLHelpers.CreateQueryString(AuthorizationEndpoint, args));
         }
 
-        public bool GetAccessToken(string code)
+        public async Task<bool> GetAccessTokenAsync(string code, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("client_id", AuthInfo.Client_ID);
@@ -110,7 +103,8 @@ namespace ShareX.UploadersLib.FileUploaders
                 args.Add("code_verifier", AuthInfo.Proof.CodeVerifier);
             }
 
-            string response = SendRequestURLEncoded(HttpMethod.POST, TokenEndpoint, args);
+            string response = await SendRequestURLEncodedAsync(HttpMethod.POST, TokenEndpoint, args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -127,7 +121,7 @@ namespace ShareX.UploadersLib.FileUploaders
             return false;
         }
 
-        public bool RefreshAccessToken()
+        public async Task<bool> RefreshAccessTokenAsync(CancellationToken cancellationToken = default)
         {
             if (OAuth2Info.CheckOAuth(AuthInfo) && !string.IsNullOrEmpty(AuthInfo.Token.refresh_token))
             {
@@ -137,7 +131,8 @@ namespace ShareX.UploadersLib.FileUploaders
                 args.Add("refresh_token", AuthInfo.Token.refresh_token);
                 args.Add("grant_type", "refresh_token");
 
-                string response = SendRequestURLEncoded(HttpMethod.POST, TokenEndpoint, args);
+                string response = await SendRequestURLEncodedAsync(HttpMethod.POST, TokenEndpoint, args,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -157,19 +152,19 @@ namespace ShareX.UploadersLib.FileUploaders
             return false;
         }
 
-        public bool CheckAuthorization()
+        public async Task<bool> CheckAuthorizationAsync(CancellationToken cancellationToken = default)
         {
             if (OAuth2Info.CheckOAuth(AuthInfo))
             {
-                if (AuthInfo.Token.IsExpired && !RefreshAccessToken())
+                if (AuthInfo.Token.IsExpired && !await RefreshAccessTokenAsync(cancellationToken).ConfigureAwait(false))
                 {
-                    Errors.Add("Refresh access token failed.");
+                    Errors.Add(Localization.Strings.UploaderErrors_Refresh_access_token_failed);
                     return false;
                 }
             }
             else
             {
-                Errors.Add("Login is required.");
+                Errors.Add(Localization.Strings.UploaderErrors_Login_is_required);
                 return false;
             }
 
@@ -199,7 +194,7 @@ namespace ShareX.UploadersLib.FileUploaders
             return folderPath;
         }
 
-        private string CreateSession(string fileName)
+        private async Task<string> CreateSessionAsync(string fileName, CancellationToken cancellationToken)
         {
             string json = JsonConvert.SerializeObject(new
             {
@@ -214,7 +209,8 @@ namespace ShareX.UploadersLib.FileUploaders
             string url = URLHelpers.BuildUri("https://graph.microsoft.com", $"/v1.0/{folderPath}:/{fileName}:/createUploadSession");
 
             AllowReportProgress = false;
-            string response = SendRequest(HttpMethod.POST, url, json, RequestHelpers.ContentTypeJSON, headers: GetAuthHeaders());
+            string response = await SendRequestAsync(HttpMethod.POST, url, json, RequestHelpers.ContentTypeJSON, headers: GetAuthHeaders(),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
             AllowReportProgress = true;
 
             OneDriveUploadSession session = JsonConvert.DeserializeObject<OneDriveUploadSession>(response);
@@ -227,17 +223,18 @@ namespace ShareX.UploadersLib.FileUploaders
             return null;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
-            if (!CheckAuthorization()) return null;
+            if (!await CheckAuthorizationAsync(cancellationToken).ConfigureAwait(false)) return null;
 
             UploadResult result;
-            string sessionUrl = CreateSession(fileName);
+            string sessionUrl = await CreateSessionAsync(fileName, cancellationToken).ConfigureAwait(false);
             long position = 0;
 
             do
             {
-                result = SendRequestFileRange(sessionUrl, stream, fileName, position, MaxSegmentSize);
+                result = await SendRequestFileRangeAsync(sessionUrl, stream, fileName, position, MaxSegmentSize,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (result.IsSuccess)
                 {
@@ -245,7 +242,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 }
                 else
                 {
-                    SendRequest(HttpMethod.DELETE, sessionUrl);
+                    await SendRequestAsync(HttpMethod.DELETE, sessionUrl, cancellationToken: cancellationToken).ConfigureAwait(false);
                     break;
                 }
             }
@@ -259,7 +256,8 @@ namespace ShareX.UploadersLib.FileUploaders
                 {
                     AllowReportProgress = false;
 
-                    result.URL = CreateShareableLink(uploadInfo.id, UseDirectLink ? OneDriveLinkType.Embed : OneDriveLinkType.Read);
+                    result.URL = await CreateShareableLinkAsync(uploadInfo.id,
+                        UseDirectLink ? OneDriveLinkType.Embed : OneDriveLinkType.Read, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -270,7 +268,8 @@ namespace ShareX.UploadersLib.FileUploaders
             return result;
         }
 
-        public string CreateShareableLink(string id, OneDriveLinkType linkType = OneDriveLinkType.Read)
+        public async Task<string> CreateShareableLinkAsync(string id, OneDriveLinkType linkType = OneDriveLinkType.Read,
+            CancellationToken cancellationToken = default)
         {
             string linkTypeValue;
 
@@ -294,8 +293,8 @@ namespace ShareX.UploadersLib.FileUploaders
                 scope = "anonymous"
             });
 
-            string response = SendRequest(HttpMethod.POST, $"https://graph.microsoft.com/v1.0/me/drive/items/{id}/createLink", json, RequestHelpers.ContentTypeJSON,
-                headers: GetAuthHeaders());
+            string response = await SendRequestAsync(HttpMethod.POST, $"https://graph.microsoft.com/v1.0/me/drive/items/{id}/createLink", json,
+                RequestHelpers.ContentTypeJSON, headers: GetAuthHeaders(), cancellationToken: cancellationToken).ConfigureAwait(false);
 
             OneDrivePermission permissionInfo = JsonConvert.DeserializeObject<OneDrivePermission>(response);
 
@@ -307,9 +306,9 @@ namespace ShareX.UploadersLib.FileUploaders
             return null;
         }
 
-        public OneDriveFileList GetPathInfo(string id)
+        public async Task<OneDriveFileList> GetPathInfoAsync(string id, CancellationToken cancellationToken = default)
         {
-            if (!CheckAuthorization()) return null;
+            if (!await CheckAuthorizationAsync(cancellationToken).ConfigureAwait(false)) return null;
 
             string folderPath = GetFolderUrl(id);
 
@@ -317,7 +316,8 @@ namespace ShareX.UploadersLib.FileUploaders
             args.Add("select", "id,name");
             args.Add("filter", "folder ne null");
 
-            string response = SendRequest(HttpMethod.GET, $"https://graph.microsoft.com/v1.0/{folderPath}/children", args, GetAuthHeaders());
+            string response = await SendRequestAsync(HttpMethod.GET, $"https://graph.microsoft.com/v1.0/{folderPath}/children", args, GetAuthHeaders(),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (response != null)
             {

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,19 +24,14 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class PuushFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.Puush;
-
-        public override Icon ServiceIcon => Resources.puush;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -47,8 +42,6 @@ namespace ShareX.UploadersLib.FileUploaders
         {
             return new Puush(config.PuushAPIKey);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpPuush;
     }
 
     public class Puush : FileUploader
@@ -75,7 +68,7 @@ namespace ShareX.UploadersLib.FileUploaders
             APIKey = apiKey;
         }
 
-        public string Login(string email, string password)
+        public async Task<string> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             arguments.Add("e", email);
@@ -84,7 +77,8 @@ namespace ShareX.UploadersLib.FileUploaders
 
             // Successful: status,apikey,expire,usage
             // Failed: status
-            string response = SendRequestMultiPart(PuushAPIAuthenticationURL, arguments);
+            string response = await SendRequestMultiPartAsync(PuushAPIAuthenticationURL, arguments,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -99,7 +93,7 @@ namespace ShareX.UploadersLib.FileUploaders
             return null;
         }
 
-        public bool DeleteFile(string id)
+        public async Task<bool> DeleteFileAsync(string id, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             arguments.Add("k", APIKey);
@@ -108,7 +102,8 @@ namespace ShareX.UploadersLib.FileUploaders
 
             // Successful: status\nlist of history items
             // Failed: status
-            string response = SendRequestMultiPart(PuushAPIDeletionURL, arguments);
+            string response = await SendRequestMultiPartAsync(PuushAPIDeletionURL, arguments,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -123,7 +118,7 @@ namespace ShareX.UploadersLib.FileUploaders
             return false;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             arguments.Add("k", APIKey);
@@ -131,7 +126,8 @@ namespace ShareX.UploadersLib.FileUploaders
 
             // Successful: status,url,id,usage
             // Failed: status
-            UploadResult result = SendRequestFile(PuushAPIUploadURL, stream, fileName, "f", arguments);
+            UploadResult result = await SendRequestFileAsync(PuushAPIUploadURL, stream, fileName, "f", arguments,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
@@ -149,17 +145,17 @@ namespace ShareX.UploadersLib.FileUploaders
                         switch (status)
                         {
                             case -1:
-                                Errors.Add("Authentication failure.");
+                                Errors.Add(Localization.Strings.Puush_Authentication_failure);
                                 break;
                             default:
                             case -2:
-                                Errors.Add("Connection error.");
+                                Errors.Add(Localization.Strings.Puush_Connection_error);
                                 break;
                             case -3:
-                                Errors.Add("Checksum error.");
+                                Errors.Add(Localization.Strings.Puush_Checksum_error);
                                 break;
                             case -4:
-                                Errors.Add("Insufficient account storage remaining.");
+                                Errors.Add(Localization.Strings.Puush_Insufficient_account_storage);
                                 break;
                         }
                     }

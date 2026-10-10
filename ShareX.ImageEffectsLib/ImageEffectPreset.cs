@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,10 +24,9 @@
 #endregion License Information (GPL v3)
 
 using Newtonsoft.Json;
-using System.Collections.Generic;
+using ShareX.HelpersLib;
+using SkiaSharp;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace ShareX.ImageEffectsLib
 {
@@ -38,10 +37,9 @@ namespace ShareX.ImageEffectsLib
         [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Auto)]
         public List<ImageEffect> Effects { get; set; } = new List<ImageEffect>();
 
-        public Bitmap ApplyEffects(Bitmap bmp)
+        public SKBitmap ApplyEffects(SKBitmap bmp)
         {
-            Bitmap result = (Bitmap)bmp.Clone();
-            result.SetResolution(96f, 96f);
+            SKBitmap result = (SKBitmap)bmp.Copy();
 
             if (Effects != null && Effects.Count > 0)
             {
@@ -74,7 +72,7 @@ namespace ShareX.ImageEffectsLib
             ImageEffectPreset preset = new ImageEffectPreset();
 
             Canvas canvas = new Canvas();
-            canvas.Margin = new Padding(0, 0, 0, 30);
+            canvas.Margin = new ImageMargins(0, 0, 0, 30);
             preset.Effects.Add(canvas);
 
             DrawText text = new DrawText();

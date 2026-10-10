@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,19 +25,14 @@
 
 using Newtonsoft.Json.Linq;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class SulFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.Sul;
-
-        public override Image ServiceImage => Resources.Sul;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -48,8 +43,6 @@ namespace ShareX.UploadersLib.FileUploaders
         {
             return new SulUploader(config.SulAPIKey);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpSul;
     }
 
     public sealed class SulUploader : FileUploader
@@ -61,7 +54,7 @@ namespace ShareX.UploadersLib.FileUploaders
             APIKey = apiKey;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("wizard", "true");
@@ -71,7 +64,8 @@ namespace ShareX.UploadersLib.FileUploaders
             string url = "https://s-ul.eu";
             string upload_url = URLHelpers.CombineURL(url, "api/v1/upload");
 
-            UploadResult result = SendRequestFile(upload_url, stream, fileName, "file", args);
+            UploadResult result = await SendRequestFileAsync(upload_url, stream, fileName, "file", args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
@@ -96,7 +90,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 {
                     if (string.IsNullOrEmpty(error))
                     {
-                        Errors.Add("Generic error occurred, please contact support@s-ul.eu");
+                        Errors.Add(Localization.Strings.Sul_Generic_error_contact_support);
                     }
                     else
                     {

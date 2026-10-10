@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -29,7 +29,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ShareX.UploadersLib
 {
@@ -53,7 +52,7 @@ namespace ShareX.UploadersLib
             }
         }
 
-        public async Task<bool> ConnectAsync()
+        public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
         {
             Dispose();
 
@@ -64,7 +63,7 @@ namespace ShareX.UploadersLib
 
             OAuth.RedirectURI = redirectURI;
             OAuth.State = state;
-            string url = OAuth.GetAuthorizationURL();
+            string url = await OAuth.GetAuthorizationURLAsync(cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -86,7 +85,7 @@ namespace ShareX.UploadersLib
                 listener.Prefixes.Add(redirectURI);
                 listener.Start();
 
-                HttpListenerContext context = await listener.GetContextAsync();
+                HttpListenerContext context = await listener.GetContextAsync().WaitAsync(cancellationToken).ConfigureAwait(false);
                 queryCode = context.Request.QueryString.Get("code");
                 queryState = context.Request.QueryString.Get("state");
 
@@ -96,15 +95,15 @@ namespace ShareX.UploadersLib
 
                     if (queryState != state)
                     {
-                        status = "Invalid state parameter.";
+                        status = Localization.Strings.OAuthListener_Invalid_state_parameter;
                     }
                     else if (!string.IsNullOrEmpty(queryCode))
                     {
-                        status = "Authorization completed successfully.";
+                        status = Localization.Strings.OAuthListener_Authorization_completed_successfully;
                     }
                     else
                     {
-                        status = "Authorization did not succeed.";
+                        status = Localization.Strings.OAuthListener_Authorization_did_not_succeed;
                     }
 
                     string responseText = Resources.OAuthCallbackPage.Replace("{0}", status);
@@ -114,8 +113,8 @@ namespace ShareX.UploadersLib
 
                     using (Stream responseOutput = response.OutputStream)
                     {
-                        await responseOutput.WriteAsync(buffer, 0, buffer.Length);
-                        await responseOutput.FlushAsync();
+                        await responseOutput.WriteAsync(buffer, cancellationToken).ConfigureAwait(false);
+                        await responseOutput.FlushAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -129,7 +128,7 @@ namespace ShareX.UploadersLib
 
             if (queryState == state && !string.IsNullOrEmpty(queryCode))
             {
-                return await Task.Run(() => OAuth.GetAccessToken(queryCode));
+                return await OAuth.GetAccessTokenAsync(queryCode, cancellationToken).ConfigureAwait(false);
             }
 
             return false;

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using System;
+using SkiaSharp;
 using System.ComponentModel;
 using System.Drawing;
 
@@ -43,7 +43,7 @@ namespace ShareX.ImageEffectsLib
             this.ApplyDefaultPropertyValues();
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
             if (WidthPercentage <= 0 && HeightPercentage <= 0)
             {
@@ -52,9 +52,9 @@ namespace ShareX.ImageEffectsLib
 
             int width = (int)Math.Round(WidthPercentage / 100 * bmp.Width);
             int height = (int)Math.Round(HeightPercentage / 100 * bmp.Height);
-            Size size = ImageHelpers.ApplyAspectRatio(width, height, bmp);
+            Size size = SkiaImageHelpers.ApplyAspectRatio(width, height, bmp);
 
-            return ImageHelpers.ResizeImage(bmp, size);
+            return SkiaImageHelpers.ResizeImage(bmp, size);
         }
 
         protected override string GetSummary()

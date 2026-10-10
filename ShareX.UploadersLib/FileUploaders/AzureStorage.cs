@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,23 +24,18 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class AzureStorageUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.AzureStorage;
-
-        public override Image ServiceImage => Resources.AzureStorage;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -54,8 +49,6 @@ namespace ShareX.UploadersLib.FileUploaders
             return new AzureStorage(config.AzureStorageAccountName, config.AzureStorageAccountAccessKey, config.AzureStorageContainer,
                 config.AzureStorageEnvironment, config.AzureStorageCustomDomain, config.AzureStorageUploadPath, config.AzureStorageCacheControl);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpAzureStorage;
     }
 
     public sealed class AzureStorage : FileUploader
@@ -82,11 +75,11 @@ namespace ShareX.UploadersLib.FileUploaders
             AzureStorageCacheControl = cacheControl;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(AzureStorageAccountName)) Errors.Add("'Account Name' must not be empty");
-            if (string.IsNullOrEmpty(AzureStorageAccountAccessKey)) Errors.Add("'Access key' must not be empty");
-            if (string.IsNullOrEmpty(AzureStorageContainer)) Errors.Add("'Container' must not be empty");
+            if (string.IsNullOrEmpty(AzureStorageAccountName)) Errors.Add(Localization.Strings.AzureStorage_Account_name_must_not_be_empty);
+            if (string.IsNullOrEmpty(AzureStorageAccountAccessKey)) Errors.Add(Localization.Strings.AzureStorage_Access_key_must_not_be_empty);
+            if (string.IsNullOrEmpty(AzureStorageContainer)) Errors.Add(Localization.Strings.AzureStorage_Container_must_not_be_empty);
 
             if (IsError)
             {
@@ -121,7 +114,7 @@ namespace ShareX.UploadersLib.FileUploaders
 
             requestHeaders["Authorization"] = $"SharedKey {AzureStorageAccountName}:{stringToSign}";
 
-            SendRequest(HttpMethod.PUT, requestURL, stream, contentType, null, requestHeaders);
+            await SendRequestAsync(HttpMethod.PUT, requestURL, stream, contentType, null, requestHeaders, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (LastResponseInfo != null && LastResponseInfo.IsSuccess)
             {
@@ -132,7 +125,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 };
             }
 
-            Errors.Add("Upload failed.");
+            Errors.Add(Localization.Strings.UploaderErrors_Upload_failed);
             return null;
         }
 

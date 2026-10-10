@@ -160,7 +160,7 @@ class Program
 
             if (log) Console.WriteLine("Capturing rectangle...");
 
-            Bitmap? capturedBitmap = null;
+            SkiaSharp.SKBitmap? capturedBitmap = null;
             await Task.Run(() =>
             {
                 capturedBitmap = screenshot.CaptureRectangle(captureRect);
@@ -185,7 +185,12 @@ class Program
             var metadataPath = Path.Combine(outputDir, metadataFilename);
 
             // Save the capture
-            capturedBitmap.Save(capturePath, ImageFormat.Png);
+            using (var skImage = SkiaSharp.SKImage.FromBitmap(capturedBitmap))
+            using (var skData = skImage.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100))
+            using (var fs = File.Create(capturePath))
+            {
+                skData.SaveTo(fs);
+            }
             if (log) Console.WriteLine($"Saved capture to: {capturePath}");
 
             // Create and save metadata

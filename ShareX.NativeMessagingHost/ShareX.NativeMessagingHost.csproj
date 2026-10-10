@@ -1,16 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\ShareX\bin\</BaseOutputPath>
     <OutputType>WinExe</OutputType>
-    <PlatformTarget>x64</PlatformTarget>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AssemblyName>ShareX_NativeMessagingHost</AssemblyName>
-    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ShareX.HelpersLib\ShareX.HelpersLib.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y &quot;$(TargetDir)*.exe&quot; &quot;$(SolutionDir)ShareX\$(OutDir)&quot;&#xD;&#xA;xcopy /y &quot;$(TargetDir)*.dll&quot; &quot;$(SolutionDir)ShareX\$(OutDir)&quot;&#xD;&#xA;xcopy /y &quot;$(TargetDir)*.json&quot; &quot;$(SolutionDir)ShareX\$(OutDir)&quot;" />
-  </Target>
 </Project>

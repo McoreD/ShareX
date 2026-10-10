@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,21 +25,16 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.Linq;
 using System.Net;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.TextUploaders
 {
     public class GitHubGistTextUploaderService : TextUploaderService
     {
         public override TextDestination EnumValue { get; } = TextDestination.Gist;
-
-        public override Icon ServiceIcon => Resources.GitHub;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -55,8 +50,6 @@ namespace ShareX.UploadersLib.TextUploaders
                 CustomURLAPI = config.GistCustomURL
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpGist;
     }
 
     public sealed class GitHubGist : TextUploader, IOAuth2Basic
@@ -74,17 +67,17 @@ namespace ShareX.UploadersLib.TextUploaders
             AuthInfo = oAuthInfos;
         }
 
-        public string GetAuthorizationURL()
+        public Task<string> GetAuthorizationURLAsync(CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("client_id", AuthInfo.Client_ID);
             args.Add("redirect_uri", Links.Callback);
             args.Add("scope", "gist");
 
-            return URLHelpers.CreateQueryString("https://github.com/login/oauth/authorize", args);
+            return Task.FromResult(URLHelpers.CreateQueryString("https://github.com/login/oauth/authorize", args));
         }
 
-        public bool GetAccessToken(string code)
+        public async Task<bool> GetAccessTokenAsync(string code, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("client_id", AuthInfo.Client_ID);
@@ -94,7 +87,8 @@ namespace ShareX.UploadersLib.TextUploaders
             WebHeaderCollection headers = new WebHeaderCollection();
             headers.Add("Accept", RequestHelpers.ContentTypeJSON);
 
-            string response = SendRequestMultiPart("https://github.com/login/oauth/access_token", args, headers);
+            string response = await SendRequestMultiPartAsync("https://github.com/login/oauth/access_token", args, headers,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -110,7 +104,7 @@ namespace ShareX.UploadersLib.TextUploaders
             return false;
         }
 
-        public override UploadResult UploadText(string text, string fileName)
+        protected override async Task<UploadResult> UploadTextCoreAsync(string text, string fileName, CancellationToken cancellationToken)
         {
             UploadResult ur = new UploadResult();
 
@@ -144,7 +138,8 @@ namespace ShareX.UploadersLib.TextUploaders
                 NameValueCollection headers = new NameValueCollection();
                 headers.Add("Authorization", "token " + AuthInfo.Token.access_token);
 
-                string response = SendRequest(HttpMethod.POST, url, json, RequestHelpers.ContentTypeJSON, null, headers);
+                string response = await SendRequestAsync(HttpMethod.POST, url, json, RequestHelpers.ContentTypeJSON, null, headers,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 GistResponse gistResponse = JsonConvert.DeserializeObject<GistResponse>(response);
 

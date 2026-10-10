@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,18 +24,13 @@
 #endregion License Information (GPL v3)
 
 using Newtonsoft.Json;
-using ShareX.UploadersLib.Properties;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class YouTubeFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.YouTube;
-
-        public override Image ServiceImage => Resources.YouTube;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -51,8 +46,6 @@ namespace ShareX.UploadersLib.FileUploaders
                 ShowDialog = config.YouTubeShowDialog
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpYouTube;
     }
 
     public sealed class YouTube : FileUploader, IOAuth2
@@ -71,29 +64,29 @@ namespace ShareX.UploadersLib.FileUploaders
             };
         }
 
-        public bool RefreshAccessToken()
+        public Task<bool> RefreshAccessTokenAsync(CancellationToken cancellationToken = default)
         {
-            return OAuth2.RefreshAccessToken();
+            return OAuth2.RefreshAccessTokenAsync(cancellationToken);
         }
 
-        public bool CheckAuthorization()
+        public Task<bool> CheckAuthorizationAsync(CancellationToken cancellationToken = default)
         {
-            return OAuth2.CheckAuthorization();
+            return OAuth2.CheckAuthorizationAsync(cancellationToken);
         }
 
-        public string GetAuthorizationURL()
+        public Task<string> GetAuthorizationURLAsync(CancellationToken cancellationToken = default)
         {
-            return OAuth2.GetAuthorizationURL();
+            return OAuth2.GetAuthorizationURLAsync(cancellationToken);
         }
 
-        public bool GetAccessToken(string code)
+        public Task<bool> GetAccessTokenAsync(string code, CancellationToken cancellationToken = default)
         {
-            return OAuth2.GetAccessToken(code);
+            return OAuth2.GetAccessTokenAsync(code, cancellationToken);
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
-            if (!CheckAuthorization()) return null;
+            if (!await CheckAuthorizationAsync(cancellationToken).ConfigureAwait(false)) return null;
 
             string title = Path.GetFileNameWithoutExtension(fileName);
             string description = "";
@@ -101,18 +94,18 @@ namespace ShareX.UploadersLib.FileUploaders
 
             if (ShowDialog)
             {
-                using (YouTubeVideoOptionsForm form = new YouTubeVideoOptionsForm(title, description, visibility))
+                YouTubeVideoOptionsWindowResult options =
+                    YouTubeVideoOptionsWindowIntegration.Show(title, description, visibility);
+
+                if (options != null)
                 {
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        title = form.Title;
-                        description = form.Description;
-                        visibility = form.Visibility;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    title = options.Title;
+                    description = options.Description;
+                    visibility = options.Visibility;
+                }
+                else
+                {
+                    return null;
                 }
             }
 
@@ -131,8 +124,8 @@ namespace ShareX.UploadersLib.FileUploaders
 
             string metadata = JsonConvert.SerializeObject(uploadVideo);
 
-            UploadResult result = SendRequestFile("https://www.googleapis.com/upload/youtube/v3/videos?part=id,snippet,status", stream, fileName, "file",
-                headers: OAuth2.GetAuthHeaders(), relatedData: metadata);
+            UploadResult result = await SendRequestFileAsync("https://www.googleapis.com/upload/youtube/v3/videos?part=id,snippet,status", stream, fileName, "file",
+                headers: OAuth2.GetAuthHeaders(), relatedData: metadata, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(result.Response))
             {
@@ -152,10 +145,10 @@ namespace ShareX.UploadersLib.FileUploaders
                     switch (responseVideo.status.uploadStatus)
                     {
                         case YouTubeVideoStatus.UploadFailed:
-                            Errors.Add("Upload failed: " + responseVideo.status.failureReason);
+                            Errors.Add(string.Format(Localization.Strings.YouTube_Upload_failed, responseVideo.status.failureReason));
                             break;
                         case YouTubeVideoStatus.UploadRejected:
-                            Errors.Add("Upload rejected: " + responseVideo.status.rejectionReason);
+                            Errors.Add(string.Format(Localization.Strings.YouTube_Upload_rejected, responseVideo.status.rejectionReason));
                             break;
                     }
                 }

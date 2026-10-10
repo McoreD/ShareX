@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,35 +24,31 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using System;
+using SkiaSharp;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
 
 namespace ShareX.ImageEffectsLib
 {
     [Description("Image")]
     public class DrawImage : ImageEffect
     {
-        [DefaultValue(""), Editor(typeof(ImageFileNameEditor), typeof(UITypeEditor))]
+        [DefaultValue("")]
         public string ImageLocation { get; set; }
 
-        [DefaultValue(ContentAlignment.TopLeft), TypeConverter(typeof(EnumProperNameConverter))]
-        public ContentAlignment Placement { get; set; }
+        [DefaultValue(ImageContentAlignment.TopLeft)]
+        public ImageContentAlignment Placement { get; set; }
 
         [DefaultValue(typeof(Point), "0, 0")]
         public Point Offset { get; set; }
 
-        [DefaultValue(DrawImageSizeMode.DontResize), Description("How the image watermark should be rescaled, if at all."), TypeConverter(typeof(EnumDescriptionConverter))]
+        [DefaultValue(DrawImageSizeMode.DontResize), Description("How the image watermark should be rescaled, if at all.")]
         public DrawImageSizeMode SizeMode { get; set; }
 
         [DefaultValue(typeof(Size), "0, 0")]
         public Size Size { get; set; }
 
-        [DefaultValue(ImageRotateFlipType.None), TypeConverter(typeof(EnumProperNameKeepCaseConverter))]
+        [DefaultValue(ImageRotateFlipType.None)]
         public ImageRotateFlipType RotateFlip { get; set; }
 
         [DefaultValue(false)]
@@ -61,11 +57,11 @@ namespace ShareX.ImageEffectsLib
         [DefaultValue(false), Description("If image watermark size bigger than source image then don't draw it.")]
         public bool AutoHide { get; set; }
 
-        [DefaultValue(ImageInterpolationMode.HighQualityBicubic), TypeConverter(typeof(EnumProperNameConverter))]
+        [DefaultValue(ImageInterpolationMode.HighQualityBicubic)]
         public ImageInterpolationMode InterpolationMode { get; set; }
 
-        [DefaultValue(CompositingMode.SourceOver), TypeConverter(typeof(EnumProperNameConverter))]
-        public CompositingMode CompositingMode { get; set; }
+        [DefaultValue(ImageCompositingMode.SourceOver)]
+        public ImageCompositingMode CompositingMode { get; set; }
 
         private int opacity;
 
@@ -87,24 +83,22 @@ namespace ShareX.ImageEffectsLib
             this.ApplyDefaultPropertyValues();
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
             if (Opacity < 1 || (SizeMode != DrawImageSizeMode.DontResize && Size.Width <= 0 && Size.Height <= 0))
             {
                 return bmp;
             }
 
-            string imageFilePath = FileHelpers.ExpandFolderVariables(ImageLocation, true);
-
-            if (!string.IsNullOrEmpty(imageFilePath) && File.Exists(imageFilePath))
+            if (ImageEffectPathHelpers.TryGetSafeLocalFilePath(ImageLocation, out string imageFilePath) && File.Exists(imageFilePath))
             {
-                using (Bitmap bmpWatermark = ImageHelpers.LoadImage(imageFilePath))
+                using (SKBitmap bmpWatermark = SkiaImageHelpers.LoadImage(imageFilePath))
                 {
                     if (bmpWatermark != null)
                     {
                         if (RotateFlip != ImageRotateFlipType.None)
                         {
-                            bmpWatermark.RotateFlip((RotateFlipType)RotateFlip);
+                            bmpWatermark.RotateFlipInPlace((int)RotateFlip);
                         }
 
                         Size imageSize;
@@ -113,26 +107,26 @@ namespace ShareX.ImageEffectsLib
                         {
                             int width = Size.Width == -1 ? bmp.Width : Size.Width;
                             int height = Size.Height == -1 ? bmp.Height : Size.Height;
-                            imageSize = ImageHelpers.ApplyAspectRatio(width, height, bmpWatermark);
+                            imageSize = SkiaImageHelpers.ApplyAspectRatio(width, height, bmpWatermark);
                         }
                         else if (SizeMode == DrawImageSizeMode.PercentageOfWatermark)
                         {
                             int width = (int)Math.Round(Size.Width / 100f * bmpWatermark.Width);
                             int height = (int)Math.Round(Size.Height / 100f * bmpWatermark.Height);
-                            imageSize = ImageHelpers.ApplyAspectRatio(width, height, bmpWatermark);
+                            imageSize = SkiaImageHelpers.ApplyAspectRatio(width, height, bmpWatermark);
                         }
                         else if (SizeMode == DrawImageSizeMode.PercentageOfCanvas)
                         {
                             int width = (int)Math.Round(Size.Width / 100f * bmp.Width);
                             int height = (int)Math.Round(Size.Height / 100f * bmp.Height);
-                            imageSize = ImageHelpers.ApplyAspectRatio(width, height, bmpWatermark);
+                            imageSize = SkiaImageHelpers.ApplyAspectRatio(width, height, bmpWatermark);
                         }
                         else
                         {
-                            imageSize = bmpWatermark.Size;
+                            imageSize = bmpWatermark.GetSize();
                         }
 
-                        Point imagePosition = Helpers.GetPosition(Placement, Offset, bmp.Size, imageSize);
+                        Point imagePosition = Helpers.GetPosition(Placement, Offset, bmp.GetSize(), imageSize);
                         Rectangle imageRectangle = new Rectangle(imagePosition, imageSize);
 
                         if (AutoHide && !new Rectangle(0, 0, bmp.Width, bmp.Height).Contains(imageRectangle))
@@ -140,32 +134,22 @@ namespace ShareX.ImageEffectsLib
                             return bmp;
                         }
 
-                        using (Graphics g = Graphics.FromImage(bmp))
+                        using (SKCanvas canvas = new(bmp))
+                        using (SKPaint paint = new())
                         {
-                            g.InterpolationMode = ImageHelpers.GetInterpolationMode(InterpolationMode);
-                            g.PixelOffsetMode = PixelOffsetMode.Half;
-                            g.CompositingMode = CompositingMode;
-
+                            paint.BlendMode = CompositingMode == ImageCompositingMode.SourceCopy ? SKBlendMode.Src : SKBlendMode.SrcOver;
                             if (Tile)
                             {
-                                using (TextureBrush brush = new TextureBrush(bmpWatermark, WrapMode.Tile))
-                                {
-                                    brush.TranslateTransform(imageRectangle.X, imageRectangle.Y);
-                                    g.FillRectangle(brush, imageRectangle);
-                                }
-                            }
-                            else if (Opacity < 100)
-                            {
-                                using (ImageAttributes ia = new ImageAttributes())
-                                {
-                                    ColorMatrix matrix = ColorMatrixManager.Alpha(Opacity / 100f);
-                                    ia.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                                    g.DrawImage(bmpWatermark, imageRectangle, 0, 0, bmpWatermark.Width, bmpWatermark.Height, GraphicsUnit.Pixel, ia);
-                                }
+                                using SKPaint texture = SkiaDrawing.Texture(bmpWatermark, ImageTileMode.Tile);
+                                texture.BlendMode = paint.BlendMode;
+                                texture.Translate(imageRectangle.X, imageRectangle.Y);
+                                canvas.FillRectangle(texture, imageRectangle);
                             }
                             else
                             {
-                                g.DrawImage(bmpWatermark, imageRectangle);
+                                if (Opacity < 100) paint.Color = SKColors.White.WithAlpha((byte)Math.Round(Opacity * 2.55));
+                                using SKImage image = SKImage.FromBitmap(bmpWatermark);
+                                canvas.DrawImage(image, imageRectangle.ToSKRect(), SkiaImageHelpers.GetSampling(InterpolationMode), paint);
                             }
                         }
                     }

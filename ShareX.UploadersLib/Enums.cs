@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -68,6 +68,8 @@ namespace ShareX.UploadersLib
         OneTimeSecret,
         [Description("Pastie")]
         Pastie,
+        [Description("PrivateBin")]
+        PrivateBin,
         CustomTextUploader, // Localized
         FileUploader // Localized
     }
@@ -99,6 +101,8 @@ namespace ShareX.UploadersLib
         BackblazeB2,
         [Description("ownCloud / Nextcloud")]
         OwnCloud,
+        [Description("Immich")]
+        Immich,
         [Description("MediaFire")]
         MediaFire,
         [Description("Pushbullet")]
@@ -109,6 +113,8 @@ namespace ShareX.UploadersLib
         Localhostr,
         [Description("Lambda")]
         Lambda,
+        [Description("img.fish")]
+        ImgFish,
         [Description("Pomf")]
         Pomf,
         [Description("Uguu")]
@@ -127,8 +133,6 @@ namespace ShareX.UploadersLib
         Plik,
         [Description("YouTube")]
         YouTube,
-        [Description("Vault.ooo")]
-        Vault_ooo,
         SharedFolder, // Localized
         Email, // Localized
         CustomFileUploader // Localized

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,7 +28,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 
 namespace ShareX.HelpersLib
 {
@@ -214,14 +213,6 @@ namespace ShareX.HelpersLib
             }
 
             return result;
-        }
-
-        public static bool GetWindowRegion(IntPtr hWnd, out Region region)
-        {
-            IntPtr hRgn = CreateRectRgn(0, 0, 0, 0);
-            RegionType regionType = (RegionType)GetWindowRgn(hWnd, hRgn);
-            region = Region.FromHrgn(hRgn);
-            return regionType != RegionType.ERROR && regionType != RegionType.NULLREGION;
         }
 
         public static bool IsDWMEnabled()
@@ -476,11 +467,11 @@ namespace ShareX.HelpersLib
             return new string(chs);
         }
 
-        public static bool FlashWindowEx(Form frm, uint flashCount = uint.MaxValue)
+        public static bool FlashWindowEx(IntPtr handle, uint flashCount = uint.MaxValue)
         {
             FLASHWINFO fInfo = new FLASHWINFO();
             fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
-            fInfo.hwnd = frm.Handle;
+            fInfo.hwnd = handle;
             fInfo.dwFlags = (uint)FlashWindow.FLASHW_ALL | (uint)FlashWindow.FLASHW_TIMERNOFG;
             fInfo.uCount = flashCount;
             fInfo.dwTimeout = 0;
@@ -555,41 +546,48 @@ namespace ShareX.HelpersLib
             return icon;
         }
 
-        public static Bitmap GetFileThumbnail(string filePath, Size thumbnailSize)
+        public static SkiaSharp.SKBitmap GetFileThumbnail(string filePath, Size thumbnailSize)
         {
             Guid guid = typeof(IShellItemImageFactory).GUID;
-            SHCreateItemFromParsingName(filePath, IntPtr.Zero, guid, out IShellItemImageFactory imageFactory);
-            SIZE size = new SIZE(thumbnailSize.Width, thumbnailSize.Height);
-            imageFactory.GetImage(size, SIIGBF.SIIGBF_RESIZETOFIT, out IntPtr hbitmap);
-            Bitmap bmp = null;
+            IShellItemImageFactory imageFactory = null;
+            IntPtr hbitmap = IntPtr.Zero;
 
             try
             {
-                bmp = Image.FromHbitmap(hbitmap);
+                SHCreateItemFromParsingName(filePath, IntPtr.Zero, guid, out imageFactory);
+                SIZE size = new SIZE(thumbnailSize.Width, thumbnailSize.Height);
+                imageFactory.GetImage(size, SIIGBF.SIIGBF_RESIZETOFIT, out hbitmap);
+                return hbitmap != IntPtr.Zero ? WindowsImageInterop.FromHBitmap(hbitmap) : null;
             }
             finally
             {
-                DeleteObject(hbitmap);
-            }
+                if (hbitmap != IntPtr.Zero)
+                {
+                    DeleteObject(hbitmap);
+                }
 
-            return bmp;
+                if (imageFactory != null && Marshal.IsComObject(imageFactory))
+                {
+                    Marshal.ReleaseComObject(imageFactory);
+                }
+            }
         }
 
         public static float GetScreenScalingFactor()
         {
             float scalingFactor;
 
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+            IntPtr desktop = GetDC(IntPtr.Zero);
+            try
             {
-                IntPtr desktop = g.GetHdc();
                 int LogicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.VERTRES);
                 int PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
                 int logpixelsy = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY);
                 float screenScalingFactor = (float)PhysicalScreenHeight / LogicalScreenHeight;
                 float dpiScalingFactor = logpixelsy / 96f;
                 scalingFactor = Math.Max(screenScalingFactor, dpiScalingFactor);
-                g.ReleaseHdc(desktop);
             }
+            finally { ReleaseDC(IntPtr.Zero, desktop); }
 
             return scalingFactor;
         }

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,16 +24,15 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
+using SkiaSharp;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
 
 namespace ShareX.ImageEffectsLib
 {
     [Description("Background image")]
     public class DrawBackgroundImage : ImageEffect
     {
-        [DefaultValue(""), Editor(typeof(ImageFileNameEditor), typeof(UITypeEditor))]
+        [DefaultValue("")]
         public string ImageFilePath { get; set; }
 
         [DefaultValue(true)]
@@ -47,9 +46,14 @@ namespace ShareX.ImageEffectsLib
             this.ApplyDefaultPropertyValues();
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
-            return ImageHelpers.DrawBackgroundImage(bmp, ImageFilePath, Center, Tile);
+            if (ImageEffectPathHelpers.TryGetSafeLocalFilePath(ImageFilePath, out string imageFilePath))
+            {
+                return SkiaImageHelpers.DrawBackgroundImage(bmp, imageFilePath, Center, Tile);
+            }
+
+            return bmp;
         }
 
         protected override string GetSummary()

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -41,6 +41,8 @@ namespace ShareX.UploadersLib
         public bool UseNameParser { get; set; }
         public NameParserType NameParserType { get; set; } = NameParserType.Text;
 
+        public bool AllowNameParserFileRead { get; set; } = true;
+
         public ShareXCustomUploaderSyntaxParser()
         {
         }
@@ -55,7 +57,10 @@ namespace ShareX.UploadersLib
         {
             if (UseNameParser && !string.IsNullOrEmpty(text))
             {
-                NameParser nameParser = new NameParser(NameParserType);
+                NameParser nameParser = new NameParser(NameParserType)
+                {
+                    AllowFileRead = AllowNameParserFileRead
+                };
                 EscapeHelper escapeHelper = new EscapeHelper();
                 escapeHelper.KeepEscapeCharacter = true;
                 text = escapeHelper.Parse(text, nameParser.Parse);
@@ -68,7 +73,7 @@ namespace ShareX.UploadersLib
         {
             if (string.IsNullOrEmpty(functionName))
             {
-                throw new Exception("Function name cannot be empty.");
+                throw new Exception(Localization.Strings.CustomUploaderParser_Function_name_cannot_be_empty);
             }
 
             foreach (CustomUploaderFunction function in Functions)
@@ -78,14 +83,15 @@ namespace ShareX.UploadersLib
                 {
                     if (function.MinParameterCount > 0 && (parameters == null || parameters.Length < function.MinParameterCount))
                     {
-                        throw new Exception($"Minimum parameter count for function \"{function.Name}\" is {function.MinParameterCount}.");
+                        throw new Exception(string.Format(Localization.Strings.CustomUploaderParser_Minimum_parameter_count,
+                            function.Name, function.MinParameterCount));
                     }
 
                     return function.Call(this, parameters);
                 }
             }
 
-            throw new Exception("Invalid function name: " + functionName);
+            throw new Exception(string.Format(Localization.Strings.CustomUploaderParser_Invalid_function_name, functionName));
         }
     }
 }

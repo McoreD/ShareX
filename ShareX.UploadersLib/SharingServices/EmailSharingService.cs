@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,7 +24,6 @@
 #endregion License Information (GPL v3)
 
 using ShareX.UploadersLib.FileUploaders;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.SharingServices
 {
@@ -41,8 +40,6 @@ namespace ShareX.UploadersLib.SharingServices
         {
             return new EmailSharer(config);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpEmail;
     }
 
     public sealed class EmailSharer : URLSharer
@@ -54,8 +51,9 @@ namespace ShareX.UploadersLib.SharingServices
             this.config = config;
         }
 
-        public override UploadResult ShareURL(string url)
+        protected override Task<UploadResult> ShareURLCoreAsync(string url, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             UploadResult result = new UploadResult { URL = url, IsURLExpected = false };
 
             if (config.EmailAutomaticSend && !string.IsNullOrEmpty(config.EmailAutomaticSendTo))
@@ -75,34 +73,36 @@ namespace ShareX.UploadersLib.SharingServices
             }
             else
             {
-                using (EmailForm emailForm = new EmailForm(config.EmailRememberLastTo ? config.EmailLastTo : "", config.EmailDefaultSubject, url))
+                EmailWindowResult emailResult = EmailWindowIntegration.Show(
+                    config.EmailRememberLastTo ? config.EmailLastTo : "",
+                    config.EmailDefaultSubject,
+                    url);
+
+                if (emailResult != null)
                 {
-                    if (emailForm.ShowDialog() == DialogResult.OK)
+                    if (config.EmailRememberLastTo)
                     {
-                        if (config.EmailRememberLastTo)
-                        {
-                            config.EmailLastTo = emailForm.ToEmail;
-                        }
-
-                        Email email = new Email()
-                        {
-                            SmtpServer = config.EmailSmtpServer,
-                            SmtpPort = config.EmailSmtpPort,
-                            FromEmail = config.EmailFrom,
-                            Password = config.EmailPassword,
-                            ToEmail = emailForm.ToEmail,
-                            Subject = emailForm.Subject,
-                            Body = emailForm.Body
-                        };
-
-                        email.Send();
+                        config.EmailLastTo = emailResult.ToEmail;
                     }
+
+                    Email email = new Email()
+                    {
+                        SmtpServer = config.EmailSmtpServer,
+                        SmtpPort = config.EmailSmtpPort,
+                        FromEmail = config.EmailFrom,
+                        Password = config.EmailPassword,
+                        ToEmail = emailResult.ToEmail,
+                        Subject = emailResult.Subject,
+                        Body = emailResult.Body
+                    };
+
+                    email.Send();
                 }
             }
 
             //URLHelpers.OpenURL("mailto:?body=" + URLHelpers.URLEncode(url));
 
-            return result;
+            return Task.FromResult(result);
         }
     }
 }

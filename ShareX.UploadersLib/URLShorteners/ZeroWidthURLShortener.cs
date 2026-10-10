@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,18 +25,13 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Specialized;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.URLShorteners
 {
     public class ZeroWidthURLShortenerService : URLShortenerService
     {
         public override UrlShortenerType EnumValue { get; } = UrlShortenerType.ZeroWidthShortener;
-
-        public override Image ServiceImage => Resources.ZeroWidthShortener;
 
         public override bool CheckConfig(UploadersConfig config) => true;
 
@@ -48,8 +43,6 @@ namespace ShareX.UploadersLib.URLShorteners
                 Token = config.ZeroWidthShortenerToken
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpZeroWidthShortener;
     }
 
     public sealed class ZeroWidthURLShortener : URLShortener
@@ -69,7 +62,7 @@ namespace ShareX.UploadersLib.URLShorteners
             return null;
         }
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
 
@@ -85,7 +78,8 @@ namespace ShareX.UploadersLib.URLShorteners
 
             NameValueCollection headers = GetAuthHeaders();
 
-            string response = SendRequest(HttpMethod.POST, RequestURL, json, RequestHelpers.ContentTypeJSON, null, headers);
+            string response = await SendRequestAsync(HttpMethod.POST, RequestURL, json, RequestHelpers.ContentTypeJSON, null, headers,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {

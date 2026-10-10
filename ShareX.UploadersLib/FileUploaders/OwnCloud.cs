@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,21 +26,16 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class OwnCloudFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.OwnCloud;
-
-        public override Image ServiceImage => Resources.OwnCloud;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -61,8 +56,6 @@ namespace ShareX.UploadersLib.FileUploaders
                 AutoExpire = config.OwnCloudAutoExpire
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpOwnCloud;
     }
 
     public sealed class OwnCloud : FileUploader
@@ -86,16 +79,16 @@ namespace ShareX.UploadersLib.FileUploaders
             Password = password;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(Host))
             {
-                throw new Exception("ownCloud Host is empty.");
+                throw new Exception(Localization.Strings.OwnCloud_Host_is_empty);
             }
 
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
             {
-                throw new Exception("ownCloud Username or Password is empty.");
+                throw new Exception(Localization.Strings.OwnCloud_Credentials_are_empty);
             }
 
             if (string.IsNullOrEmpty(Path))
@@ -114,7 +107,8 @@ namespace ShareX.UploadersLib.FileUploaders
             NameValueCollection headers = RequestHelpers.CreateAuthenticationHeader(Username, Password);
             headers["OCS-APIREQUEST"] = "true";
 
-            string response = SendRequest(HttpMethod.PUT, url, stream, MimeTypes.GetMimeTypeFromFileName(fileName), null, headers);
+            string response = await SendRequestAsync(HttpMethod.PUT, url, stream, MimeTypes.GetMimeTypeFromFileName(fileName), null, headers,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             UploadResult result = new UploadResult(response);
 
@@ -123,7 +117,7 @@ namespace ShareX.UploadersLib.FileUploaders
                 if (CreateShare)
                 {
                     AllowReportProgress = false;
-                    result.URL = ShareFile(path, fileName);
+                    result.URL = await ShareFileAsync(path, fileName, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -135,7 +129,7 @@ namespace ShareX.UploadersLib.FileUploaders
         }
 
         // https://doc.owncloud.org/server/10.0/developer_manual/core/ocs-share-api.html#create-a-new-share
-        public string ShareFile(string path, string fileName)
+        public async Task<string> ShareFileAsync(string path, string fileName, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("path", path); // path to the file/folder which should be shared
@@ -149,7 +143,7 @@ namespace ShareX.UploadersLib.FileUploaders
             {
                 if (AutoExpireTime == 0)
                 {
-                    throw new Exception("ownCloud Auto Epxire Time is not valid.");
+                    throw new Exception(Localization.Strings.OwnCloud_Auto_expire_time_is_invalid);
                 }
                 else
                 {
@@ -160,7 +154,7 @@ namespace ShareX.UploadersLib.FileUploaders
                     }
                     catch
                     {
-                        throw new Exception("ownCloud Auto Expire time is invalid");
+                        throw new Exception(Localization.Strings.OwnCloud_Auto_expire_time_is_invalid);
                     }
                 }
             }
@@ -171,7 +165,8 @@ namespace ShareX.UploadersLib.FileUploaders
             NameValueCollection headers = RequestHelpers.CreateAuthenticationHeader(Username, Password);
             headers["OCS-APIREQUEST"] = "true";
 
-            string response = SendRequestMultiPart(url, args, headers);
+            string response = await SendRequestMultiPartAsync(url, args, headers,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -209,7 +204,8 @@ namespace ShareX.UploadersLib.FileUploaders
                     }
                     else
                     {
-                        Errors.Add(string.Format("Status: {0}\r\nStatus code: {1}\r\nMessage: {2}", result.ocs.meta.status, result.ocs.meta.statuscode, result.ocs.meta.message));
+                        Errors.Add(string.Format(Localization.Strings.OwnCloud_Error_details,
+                            result.ocs.meta.status, result.ocs.meta.statuscode, result.ocs.meta.message));
                     }
                 }
             }

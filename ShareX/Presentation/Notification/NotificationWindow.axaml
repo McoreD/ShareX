@@ -1,0 +1,134 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:theming="using:ShareX.AvaloniaUI.Theming"
+        x:Class="ShareX.NotificationWindow"
+        x:CompileBindings="False"
+        CanResize="False"
+        ShowActivated="False"
+        ShowInTaskbar="False"
+        WindowDecorations="None"
+        Topmost="True"
+        SizeToContent="WidthAndHeight"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        FontFamily="{DynamicResource ShareX.FontFamily.Default}">
+
+    <Window.Styles>
+        <Style Selector="Button.notification-action">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="#CC383838"/>
+            <Setter Property="BorderBrush" Value="#33FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#F2FFFFFF"/>
+        </Style>
+        <Style Selector="Button.notification-action /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#CC383838"/>
+            <Setter Property="BorderBrush" Value="#33FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Button.notification-action:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Accent}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShareX.Brush.Accent}"/>
+        </Style>
+        <Style Selector="Button.notification-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ShareX.Brush.Accent}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ShareX.Brush.Accent}"/>
+        </Style>
+        <Style Selector="Button.notification-action:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.97)"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="14">
+        <Border Background="Transparent"
+                CornerRadius="4"
+                BoxShadow="0 0 15 #80000000">
+            <Border x:Name="NotificationCard"
+                    MinWidth="1"
+                    MinHeight="1"
+                    CornerRadius="4"
+                    ClipToBounds="True"
+                    BorderBrush="{DynamicResource ShareX.Brush.Accent.Start}"
+                    BorderThickness="1"
+                    PointerPressed="OnCardPointerPressed"
+                    PointerMoved="OnCardPointerMoved"
+                    PointerReleased="OnCardPointerReleased">
+                <Grid>
+                <Image x:Name="PreviewImage"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+
+                <StackPanel x:Name="TextContent"
+                            Spacing="6">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border Width="34"
+                                Height="34"
+                                CornerRadius="9"
+                                Background="{DynamicResource ShareX.Brush.Accent}">
+                            <TextBlock Text="{x:Static theming:LucideIcons.image}"
+                                       FontFamily="{DynamicResource ShareX.FontFamily.Icon}"
+                                       FontSize="17"
+                                       Foreground="{DynamicResource ShareX.Brush.Accent.Foreground}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                            <TextBlock x:Name="TitleText"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxLines="1"/>
+                            <TextBlock x:Name="BodyText"
+                                       FontSize="13"
+                                       LineHeight="19"
+                                       TextWrapping="Wrap"
+                                       TextTrimming="WordEllipsis"
+                                       MaxLines="6"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
+                <Border x:Name="ImageCaption"
+                        Padding="10,7"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        CornerRadius="3,3,0,0"
+                        Background="#C01B1B1B"
+                        IsHitTestVisible="False">
+                    <StackPanel Spacing="2">
+                        <TextBlock x:Name="ImageTitleText"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxLines="2"/>
+                        <TextBlock x:Name="ImageBodyText"
+                                   FontSize="12"
+                                   Foreground="#D9FFFFFF"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxLines="2"/>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="ActionsPanel"
+                        Padding="6"
+                        VerticalAlignment="Bottom"
+                        CornerRadius="0,0,3,3"
+                        Background="#C01B1B1B">
+                    <WrapPanel x:Name="ActionButtons"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</Window>

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,12 +24,9 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace ShareX.UploadersLib.ImageUploaders
@@ -37,8 +34,6 @@ namespace ShareX.UploadersLib.ImageUploaders
     public class PhotobucketImageUploaderService : ImageUploaderService
     {
         public override ImageDestination EnumValue { get; } = ImageDestination.Photobucket;
-
-        public override Icon ServiceIcon => Resources.Photobucket;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -49,8 +44,6 @@ namespace ShareX.UploadersLib.ImageUploaders
         {
             return new Photobucket(config.PhotobucketOAuthInfo, config.PhotobucketAccountInfo);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpPhotobucket;
     }
 
     public sealed class Photobucket : ImageUploader, IOAuth
@@ -74,16 +67,17 @@ namespace ShareX.UploadersLib.ImageUploaders
             AccountInfo = accountInfo;
         }
 
-        public string GetAuthorizationURL()
+        public Task<string> GetAuthorizationURLAsync(CancellationToken cancellationToken = default)
         {
-            return GetAuthorizationURL(URLRequestToken, URLAuthorize, AuthInfo, null, HttpMethod.POST);
+            return GetAuthorizationURLAsync(URLRequestToken, URLAuthorize, AuthInfo, null, HttpMethod.POST, cancellationToken);
         }
 
-        public bool GetAccessToken(string verificationCode)
+        public async Task<bool> GetAccessTokenAsync(string verificationCode, CancellationToken cancellationToken = default)
         {
             AuthInfo.AuthVerifier = verificationCode;
 
-            NameValueCollection nv = GetAccessTokenEx(URLAccessToken, AuthInfo, HttpMethod.POST);
+            NameValueCollection nv = await GetAccessTokenExAsync(URLAccessToken, AuthInfo, HttpMethod.POST,
+                cancellationToken).ConfigureAwait(false);
 
             if (nv != null)
             {
@@ -100,12 +94,13 @@ namespace ShareX.UploadersLib.ImageUploaders
             return AccountInfo;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
-            return UploadMedia(stream, fileName, AccountInfo.ActiveAlbumPath);
+            return await UploadMediaAsync(stream, fileName, AccountInfo.ActiveAlbumPath, cancellationToken).ConfigureAwait(false);
         }
 
-        public UploadResult UploadMedia(Stream stream, string fileName, string albumID)
+        public async Task<UploadResult> UploadMediaAsync(Stream stream, string fileName, string albumID,
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("id", albumID); // Album identifier.
@@ -124,7 +119,8 @@ namespace ShareX.UploadersLib.ImageUploaders
             string query = OAuthManager.GenerateQuery(url, args, HttpMethod.POST, AuthInfo);
             query = FixURL(query);
 
-            UploadResult result = SendRequestFile(query, stream, fileName, "uploadfile");
+            UploadResult result = await SendRequestFileAsync(query, stream, fileName, "uploadfile",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
@@ -141,7 +137,7 @@ namespace ShareX.UploadersLib.ImageUploaders
             return result;
         }
 
-        public bool CreateAlbum(string albumID, string albumName)
+        public async Task<bool> CreateAlbumAsync(string albumID, string albumName, CancellationToken cancellationToken = default)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("id", albumID); // Album identifier.
@@ -151,7 +147,7 @@ namespace ShareX.UploadersLib.ImageUploaders
             string query = OAuthManager.GenerateQuery(url, args, HttpMethod.POST, AuthInfo);
             query = FixURL(query);
 
-            string response = SendRequestMultiPart(query, args);
+            string response = await SendRequestMultiPartAsync(query, args, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -23,19 +23,14 @@
 
 #endregion License Information (GPL v3)
 
-using ShareX.UploadersLib.Properties;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.URLShorteners
 {
     public class YourlsURLShortenerService : URLShortenerService
     {
         public override UrlShortenerType EnumValue { get; } = UrlShortenerType.YOURLS;
-
-        public override Icon ServiceIcon => Resources.Yourls;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -53,8 +48,6 @@ namespace ShareX.UploadersLib.URLShorteners
                 Password = config.YourlsPassword
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpYourls;
     }
 
     public sealed class YourlsURLShortener : URLShortener
@@ -64,7 +57,7 @@ namespace ShareX.UploadersLib.URLShorteners
         public string Username { get; set; }
         public string Password { get; set; }
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
 
@@ -83,7 +76,7 @@ namespace ShareX.UploadersLib.URLShorteners
                 }
                 else
                 {
-                    throw new Exception("Signature or Username/Password is missing.");
+                    throw new Exception(Localization.Strings.Yourls_Credentials_missing);
                 }
 
                 arguments.Add("action", "shorturl");
@@ -92,7 +85,7 @@ namespace ShareX.UploadersLib.URLShorteners
                 //arguments.Add("title", "");
                 arguments.Add("format", "simple");
 
-                result.Response = SendRequestMultiPart(APIURL, arguments);
+                result.Response = await SendRequestMultiPartAsync(APIURL, arguments, cancellationToken: cancellationToken).ConfigureAwait(false);
                 result.ShortenedURL = result.Response;
             }
 

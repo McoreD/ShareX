@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,20 +25,14 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class StreamableFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.Streamable;
-
-        public override Icon ServiceIcon => Resources.Streamable;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -52,8 +46,6 @@ namespace ShareX.UploadersLib.FileUploaders
                 UseDirectURL = config.StreamableUseDirectURL
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpStreamable;
     }
 
     public class Streamable : FileUploader
@@ -70,7 +62,7 @@ namespace ShareX.UploadersLib.FileUploaders
             Password = password;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             NameValueCollection headers = null;
 
@@ -80,14 +72,15 @@ namespace ShareX.UploadersLib.FileUploaders
             }
 
             string url = URLHelpers.CombineURL(Host, "upload");
-            UploadResult result = SendRequestFile(url, stream, fileName, "file", headers: headers);
+            UploadResult result = await SendRequestFileAsync(url, stream, fileName, "file", headers: headers,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            TranscodeFile(result);
+            await TranscodeFileAsync(result, cancellationToken).ConfigureAwait(false);
 
             return result;
         }
 
-        private void TranscodeFile(UploadResult result)
+        private async Task TranscodeFileAsync(UploadResult result, CancellationToken cancellationToken)
         {
             StreamableTranscodeResponse transcodeResponse = JsonConvert.DeserializeObject<StreamableTranscodeResponse>(result.Response);
 
@@ -98,7 +91,8 @@ namespace ShareX.UploadersLib.FileUploaders
 
                 while (!StopUploadRequested)
                 {
-                    string statusJson = SendRequest(HttpMethod.GET, URLHelpers.CombineURL(Host, "videos", transcodeResponse.Shortcode));
+                    string statusJson = await SendRequestAsync(HttpMethod.GET, URLHelpers.CombineURL(Host, "videos", transcodeResponse.Shortcode),
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
                     StreamableStatusResponse response = JsonConvert.DeserializeObject<StreamableStatusResponse>(statusJson);
 
                     if (response.status > 2)
@@ -129,12 +123,12 @@ namespace ShareX.UploadersLib.FileUploaders
                     progress.UpdateProgress(response.percent - progress.Position);
                     OnProgressChanged(progress);
 
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
                 }
             }
             else
             {
-                Errors.Add("Could not create video");
+                Errors.Add(Localization.Strings.Streamable_Could_not_create_video);
                 result.IsSuccess = false;
             }
         }

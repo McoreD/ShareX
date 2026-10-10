@@ -1,8 +1,8 @@
-﻿#region License Information (GPL v3)
+#region License Information (GPL v3)
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
 
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
-using ShareX.HelpersLib.Properties;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -45,7 +45,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace ShareX.HelpersLib
@@ -62,27 +61,6 @@ namespace ShareX.HelpersLib
         public const string Base56 = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz"; // A variant, Base56, excludes 1 (one) and o (lowercase o) compared to Base 58.
 
         public static readonly Version OSVersion = Environment.OSVersion.Version;
-
-        private static Cursor[] cursorList;
-
-        public static Cursor[] CursorList
-        {
-            get
-            {
-                if (cursorList == null)
-                {
-                    cursorList = new Cursor[] {
-                        Cursors.AppStarting, Cursors.Arrow, Cursors.Cross, Cursors.Default, Cursors.Hand, Cursors.Help,
-                        Cursors.HSplit, Cursors.IBeam, Cursors.No, Cursors.NoMove2D, Cursors.NoMoveHoriz, Cursors.NoMoveVert,
-                        Cursors.PanEast, Cursors.PanNE, Cursors.PanNorth, Cursors.PanNW, Cursors.PanSE, Cursors.PanSouth,
-                        Cursors.PanSW, Cursors.PanWest, Cursors.SizeAll, Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE,
-                        Cursors.SizeWE, Cursors.UpArrow, Cursors.VSplit, Cursors.WaitCursor
-                    };
-                }
-
-                return cursorList;
-            }
-        }
 
         public static string AddZeroes(string input, int digits = 2)
         {
@@ -195,7 +173,7 @@ namespace ShareX.HelpersLib
 
         public static string[] GetLocalizedEnumDescriptions<T>()
         {
-            return GetLocalizedEnumDescriptions<T>(Resources.ResourceManager);
+            return GetLocalizedEnumDescriptions<T>(Localization.Strings.ResourceManager);
         }
 
         public static string[] GetLocalizedEnumDescriptions<T>(ResourceManager resourceManager)
@@ -215,7 +193,12 @@ namespace ShareX.HelpersLib
 
         public static string[] GetEnumNamesProper<T>()
         {
-            string[] names = Enum.GetNames(typeof(T));
+            return GetEnumNamesProper(typeof(T));
+        }
+
+        public static string[] GetEnumNamesProper(Type enumType)
+        {
+            string[] names = Enum.GetNames(enumType);
             string[] newNames = new string[names.Length];
 
             for (int i = 0; i < names.Length; i++)
@@ -276,7 +259,7 @@ namespace ShareX.HelpersLib
 
         public static string GetApplicationVersion(bool includeRevision = false)
         {
-            Version version = Version.Parse(Application.ProductVersion);
+            Version version = (Assembly.GetEntryAssembly() ?? typeof(Helpers).Assembly).GetName().Version;
             string result = $"{version.Major}.{version.Minor}.{version.Build}";
             if (includeRevision)
             {
@@ -374,7 +357,7 @@ namespace ShareX.HelpersLib
         public static bool IsDefaultInstallDir()
         {
             string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            return Application.ExecutablePath.StartsWith(path);
+            return Environment.ProcessPath.StartsWith(path);
         }
 
         public static bool IsValidIPAddress(string ip)
@@ -394,7 +377,22 @@ namespace ShareX.HelpersLib
             return time;
         }
 
-        public static void PlaySoundAsync(Stream stream)
+        public static void PlaySound(Stream stream)
+        {
+            if (stream != null)
+            {
+                Task.Run(() =>
+                {
+                    using (stream)
+                    using (SoundPlayer soundPlayer = new SoundPlayer(stream))
+                    {
+                        soundPlayer.Play();
+                    }
+                });
+            }
+        }
+
+        public static void PlaySoundSync(Stream stream)
         {
             if (stream != null)
             {
@@ -462,24 +460,24 @@ namespace ShareX.HelpersLib
             return Guid.NewGuid().ToString("N");
         }
 
-        public static Point GetPosition(ContentAlignment placement, int offset, Size backgroundSize, Size objectSize)
+        public static Point GetPosition(ImageContentAlignment placement, int offset, Size backgroundSize, Size objectSize)
         {
             return GetPosition(placement, new Point(offset, offset), backgroundSize, objectSize);
         }
 
-        public static Point GetPosition(ContentAlignment placement, int offset, Rectangle background, Size objectSize)
+        public static Point GetPosition(ImageContentAlignment placement, int offset, Rectangle background, Size objectSize)
         {
             return GetPosition(placement, new Point(offset, offset), background, objectSize);
         }
 
-        public static Point GetPosition(ContentAlignment placement, Point offset, Rectangle background, Size objectSize)
+        public static Point GetPosition(ImageContentAlignment placement, Point offset, Rectangle background, Size objectSize)
         {
             Point position = GetPosition(placement, offset, background.Size, objectSize);
 
             return new Point(background.X + position.X, background.Y + position.Y);
         }
 
-        public static Point GetPosition(ContentAlignment placement, Point offset, Size backgroundSize, Size objectSize)
+        public static Point GetPosition(ImageContentAlignment placement, Point offset, Size backgroundSize, Size objectSize)
         {
             int midX = (int)Math.Round((backgroundSize.Width / 2f) - (objectSize.Width / 2f));
             int midY = (int)Math.Round((backgroundSize.Height / 2f) - (objectSize.Height / 2f));
@@ -489,40 +487,24 @@ namespace ShareX.HelpersLib
             switch (placement)
             {
                 default:
-                case ContentAlignment.TopLeft:
+                case ImageContentAlignment.TopLeft:
                     return new Point(offset.X, offset.Y);
-                case ContentAlignment.TopCenter:
+                case ImageContentAlignment.TopCenter:
                     return new Point(midX, offset.Y);
-                case ContentAlignment.TopRight:
+                case ImageContentAlignment.TopRight:
                     return new Point(right - offset.X, offset.Y);
-                case ContentAlignment.MiddleLeft:
+                case ImageContentAlignment.MiddleLeft:
                     return new Point(offset.X, midY);
-                case ContentAlignment.MiddleCenter:
+                case ImageContentAlignment.MiddleCenter:
                     return new Point(midX, midY);
-                case ContentAlignment.MiddleRight:
+                case ImageContentAlignment.MiddleRight:
                     return new Point(right - offset.X, midY);
-                case ContentAlignment.BottomLeft:
+                case ImageContentAlignment.BottomLeft:
                     return new Point(offset.X, bottom - offset.Y);
-                case ContentAlignment.BottomCenter:
+                case ImageContentAlignment.BottomCenter:
                     return new Point(midX, bottom - offset.Y);
-                case ContentAlignment.BottomRight:
+                case ImageContentAlignment.BottomRight:
                     return new Point(right - offset.X, bottom - offset.Y);
-            }
-        }
-
-        public static Size MeasureText(string text, Font font)
-        {
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                return g.MeasureString(text, font).ToSize();
-            }
-        }
-
-        public static Size MeasureText(string text, Font font, int width)
-        {
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                return g.MeasureString(text, font, width).ToSize();
             }
         }
 
@@ -548,7 +530,7 @@ namespace ShareX.HelpersLib
                     }
                     else
                     {
-                        status[i] = "Timeout";
+                        status[i] = Localization.Strings.Helpers_Timeout;
                     }
                     Thread.Sleep(100);
                 }
@@ -679,14 +661,6 @@ namespace ShareX.HelpersLib
             }
 
             return productName;
-        }
-
-        public static Cursor CreateCursor(byte[] data)
-        {
-            using (MemoryStream ms = new MemoryStream(data))
-            {
-                return new Cursor(ms);
-            }
         }
 
         public static string EscapeCLIText(string text)
@@ -856,58 +830,35 @@ namespace ShareX.HelpersLib
             }
         }
 
-        public static Icon GetProgressIcon(int percentage)
-        {
-            return GetProgressIcon(percentage, Color.FromArgb(16, 116, 193));
-        }
-
-        public static Icon GetProgressIcon(int percentage, Color color)
+        public static byte[] GetProgressIconBytes(int percentage, Color color)
         {
             percentage = percentage.Clamp(0, 100);
-
-            Size size = SystemInformation.SmallIconSize;
-
-            using (Bitmap bmp = new Bitmap(size.Width, size.Height))
-            using (Graphics g = Graphics.FromImage(bmp))
+            Size size = OperatingSystem.IsWindows()
+                ? new Size(NativeMethods.GetSystemMetrics(SystemMetric.SM_CXSMICON), NativeMethods.GetSystemMetrics(SystemMetric.SM_CYSMICON))
+                : new Size(16, 16);
+            using SKBitmap bitmap = SkiaImageHelpers.CreateBitmap(size.Width, size.Height);
+            using SKCanvas canvas = new(bitmap);
+            canvas.Clear(new SKColor(39, 39, 39));
+            int height = (int)(size.Height * (percentage / 100f));
+            using SKPaint fill = SkiaDrawing.Fill(color);
+            canvas.DrawRect(0, size.Height - height, size.Width, height, fill);
+            if (height > 0 && height < size.Height)
             {
-                using (Brush brush = new SolidBrush(Color.FromArgb(39, 39, 39)))
-                {
-                    g.FillRectangle(brush, 0, 0, size.Width, size.Height);
-                }
-
-                int y = (int)(size.Height * (percentage / 100f));
-
-                if (y > 0)
-                {
-                    using (Brush brush = new SolidBrush(color))
-                    {
-                        g.FillRectangle(brush, 0, size.Height - y, size.Width, y);
-                    }
-
-                    if (y < size.Height)
-                    {
-                        using (Pen pen = new Pen(ColorHelpers.LighterColor(color, 0.3f)))
-                        {
-                            g.DrawLine(pen, 0, size.Height - y, size.Width - 1, size.Height - y);
-                        }
-                    }
-                }
-
-                using (Font font = new Font("Arial", 10))
-                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                {
-                    percentage = percentage.Clamp(0, 99);
-
-                    g.DrawString(percentage.ToString(), font, Brushes.White, size.Width / 2f, size.Height / 2f, sf);
-                }
-
-                bmp.SetPixel(0, 0, Color.Transparent);
-                bmp.SetPixel(bmp.Width - 1, 0, Color.Transparent);
-                bmp.SetPixel(0, bmp.Height - 1, Color.Transparent);
-                bmp.SetPixel(bmp.Width - 1, bmp.Height - 1, Color.Transparent);
-
-                return Icon.FromHandle(bmp.GetHicon());
+                using SKPaint line = SkiaDrawing.Stroke(ColorHelpers.LighterColor(color, 0.3f));
+                canvas.DrawLine(0, size.Height - height, size.Width - 1, size.Height - height, line);
             }
+            using ImageFont settings = new("Arial", 10);
+            using SKFont font = settings.CreateFont();
+            using SKPaint text = new() { Color = SKColors.White, IsAntialias = true };
+            string label = Math.Min(percentage, 99).ToString();
+            font.MeasureText(label, out SKRect bounds);
+            canvas.DrawText(label, (size.Width - bounds.Width) / 2 - bounds.Left,
+                (size.Height - bounds.Height) / 2 - bounds.Top, font, text);
+            bitmap.SetPixel(0, 0, SKColors.Transparent);
+            bitmap.SetPixel(size.Width - 1, 0, SKColors.Transparent);
+            bitmap.SetPixel(0, size.Height - 1, SKColors.Transparent);
+            bitmap.SetPixel(size.Width - 1, size.Height - 1, SKColors.Transparent);
+            return bitmap.GetIconBytes();
         }
 
         public static string GetChecksum(string filePath)
@@ -965,10 +916,22 @@ namespace ShareX.HelpersLib
             return Task.WhenAll(tasks);
         }
 
-        public static void LockCursorToWindow(Form form)
+        public static void LockCursorToWindow(Avalonia.Controls.Window window)
         {
-            form.Activated += (sender, e) => Cursor.Clip = form.Bounds;
-            form.Deactivate += (sender, e) => Cursor.Clip = Rectangle.Empty;
+            window.Activated += (sender, e) =>
+            {
+                IntPtr handle = window.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+                if (OperatingSystem.IsWindows() && handle != IntPtr.Zero)
+                {
+                    Rectangle bounds = NativeMethods.GetWindowRect(handle);
+                    if (bounds.Width > 0 && bounds.Height > 0)
+                    {
+                        NativeMethods.ClipCursor(new RECT(bounds));
+                    }
+                }
+            };
+            window.Deactivated += (sender, e) => { if (OperatingSystem.IsWindows()) NativeMethods.ClipCursor(IntPtr.Zero); };
+            window.Closed += (sender, e) => { if (OperatingSystem.IsWindows()) NativeMethods.ClipCursor(IntPtr.Zero); };
         }
 
         public static bool IsDefaultSettings<T>(IEnumerable<T> current, IEnumerable<T> source, Func<T, T, bool> predicate)

@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:localization="using:ShareX.UploadersLib.Localization"
+        x:Class="ShareX.UploadersLib.ParserSelectWindow"
+        Title="{x:Static localization:Strings.ParserSelectWindow_ShareX_Select}"
+        MinWidth="200"
+        MinHeight="50"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        Topmost="True"
+        Background="{DynamicResource ShareX.Brush.Background.Main}"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Styles>
+        <Style Selector="Button.parser-option">
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Styles>
+
+    <ThemeVariantScope>
+        <StackPanel x:Name="ColumnsPanel"
+                    Orientation="Horizontal"
+                    Spacing="6"
+                    Margin="8"
+                    Background="{DynamicResource ShareX.Brush.Background.Main}"/>
+    </ThemeVariantScope>
+</Window>

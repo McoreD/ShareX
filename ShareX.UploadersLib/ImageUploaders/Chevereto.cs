@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,19 +25,14 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.ImageUploaders
 {
     public class CheveretoImageUploaderService : ImageUploaderService
     {
         public override ImageDestination EnumValue { get; } = ImageDestination.Chevereto;
-
-        public override Image ServiceImage => Resources.Chevereto;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -52,8 +47,6 @@ namespace ShareX.UploadersLib.ImageUploaders
                 DirectURL = config.CheveretoDirectURL
             };
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpChevereto;
     }
 
     public sealed class Chevereto : ImageUploader
@@ -67,7 +60,7 @@ namespace ShareX.UploadersLib.ImageUploaders
             Uploader = uploader;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("key", Uploader.APIKey);
@@ -75,7 +68,8 @@ namespace ShareX.UploadersLib.ImageUploaders
 
             string url = URLHelpers.FixPrefix(Uploader.UploadURL);
 
-            UploadResult result = SendRequestFile(url, stream, fileName, "source", args);
+            UploadResult result = await SendRequestFileAsync(url, stream, fileName, "source", args,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {

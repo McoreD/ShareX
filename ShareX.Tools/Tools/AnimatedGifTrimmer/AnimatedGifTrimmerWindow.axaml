@@ -1,0 +1,155 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:ShareX.Tools"
+        xmlns:loc="using:ShareX.Tools.Localization"
+        xmlns:theming="using:ShareX.AvaloniaUI.Theming"
+        x:Class="ShareX.Tools.AnimatedGifTrimmerWindow"
+        x:DataType="local:AnimatedGifTrimmerViewModel"
+        Title="{x:Static loc:Strings.AnimatedGifTrimmer_Title}"
+        Background="{DynamicResource ShareX.Brush.Background.Main}"
+        Width="900" Height="720" MinWidth="760" MinHeight="620"
+        WindowStartupLocation="CenterScreen">
+    <Grid Background="{DynamicResource ShareX.Brush.Background.Main}">
+        <Grid Margin="16" RowDefinitions="Auto,*,Auto" RowSpacing="12">
+            <Border Classes="tool-panel">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <TextBlock Classes="section-heading" Text="{x:Static loc:Strings.AnimatedGifTrimmer_Gif}"/>
+                    <TextBlock Grid.Column="1" Classes="path-text" Text="{Binding InputDisplay}"
+                               VerticalAlignment="Center" ToolTip.Tip="{Binding InputFilePath}"/>
+                    <Button Grid.Column="2" Command="{Binding BrowseCommand}" IsEnabled="{Binding CanBrowse}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.folder_open}"/>
+                            <TextBlock Text="{x:Static loc:Strings.AnimatedGifTrimmer_Open}"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Classes="tool-panel">
+                <Grid RowDefinitions="*,Auto,Auto,Auto,Auto" RowSpacing="8">
+                    <Border Background="{DynamicResource ShareX.Brush.Background.Main}" CornerRadius="4" ClipToBounds="True">
+                        <Grid>
+                            <Image Source="{Binding Preview}" Stretch="Uniform" StretchDirection="DownOnly"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                            <StackPanel IsVisible="{Binding !HasGif}" Spacing="12"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                                <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.film}"
+                                           FontSize="36" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{x:Static loc:Strings.AnimatedGifTrimmer_ChooseGif}" FontWeight="Normal"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="0,4,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Command="{Binding StepBackwardCommand}" IsEnabled="{Binding CanEdit}" Width="40"
+                                        ToolTip.Tip="{x:Static loc:Strings.AnimatedGifTrimmer_PreviousFrame}"
+                                        AutomationProperties.Name="{x:Static loc:Strings.AnimatedGifTrimmer_PreviousFrame}">
+                                    <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.step_back}"/>
+                                </Button>
+                                <Button Command="{Binding TogglePlayCommand}" IsEnabled="{Binding CanPlay}" Width="40"
+                                        ToolTip.Tip="{Binding PlayActionText}"
+                                        AutomationProperties.Name="{Binding PlayActionText}">
+                                    <Grid>
+                                        <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.play}"
+                                                   IsVisible="{Binding !IsPlaying}" VerticalAlignment="Center"/>
+                                        <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.pause}"
+                                                   IsVisible="{Binding IsPlaying}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Button>
+                                <Button Command="{Binding StepForwardCommand}" IsEnabled="{Binding CanEdit}" Width="40"
+                                        ToolTip.Tip="{x:Static loc:Strings.AnimatedGifTrimmer_NextFrame}"
+                                        AutomationProperties.Name="{x:Static loc:Strings.AnimatedGifTrimmer_NextFrame}">
+                                    <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.step_forward}"/>
+                                </Button>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PositionText}" FontWeight="Normal" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource ShareX.Brush.Text}"/>
+                                <TextBlock Text="/" FontWeight="Normal" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding DurationText}" FontWeight="Normal" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding FrameText}" FontWeight="Normal" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <local:AnimatedGifTrimmerTimeline Grid.Row="2" Height="72" IsEnabled="{Binding CanEdit}"
+                                               Accent="{DynamicResource ShareX.Brush.Accent}"
+                                               TrackBackground="{DynamicResource ShareX.Brush.Control.Background}"
+                                               AutomationProperties.Name="{x:Static loc:Strings.AnimatedGifTrimmer_Timeline}"/>
+
+                    <ProgressBar Grid.Row="3" Height="4" IsVisible="{Binding IsWorking}"
+                                 IsIndeterminate="{Binding IsLoading}" Value="{Binding Progress}"/>
+
+                    <Grid Grid.Row="4" ColumnDefinitions="*,*,Auto,Auto" ColumnSpacing="16" IsEnabled="{Binding CanEdit}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <TextBlock Classes="row-label" Text="{x:Static loc:Strings.VideoTrimmer_Start}"/>
+                            <TextBox Grid.Column="1" Text="{Binding StartTimeText, Mode=OneWay}"
+                                     TextAlignment="Center" LostFocus="OnStartTimeLostFocus" KeyDown="OnStartTimeKeyDown"
+                                     AutomationProperties.Name="{x:Static loc:Strings.VideoTrimmer_Start}"/>
+                            <Button Grid.Column="2" Command="{Binding SetStartHereCommand}" Width="40"
+                                    ToolTip.Tip="{x:Static loc:Strings.VideoTrimmer_SetStart}"
+                                    AutomationProperties.Name="{x:Static loc:Strings.VideoTrimmer_SetStart}">
+                                <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.arrow_left_to_line}"/>
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Column="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <TextBlock Classes="row-label" Text="{x:Static loc:Strings.VideoTrimmer_End}"/>
+                            <TextBox Grid.Column="1" Text="{Binding EndTimeText, Mode=OneWay}"
+                                     TextAlignment="Center" LostFocus="OnEndTimeLostFocus" KeyDown="OnEndTimeKeyDown"
+                                     AutomationProperties.Name="{x:Static loc:Strings.VideoTrimmer_End}"/>
+                            <Button Grid.Column="2" Command="{Binding SetEndHereCommand}" Width="40"
+                                    ToolTip.Tip="{x:Static loc:Strings.VideoTrimmer_SetEnd}"
+                                    AutomationProperties.Name="{x:Static loc:Strings.VideoTrimmer_SetEnd}">
+                                <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.arrow_right_to_line}"/>
+                            </Button>
+                        </Grid>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock Classes="row-label" Text="{x:Static loc:Strings.VideoTrimmer_Duration}"/>
+                            <TextBlock Text="{Binding SelectionDurationText}" FontWeight="Normal"
+                                       Foreground="{DynamicResource ShareX.Brush.Text}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Grid.Column="3" Command="{Binding ResetCommand}" Width="40"
+                                ToolTip.Tip="{x:Static loc:Strings.VideoTrimmer_Reset}"
+                                AutomationProperties.Name="{x:Static loc:Strings.VideoTrimmer_Reset}">
+                            <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.rotate_ccw}"/>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2" Classes="tool-panel">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
+                    <TextBlock Classes="row-label" Text="{x:Static loc:Strings.VideoTrimmer_TrimMode}"/>
+                    <RadioButton Grid.Column="1" GroupName="GifTrimMode" IsChecked="{Binding Lossless, Mode=TwoWay}"
+                                 IsEnabled="{Binding CanBrowse}" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Static loc:Strings.AnimatedGifTrimmer_Lossless}" FontWeight="Normal"/>
+                    </RadioButton>
+                    <RadioButton Grid.Column="2" GroupName="GifTrimMode" IsChecked="{Binding Reencode, Mode=TwoWay}"
+                                 IsEnabled="{Binding CanBrowse}" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Static loc:Strings.AnimatedGifTrimmer_Reencode}" FontWeight="Normal"/>
+                    </RadioButton>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                        <Button Command="{Binding PrimaryActionCommand}" IsEnabled="{Binding CanUsePrimaryAction}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.scissors}"
+                                           IsVisible="{Binding !IsExporting}"/>
+                                <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.x}"
+                                           IsVisible="{Binding IsExporting}"/>
+                                <TextBlock Text="{Binding PrimaryActionText}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding OpenOutputCommand}" IsEnabled="{Binding HasOutput}" Width="40"
+                                ToolTip.Tip="{x:Static loc:Strings.VideoTrimmer_ShowOutput}"
+                                AutomationProperties.Name="{x:Static loc:Strings.VideoTrimmer_ShowOutput}">
+                            <TextBlock Classes="icon" Text="{x:Static theming:LucideIcons.folder_open}"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
+

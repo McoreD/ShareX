@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,22 +24,16 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using System;
-using System.Collections.Generic;
+using SkiaSharp;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Design;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
 
 namespace ShareX.ImageEffectsLib
 {
     [Description("Particles")]
     public class DrawParticles : ImageEffect
     {
-        [DefaultValue(""), Editor(typeof(DirectoryNameEditor), typeof(UITypeEditor))]
+        [DefaultValue("")]
         public string ImageFolder { get; set; }
 
         private int imageCount;
@@ -103,15 +97,15 @@ namespace ShareX.ImageEffectsLib
             this.ApplyDefaultPropertyValues();
         }
 
-        public override Bitmap Apply(Bitmap bmp)
+        public override SKBitmap Apply(SKBitmap bmp)
         {
             if (Background)
             {
-                Bitmap result = bmp.CreateEmptyBitmap();
+                SKBitmap result = bmp.CreateEmptyBitmap();
 
                 DrawParticlesFromFolder(result, ImageFolder);
 
-                using (Graphics g = Graphics.FromImage(result))
+                using (SKCanvas g = new SKCanvas(result))
                 {
                     g.DrawImage(bmp, 0, 0, bmp.Width, bmp.Height);
                 }
@@ -128,11 +122,9 @@ namespace ShareX.ImageEffectsLib
             }
         }
 
-        private void DrawParticlesFromFolder(Bitmap bmp, string imageFolder)
+        private void DrawParticlesFromFolder(SKBitmap bmp, string imageFolder)
         {
-            imageFolder = FileHelpers.ExpandFolderVariables(imageFolder, true);
-
-            if (!string.IsNullOrEmpty(imageFolder) && Directory.Exists(imageFolder))
+            if (ImageEffectPathHelpers.TryGetSafeLocalFolderPath(imageFolder, out imageFolder) && Directory.Exists(imageFolder))
             {
                 string[] files = FileHelpers.GetFilesByExtensions(imageFolder, ".png", ".jpg").ToArray();
 
@@ -140,15 +132,14 @@ namespace ShareX.ImageEffectsLib
                 {
                     imageRectangles.Clear();
 
-                    using (Graphics g = Graphics.FromImage(bmp))
+                    using (SKCanvas g = new SKCanvas(bmp))
                     using (ImageFilesCache imageCache = new ImageFilesCache())
                     {
-                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
                         for (int i = 0; i < ImageCount; i++)
                         {
                             string file = RandomFast.Pick(files);
-                            Bitmap bmpCached = imageCache.GetImage(file);
+                            SKBitmap bmpCached = imageCache.GetImage(file);
 
                             if (bmpCached != null)
                             {
@@ -160,7 +151,7 @@ namespace ShareX.ImageEffectsLib
             }
         }
 
-        private void DrawImage(Image img, Image img2, Graphics g)
+        private void DrawImage(SKBitmap img, SKBitmap img2, SKCanvas g)
         {
             int width, height;
 
@@ -222,23 +213,21 @@ namespace ShareX.ImageEffectsLib
                 float moveY = rect.Y + (rect.Height / 2f);
                 int rotate = RandomFast.Next(Math.Min(RandomAngleMin, RandomAngleMax), Math.Max(RandomAngleMin, RandomAngleMax));
 
-                g.TranslateTransform(moveX, moveY);
-                g.RotateTransform(rotate);
-                g.TranslateTransform(-moveX, -moveY);
+                g.Translate(moveX, moveY);
+                g.RotateDegrees(rotate);
+                g.Translate(-moveX, -moveY);
             }
-
-            g.PixelOffsetMode = PixelOffsetMode.Half;
 
             if (RandomOpacity)
             {
                 float opacity = RandomFast.Next(Math.Min(RandomOpacityMin, RandomOpacityMax), Math.Max(RandomOpacityMin, RandomOpacityMax)).Clamp(0, 100) / 100f;
 
-                ColorMatrix matrix = new ColorMatrix();
+                ImageColorMatrix matrix = new ImageColorMatrix();
                 matrix.Matrix33 = opacity;
-                using (ImageAttributes attributes = new ImageAttributes())
+                using (SKPaint attributes = new SKPaint())
                 {
-                    attributes.SetColorMatrix(matrix);
-                    g.DrawImage(img2, rect, 0, 0, img2.Width, img2.Height, GraphicsUnit.Pixel, attributes);
+                    attributes.ColorFilter = matrix.CreateFilter();
+                    g.DrawImage(img2, rect, 0, 0, img2.Width, img2.Height, attributes);
                 }
             }
             else
@@ -248,10 +237,9 @@ namespace ShareX.ImageEffectsLib
 
             if (RandomAngle)
             {
-                g.ResetTransform();
+                g.ResetMatrix();
             }
 
-            g.PixelOffsetMode = PixelOffsetMode.Default;
         }
 
         protected override string GetSummary()

@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -40,11 +40,11 @@ namespace ShareX
             {
                 CleanupAppTempFolder();
 
-                if (Program.Settings != null)
+                if (ApplicationState.SettingsOrNull is { } settings)
                 {
-                    int keepFileCount = Math.Max(Program.Settings.CleanupKeepFileCount, 0);
+                    int keepFileCount = Math.Max(settings.CleanupKeepFileCount, 0);
 
-                    if (Program.Settings.AutoCleanupBackupFiles)
+                    if (settings.AutoCleanupBackupFiles)
                     {
                         CleanupFolder(SettingManager.BackupFolder, "ApplicationConfig-*.json", keepFileCount);
                         CleanupFolder(SettingManager.BackupFolder, "HotkeysConfig-*.json", keepFileCount);
@@ -52,9 +52,9 @@ namespace ShareX
                         CleanupFolder(SettingManager.BackupFolder, "History-*.json", keepFileCount);
                     }
 
-                    if (Program.Settings.AutoCleanupLogFiles)
+                    if (settings.AutoCleanupLogFiles)
                     {
-                        CleanupFolder(Program.LogsFolder, "ShareX-Log-*.txt", keepFileCount);
+                        CleanupFolder(AppPaths.LogsFolder, "ShareX-Log-*.txt", keepFileCount);
                     }
                 }
             }

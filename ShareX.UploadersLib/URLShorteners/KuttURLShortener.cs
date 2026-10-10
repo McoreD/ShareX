@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,18 +25,13 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Specialized;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.URLShorteners
 {
     public class KuttURLShortenerService : URLShortenerService
     {
         public override UrlShortenerType EnumValue { get; } = UrlShortenerType.Kutt;
-
-        public override Image ServiceImage => Resources.Kutt;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -47,8 +42,6 @@ namespace ShareX.UploadersLib.URLShorteners
         {
             return new KuttURLShortener(config.KuttSettings);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpKutt;
     }
 
     public sealed class KuttURLShortener : URLShortener
@@ -60,14 +53,14 @@ namespace ShareX.UploadersLib.URLShorteners
             Settings = settings;
         }
 
-        public override UploadResult ShortenURL(string url)
+        protected override async Task<UploadResult> ShortenURLCoreAsync(string url, CancellationToken cancellationToken)
         {
             UploadResult result = new UploadResult { URL = url };
-            result.ShortenedURL = Submit(url);
+            result.ShortenedURL = await SubmitAsync(url, cancellationToken).ConfigureAwait(false);
             return result;
         }
 
-        public string Submit(string url)
+        public async Task<string> SubmitAsync(string url, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(Settings.Host))
             {
@@ -94,7 +87,8 @@ namespace ShareX.UploadersLib.URLShorteners
             NameValueCollection headers = new NameValueCollection();
             headers.Add("X-API-KEY", Settings.APIKey);
 
-            string response = SendRequest(HttpMethod.POST, requestURL, json, RequestHelpers.ContentTypeJSON, headers: headers);
+            string response = await SendRequestAsync(HttpMethod.POST, requestURL, json, RequestHelpers.ContentTypeJSON, headers: headers,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(response))
             {

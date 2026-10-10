@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -23,20 +23,15 @@
 
 #endregion License Information (GPL v3)
 
-using ShareX.UploadersLib.Properties;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class EmailFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.Email;
-
-        public override Image ServiceImage => Resources.mail;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -60,37 +55,37 @@ namespace ShareX.UploadersLib.FileUploaders
             }
             else
             {
-                using (EmailForm emailForm = new EmailForm(config.EmailRememberLastTo ? config.EmailLastTo : "", config.EmailDefaultSubject, config.EmailDefaultBody))
-                {
-                    if (emailForm.ShowDialog() == DialogResult.OK)
-                    {
-                        if (config.EmailRememberLastTo)
-                        {
-                            config.EmailLastTo = emailForm.ToEmail;
-                        }
+                EmailWindowResult emailResult = EmailWindowIntegration.Show(
+                    config.EmailRememberLastTo ? config.EmailLastTo : "",
+                    config.EmailDefaultSubject,
+                    config.EmailDefaultBody);
 
-                        return new Email()
-                        {
-                            SmtpServer = config.EmailSmtpServer,
-                            SmtpPort = config.EmailSmtpPort,
-                            FromEmail = config.EmailFrom,
-                            Password = config.EmailPassword,
-                            ToEmail = emailForm.ToEmail,
-                            Subject = emailForm.Subject,
-                            Body = emailForm.Body
-                        };
-                    }
-                    else
+                if (emailResult != null)
+                {
+                    if (config.EmailRememberLastTo)
                     {
-                        taskInfo.StopRequested = true;
+                        config.EmailLastTo = emailResult.ToEmail;
                     }
+
+                    return new Email()
+                    {
+                        SmtpServer = config.EmailSmtpServer,
+                        SmtpPort = config.EmailSmtpPort,
+                        FromEmail = config.EmailFrom,
+                        Password = config.EmailPassword,
+                        ToEmail = emailResult.ToEmail,
+                        Subject = emailResult.Subject,
+                        Body = emailResult.Body
+                    };
+                }
+                else
+                {
+                    taskInfo.StopRequested = true;
                 }
             }
 
             return null;
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpEmail;
     }
 
     public class Email : FileUploader
@@ -142,10 +137,11 @@ namespace ShareX.UploadersLib.FileUploaders
             }
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             Send(ToEmail, Subject, Body, stream, fileName);
-            return new UploadResult { IsURLExpected = false };
+            return Task.FromResult(new UploadResult { IsURLExpected = false });
         }
     }
 }

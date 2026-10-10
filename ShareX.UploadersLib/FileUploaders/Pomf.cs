@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,19 +25,14 @@
 
 using Newtonsoft.Json;
 using ShareX.HelpersLib;
-using ShareX.UploadersLib.Properties;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 
 namespace ShareX.UploadersLib.FileUploaders
 {
     public class PomfFileUploaderService : FileUploaderService
     {
         public override FileDestination EnumValue { get; } = FileDestination.Pomf;
-
-        public override Icon ServiceIcon => Resources.Pomf;
 
         public override bool CheckConfig(UploadersConfig config)
         {
@@ -48,8 +43,6 @@ namespace ShareX.UploadersLib.FileUploaders
         {
             return new Pomf(config.PomfUploader);
         }
-
-        public override TabPage GetUploadersConfigTabPage(UploadersConfigForm form) => form.tpPomf;
     }
 
     public class Pomf : FileUploader
@@ -61,9 +54,10 @@ namespace ShareX.UploadersLib.FileUploaders
             Uploader = uploader;
         }
 
-        public override UploadResult Upload(Stream stream, string fileName)
+        protected override async Task<UploadResult> UploadCoreAsync(Stream stream, string fileName, CancellationToken cancellationToken)
         {
-            UploadResult result = SendRequestFile(Uploader.UploadURL, stream, fileName, "files[]");
+            UploadResult result = await SendRequestFileAsync(Uploader.UploadURL, stream, fileName, "files[]",
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {

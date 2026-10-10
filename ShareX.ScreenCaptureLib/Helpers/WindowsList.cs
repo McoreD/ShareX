@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -64,7 +64,8 @@ namespace ShareX.ScreenCaptureLib
 
         private bool IsValidWindow(WindowInfo window)
         {
-            return window != null && window.IsVisible && !string.IsNullOrEmpty(window.Text) && IsClassNameAllowed(window) && window.Rectangle.IsValid();
+            return window != null && window.IsVisible && !window.IsCloaked && !string.IsNullOrEmpty(window.Text) &&
+                IsClassNameAllowed(window) && window.Rectangle.IsValid();
         }
 
         private bool IsClassNameAllowed(WindowInfo window)

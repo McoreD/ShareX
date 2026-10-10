@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,13 +24,13 @@
 #endregion License Information (GPL v3)
 
 using System;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Bitmap = SkiaSharp.SKBitmap;
 
 namespace ShareX.HelpersLib
 {
@@ -99,7 +99,8 @@ namespace ShareX.HelpersLib
 
                             try
                             {
-                                bmp = new Bitmap(memoryStream);
+                                bmp = SkiaImageHelpers.Decode(memoryStream);
+                                memoryStream.Dispose();
                             }
                             catch
                             {
@@ -166,7 +167,7 @@ namespace ShareX.HelpersLib
 
                                 using (MemoryStream ms = new MemoryStream(dataBytes))
                                 {
-                                    return new Bitmap(ms);
+                                    return SkiaImageHelpers.Decode(ms);
                                 }
                             }
                             catch

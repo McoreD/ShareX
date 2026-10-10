@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2025 ShareX Team
+    Copyright (c) 2007-2026 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -26,7 +26,6 @@
 using Microsoft.Win32;
 using ShareX.HelpersLib;
 using System;
-using System.Windows.Forms;
 
 #if MicrosoftStore
 using Windows.ApplicationModel;
@@ -48,7 +47,7 @@ namespace ShareX
 #if STEAM
                 return FileHelpers.GetAbsolutePath("../ShareX_Launcher.exe");
 #else
-                return Application.ExecutablePath;
+                return Environment.ProcessPath;
 #endif
             }
         }
