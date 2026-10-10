@@ -23,7 +23,6 @@
 
 #endregion License Information (GPL v3)
 
-using ShareX.EditorInterop;
 using ShareX.HelpersLib;
 using ShareX.HistoryLib;
 using ShareX.ImageEffectsLib;
@@ -1207,26 +1206,27 @@ namespace ShareX
 
             worker.DoWork += () =>
             {
-                byte[] inputBytes = null;
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    bmp.Save(ms, ImageFormat.Png);
-                    inputBytes = ms.ToArray();
-                }
-
-                var task = AvaloniaAppHost.RequestEditAsync(inputBytes);
-                task.Wait();
-
-                if (task.Result != null)
-                {
-                    bmp?.Dispose();
-                    using (MemoryStream ms = new MemoryStream(task.Result))
-                    using (Bitmap temp = new Bitmap(ms))
-                    {
-                        bmp = new Bitmap(temp);
-                    }
-                    return;
-                }
+                // Editor feature disabled in this build
+                // byte[] inputBytes = null;
+                // using (MemoryStream ms = new MemoryStream())
+                // {
+                //     bmp.Save(ms, ImageFormat.Png);
+                //     inputBytes = ms.ToArray();
+                // }
+                //
+                // var task = AvaloniaAppHost.RequestEditAsync(inputBytes);
+                // task.Wait();
+                //
+                // if (task.Result != null)
+                // {
+                //     bmp?.Dispose();
+                //     using (MemoryStream ms = new MemoryStream(task.Result))
+                //     using (Bitmap temp = new Bitmap(ms))
+                //     {
+                //         bmp = new Bitmap(temp);
+                //     }
+                //     return;
+                // }
 
                 bmp = AnnotateImage(bmp, filePath, taskSettings);
             };

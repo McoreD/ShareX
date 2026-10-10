@@ -349,7 +349,7 @@ namespace ShareX
             }
 
             // Initialize Avalonia for the editor window
-            EditorInterop.AvaloniaAppHost.Initialize();
+            // EditorInterop.AvaloniaAppHost.Initialize();
 
             if (Program.SteamFirstTimeConfig)
             {
@@ -1277,7 +1277,11 @@ namespace ShareX
 
         protected override void SetVisibleCore(bool value)
         {
-            if (value && !IsHandleCreated && (Program.SilentRun || Program.Settings.SilentRun) && Program.Settings.ShowTray)
+            // Check if there's a command-line flag to force show the window
+            bool forceShow = Program.CLI != null && Program.CLI.IsCommandExist("show", "show-window");
+            
+            // Only hide if: we want to show AND handle not created AND not force show AND (silent mode enabled OR settings say silent) AND settings say show tray
+            if (value && !IsHandleCreated && !forceShow && (Program.SilentRun || (Program.Settings != null && Program.Settings.SilentRun)) && (Program.Settings != null && Program.Settings.ShowTray))
             {
                 CreateHandle();
                 value = false;
@@ -2374,7 +2378,8 @@ namespace ShareX
             {
                 try 
                 {
-                    EditorInterop.AvaloniaAppHost.OpenEditor(uim.SelectedItem.Info.FilePath);
+                    // EditorInterop.AvaloniaAppHost.OpenEditor(uim.SelectedItem.Info.FilePath);
+                    MessageBox.Show("Editor feature not available in this build.", "ShareX", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {

@@ -268,101 +268,131 @@ namespace ShareX
         [STAThread]
         private static void Main(string[] args)
         {
-            StartupWork();
+            try
+            {
+                StartupWork();
 
-            StartTimer = Stopwatch.StartNew();
+                StartTimer = Stopwatch.StartNew();
 
-            CLI = new ShareXCLIManager(args);
-            CLI.ParseCommands();
+                CLI = new ShareXCLIManager(args);
+                CLI.ParseCommands();
 
 #if STEAM
-            if (CheckUninstall()) return; // Steam will run ShareX with -Uninstall when uninstalling
+                if (CheckUninstall()) return; // Steam will run ShareX with -Uninstall when uninstalling
 #endif
 
-            SystemOptions.UpdateSystemOptions();
-            UpdatePersonalPath();
+                SystemOptions.UpdateSystemOptions();
+                UpdatePersonalPath();
 
-            DebugHelper.Init(LogsFilePath);
+                DebugHelper.Init(LogsFilePath);
 
-            IsAdmin = Helpers.IsAdministrator();
-            MultiInstance = CLI.IsCommandExist("multi", "m");
+                IsAdmin = Helpers.IsAdministrator();
+                MultiInstance = CLI.IsCommandExist("multi", "m");
 
-            using (SingleInstanceManager singleInstanceManager = new SingleInstanceManager(MutexName, PipeName, !MultiInstance, args))
-            {
-                if (!singleInstanceManager.IsSingleInstance || singleInstanceManager.IsFirstInstance)
+                using (SingleInstanceManager singleInstanceManager = new SingleInstanceManager(MutexName, PipeName, !MultiInstance, args))
                 {
-                    singleInstanceManager.ArgumentsReceived += SingleInstanceManager_ArgumentsReceived;
-
-                    using (TimerResolutionManager timerResolutionManager = new TimerResolutionManager())
+                    if (!singleInstanceManager.IsSingleInstance || singleInstanceManager.IsFirstInstance)
                     {
-                        Run();
-                    }
+                        singleInstanceManager.ArgumentsReceived += SingleInstanceManager_ArgumentsReceived;
 
-                    if (restartRequested)
-                    {
-                        DebugHelper.WriteLine("ShareX restarting.");
-
-                        if (restartAsAdmin)
+                        using (TimerResolutionManager timerResolutionManager = new TimerResolutionManager())
                         {
-                            TaskHelpers.RunShareXAsAdmin("-silent");
+                            Run();
                         }
-                        else
+
+                        if (restartRequested)
                         {
-                            Process.Start(Application.ExecutablePath);
+                            DebugHelper.WriteLine("ShareX restarting.");
+
+                            if (restartAsAdmin)
+                            {
+                                TaskHelpers.RunShareXAsAdmin("-silent");
+                            }
+                            else
+                            {
+                                Process.Start(Application.ExecutablePath);
+                            }
                         }
                     }
                 }
-            }
 
-            DebugHelper.Flush();
+                DebugHelper.Flush();
+            }
+            catch (Exception ex)
+            {
+                string errorFile = Path.Combine(Path.GetTempPath(), "ShareX_startup_error.txt");
+                try
+                {
+                    File.WriteAllText(errorFile, "ShareX Startup Error:\r\n" + ex.ToString());
+                }
+                catch { }
+                throw;
+            }
         }
 
         private static void Run()
         {
-            ApplicationConfiguration.Initialize();
-
-            DebugHelper.WriteLine("ShareX starting.");
-            DebugHelper.WriteLine("Version: " + VersionText);
-            DebugHelper.WriteLine("Build: " + Build);
-            DebugHelper.WriteLine("Command line: " + Environment.CommandLine);
-            DebugHelper.WriteLine("Personal path: " + PersonalFolder);
-            if (!string.IsNullOrEmpty(PersonalPathDetectionMethod))
+            try
             {
-                DebugHelper.WriteLine("Personal path detection method: " + PersonalPathDetectionMethod);
+                ApplicationConfiguration.Initialize();
             }
-            DebugHelper.WriteLine("Operating system: " + Helpers.GetOperatingSystemProductName(true));
-            DebugHelper.WriteLine(".NET version: " + Environment.Version);
-            DebugHelper.WriteLine("Running as elevated process: " + IsAdmin);
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("FATAL: ApplicationConfiguration.Initialize() failed: " + ex);
+                Environment.Exit(1);
+            }
 
-            SilentRun = CLI.IsCommandExist("silent", "s");
+            try
+            {
+                DebugHelper.WriteLine("ShareX starting.");
+                DebugHelper.WriteLine("Version: " + VersionText);
+                DebugHelper.WriteLine("Build: " + Build);
+                DebugHelper.WriteLine("Command line: " + Environment.CommandLine);
+                DebugHelper.WriteLine("Personal path: " + PersonalFolder);
+                if (!string.IsNullOrEmpty(PersonalPathDetectionMethod))
+                {
+                    DebugHelper.WriteLine("Personal path detection method: " + PersonalPathDetectionMethod);
+                }
+                DebugHelper.WriteLine("Operating system: " + Helpers.GetOperatingSystemProductName(true));
+                DebugHelper.WriteLine(".NET version: " + Environment.Version);
+                DebugHelper.WriteLine("Running as elevated process: " + IsAdmin);
+
+                SilentRun = CLI.IsCommandExist("silent", "s");
 #if MicrosoftStore
-            SilentRun = SilentRun || AppInstance.GetActivatedEventArgs()?.Kind == ActivationKind.StartupTask;
+                SilentRun = SilentRun || AppInstance.GetActivatedEventArgs()?.Kind == ActivationKind.StartupTask;
 #endif
 
 #if STEAM
-            SteamFirstTimeConfig = CLI.IsCommandExist("SteamConfig");
+                SteamFirstTimeConfig = CLI.IsCommandExist("SteamConfig");
 #endif
 
-            IgnoreHotkeyWarning = CLI.IsCommandExist("NoHotkeys");
+                IgnoreHotkeyWarning = CLI.IsCommandExist("NoHotkeys");
 
-            CreateParentFolders();
-            RegisterExtensions();
-            CheckPuushMode();
-            DebugWriteFlags();
+                CreateParentFolders();
+                RegisterExtensions();
+                CheckPuushMode();
+                DebugWriteFlags();
 
-            SettingManager.LoadInitialSettings();
+                SettingManager.LoadInitialSettings();
 
-            UpdateManager = new ShareXUpdateManager();
-            LanguageHelper.ChangeLanguage(Settings.Language);
-            CleanupManager.CleanupAsync();
+                UpdateManager = new ShareXUpdateManager();
+                LanguageHelper.ChangeLanguage(Settings.Language);
+                CleanupManager.CleanupAsync();
 
-            DebugHelper.WriteLine("MainForm init started.");
-            MainForm = new MainForm();
-            DebugHelper.WriteLine("MainForm init finished.");
+                DebugHelper.WriteLine("MainForm init started.");
+                MainForm = new MainForm();
+                DebugHelper.WriteLine("MainForm init finished.");
 
-            Application.Run(MainForm);
+                Application.Run(MainForm);
 
-            CloseSequence();
+                CloseSequence();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("FATAL: Exception during Run(): " + ex);
+                DebugHelper.WriteException(ex);
+                throw;
+            }
         }
 
         public static void CloseSequence()
@@ -627,33 +657,41 @@ namespace ShareX
 
         private static void StartupWork()
         {
-            AssemblyLoadContext.Default.Resolving += (ctx, asmName) =>
+            try
             {
-                if (string.IsNullOrEmpty(asmName.CultureName) || !asmName.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                AssemblyLoadContext.Default.Resolving += (ctx, asmName) =>
                 {
-                    return null;
-                }
+                    if (string.IsNullOrEmpty(asmName.CultureName) || !asmName.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return null;
+                    }
 
-                string baseDir = AppContext.BaseDirectory;
-                string path = Path.Combine(baseDir, "Languages", asmName.CultureName, asmName.Name + ".dll");
-                return File.Exists(path) ? ctx.LoadFromAssemblyPath(path) : null;
-            };
+                    string baseDir = AppContext.BaseDirectory;
+                    string path = Path.Combine(baseDir, "Languages", asmName.CultureName, asmName.Name + ".dll");
+                    return File.Exists(path) ? ctx.LoadFromAssemblyPath(path) : null;
+                };
 
 #if DEBUG
-            if (Debugger.IsAttached)
-            {
-                return;
-            }
+                if (Debugger.IsAttached)
+                {
+                    return;
+                }
 #endif
 
-            // Add the event handler for handling UI thread exceptions to the event
-            Application.ThreadException += Application_ThreadException;
+                // Add the event handler for handling UI thread exceptions to the event
+                Application.ThreadException += Application_ThreadException;
 
-            // Set the unhandled exception mode to force all Windows Forms errors to go through our handler
-            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+                // Set the unhandled exception mode to force all Windows Forms errors to go through our handler
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
-            // Add the event handler for handling non-UI thread exceptions to the event
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+                // Add the event handler for handling non-UI thread exceptions to the event
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Error during startup work initialization: " + ex.ToString());
+                throw;
+            }
         }
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
@@ -668,7 +706,14 @@ namespace ShareX
 
         private static void OnError(Exception e)
         {
-            using (ErrorForm errorForm = new ErrorForm(e.Message, $"{e}\r\n\r\n{Title}", LogsFilePath, Links.GitHubIssues))
+            string errorMessage = $"{e.Message}\r\n\r\n{e}\r\n\r\n{Title}";
+            
+            // Output to console for debugging
+            Console.Error.WriteLine("=== ShareX Error ===");
+            Console.Error.WriteLine(errorMessage);
+            Console.Error.WriteLine("====================");
+            
+            using (ErrorForm errorForm = new ErrorForm(e.Message, errorMessage, LogsFilePath, Links.GitHubIssues))
             {
                 errorForm.ShowDialog();
             }
